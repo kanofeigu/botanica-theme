@@ -325,6 +325,8 @@
       "price_min": "Min price",
       "price_max": "Max price",
       "price_label": "Price",
+      "from": "From",
+      "to": "To",
       "price_any": "Any price",
       "price_under_html": "Under {{ amount }}",
       "price_between_html": "{{ lo }} – {{ hi }}",

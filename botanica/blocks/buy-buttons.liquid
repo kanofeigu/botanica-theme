@@ -21,9 +21,6 @@
           class="bt-qty__input"
           value="1"
           min="1"
-          {% comment %}theme-check-disable UndefinedObject{% endcomment %}
-          form="{{ product_form_id }}"
-          {% comment %}theme-check-enable UndefinedObject{% endcomment %}
         >
         <button type="button" class="bt-qty__btn" name="plus" aria-label="{{ 'products.product.quantity.increase' | t: product: product.title | escape }}">
           <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg>
@@ -38,9 +35,6 @@
       name="add"
       class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block"
       data-atc-button
-      {% comment %}theme-check-disable UndefinedObject{% endcomment %}
-      form="{{ product_form_id }}"
-      {% comment %}theme-check-enable UndefinedObject{% endcomment %}
       {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
       aria-label="{{ 'products.product.add_to_cart' | t }}"
     >

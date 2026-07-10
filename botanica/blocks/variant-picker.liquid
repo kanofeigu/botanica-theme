@@ -54,7 +54,6 @@
                 type="radio"
                 name="{{ option.name | escape }}"
                 value="{{ value | escape }}"
-                form="{{ product_form_id }}"
                 {% if option.selected_value == value %}checked{% endif %}
                 {% if is_unavailable %}disabled{% endif %}
                 {% if is_unavailable %}aria-disabled="true"{% endif %}

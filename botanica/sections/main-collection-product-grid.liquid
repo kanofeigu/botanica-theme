@@ -137,87 +137,50 @@
                       {%- endfor -%}
                     {%- when 'price_range' -%}
                       {%- liquid
-                        assign range_max_val = filter.range_max | divided_by: 100.0
-                        assign cur_min = filter.min_value.value | divided_by: 100.0
-                        assign cur_max = filter.max_value.value | divided_by: 100.0
-                        assign current_key = ''
-                        assign current_label = 'collections.filters.price_any' | t
-                        if cur_min > 0 or cur_max < range_max_val
-                          assign current_key = cur_min | round | append: '-' | append: cur_max | round
+                        assign max_price = filter.range_max | divided_by: 100.0 | ceil
+                        assign min_value = filter.min_value.value | default: 0 | divided_by: 100.0
+                        assign max_value = filter.max_value.value | default: filter.range_max | divided_by: 100.0
+                        if min_value < 0
+                          assign min_value = 0
                         endif
-                        assign base_url = filter.url_to_remove | default: collection.url | split: '?' | first
-                        assign sort_param = collection.sort_by | default: collection.default_sort_by
-
-                        # Build the option list up front so we can compute the current label.
-                        # Tiers tuned to the $20-$58 product range: < $25, $25-$50, > $50.
-                        # NOTE: money filters expect CENTS, so multiply by 100.
-                        assign price_options = ''
-                        assign steps = '25,50' | split: ','
-                        assign prev = 0
-                        for step in steps
-                          assign step_n = step | plus: 0
-                          assign key = prev | append: '-' | append: step_n
-                          assign step_cents = step_n | times: 100
-                          if prev == 0
-                            assign lbl = 'collections.filters.price_under_html' | t: amount: step_cents | money
-                          else
-                            assign prev_cents = prev | times: 100
-                            assign lo_formatted = prev_cents | money
-                            assign hi_formatted = step_cents | money
-                            assign lbl = 'collections.filters.price_between_html' | t: lo: lo_formatted, hi: hi_formatted
-                          endif
-                          assign url = base_url | append: '?filter.v.price.gte=' | append: prev | append: '&filter.v.price.lte=' | append: step_n
-                          if sort_param != blank
-                            assign url = url | append: '&sort_by=' | append: sort_param
-                          endif
-                          assign price_options = price_options | append: key | append: '~~' | append: lbl | append: '~~' | append: url | append: '|||'
-                          if current_key == key
-                            assign current_label = lbl
-                          endif
-                          assign prev = step_n
-                        endfor
-                        assign over_key = prev | append: '-' | append: range_max_val | round
-                        assign over_cents = prev | times: 100
-                        assign over_lbl = 'collections.filters.price_over_html' | t: amount: over_cents | money
-                        assign over_url = base_url | append: '?filter.v.price.gte=' | append: prev | append: '&filter.v.price.lte=' | append: range_max_val | round
-                        if sort_param != blank
-                          assign over_url = over_url | append: '&sort_by=' | append: sort_param
-                        endif
-                        assign price_options = price_options | append: over_key | append: '~~' | append: over_lbl | append: '~~' | append: over_url
-                        if current_key == over_key
-                          assign current_label = over_lbl
-                        endif
-                        assign opt_list = price_options | split: '|||'
                       -%}
-                      <div class="bt-price-popover bt-sort" data-price-popover>
-                        <button type="button" class="bt-sort__button bt-interactive" data-price-button aria-haspopup="listbox" aria-expanded="false" aria-label="{{ 'collections.filters.price_label' | t }}">
-                          <span class="bt-sort__label">
-                            <span class="bt-sort__label-prefix">{{ 'collections.filters.price_label' | t }}:</span>
-                            <span class="bt-sort__label-value" data-price-current>{{ current_label }}</span>
-                          </span>
-                          <svg class="bt-sort__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-                        </button>
-                        <div class="bt-sort__menu" data-price-menu role="listbox" aria-label="{{ 'collections.filters.price_label' | t }}" hidden>
-                          <a href="{{ base_url }}{% if sort_param != blank %}?sort_by={{ sort_param }}{% endif %}" class="bt-sort__option{% if current_key == blank %} is-selected{% endif %}" role="option" {% if current_key == blank %}aria-selected="true"{% endif %} data-price-option data-price-label="{{ 'collections.filters.price_any' | t }}">
-                            <span>{{ 'collections.filters.price_any' | t }}</span>
-                            <svg class="bt-sort__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                          </a>
-                          {%- for opt in opt_list -%}
-                            {%- liquid
-                              assign parts = opt | split: '~~'
-              assign opt_key = parts[0]
-              assign opt_label = parts[1]
-              assign opt_url = parts[2]
-              assign is_sel = false
-              if current_key == opt_key
-                assign is_sel = true
-              endif
-                            -%}
-                            <a href="{{ opt_url }}" class="bt-sort__option{% if is_sel %} is-selected{% endif %}" role="option" {% if is_sel %}aria-selected="true"{% endif %} data-price-option data-price-label="{{ opt_label | escape }}">
-                              <span>{{ opt_label }}</span>
-                              <svg class="bt-sort__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                            </a>
-                          {%- endfor -%}
+                      <div class="bt-price-range">
+                        <div class="bt-price-range__field">
+                          <label class="bt-price-range__label" for="Filter-Price-GTE">{{ 'collections.filters.from' | t }}</label>
+                          <div class="bt-price-range__input-wrap">
+                            <span class="bt-price-range__currency">{{ cart.currency.symbol }}</span>
+                            <input
+                              class="bt-price-range__input"
+                              name="{{ filter.min_value.param_name }}"
+                              id="Filter-Price-GTE"
+                              value="{% if min_value > 0 %}{{ min_value | round }}{% endif %}"
+                              type="number"
+                              inputmode="decimal"
+                              placeholder="0"
+                              min="0"
+                              max="{{ max_price }}"
+                              data-price-min
+                            >
+                          </div>
+                        </div>
+                        <span class="bt-price-range__sep" aria-hidden="true">—</span>
+                        <div class="bt-price-range__field">
+                          <label class="bt-price-range__label" for="Filter-Price-LTE">{{ 'collections.filters.to' | t }}</label>
+                          <div class="bt-price-range__input-wrap">
+                            <span class="bt-price-range__currency">{{ cart.currency.symbol }}</span>
+                            <input
+                              class="bt-price-range__input"
+                              name="{{ filter.max_value.param_name }}"
+                              id="Filter-Price-LTE"
+                              value="{% if max_value < filter.range_max %}{{ max_value | round }}{% endif %}"
+                              type="number"
+                              inputmode="decimal"
+                              placeholder="{{ max_price }}"
+                              min="0"
+                              max="{{ max_price }}"
+                              data-price-max
+                            >
+                          </div>
                         </div>
                       </div>
                   {%- endcase -%}
@@ -392,19 +355,6 @@
             ajaxNavigate(urlWithSort(sortVal));
           });
         }
-        /* Price options: AJAX navigate via the option's href.
-           Price popover portals to body so the link is outside
-           .bt-collection-grid — the global click delegation won't
-           catch it, so we handle it here. */
-        if (opt.hasAttribute('data-price-option')) {
-          opt.addEventListener('click', function (e) {
-            var href = opt.getAttribute('href');
-            if (!href || href === '#') return;
-            e.preventDefault();
-            hide();
-            ajaxNavigate(href);
-          });
-        }
       });
       root.addEventListener('mouseleave', function () {
         if (!currentEl) return;
@@ -420,7 +370,7 @@
       /* Clean up any orphaned portal menus left on body from previous AJAX swap */
       document.querySelectorAll('body > .bt-sort__menu').forEach(function (m) {
         /* only remove if its original parent is gone (stale) */
-        if (!m.closest('.bt-collection-grid') && !m.closest('[data-sort]') && !m.closest('[data-price-popover]')) {
+        if (!m.closest('.bt-collection-grid') && !m.closest('[data-sort]')) {
           m.remove();
         }
       });
@@ -428,13 +378,6 @@
         if (root._btPopoverInit) return; root._btPopoverInit = true;
         setupPopover(root, '[data-sort-button]', '[data-sort-menu]', {
           currentSel: '[data-sort-current]', optionSel: '[data-sort-option]'
-        });
-      });
-      document.querySelectorAll('[data-price-popover]').forEach(function (root) {
-        if (root._btPopoverInit) return; root._btPopoverInit = true;
-        setupPopover(root, '[data-price-button]', '[data-price-menu]', {
-          currentSel: '[data-price-current]', optionSel: '[data-price-option]',
-          labelAttr: 'data-price-label', matchWidth: true
         });
       });
     }
@@ -483,8 +426,6 @@
         if (link.target === '_blank' || link.hasAttribute('download')) return;
         /* skip sort options (handled by their own click handler) */
         if (link.hasAttribute('data-sort-value')) return;
-        /* skip price options (handled by popover click handler) */
-        if (link.hasAttribute('data-price-option')) return;
         /* skip product links — navigate normally to PDP */
         if (href.indexOf('/products/') !== -1) return;
         e.preventDefault();
@@ -499,6 +440,34 @@
         if (!url) return;
         ajaxNavigate(url);
       });
+
+      /* Price range ── debounced AJAX on input */
+      var priceTimer = null;
+      document.addEventListener('input', function (e) {
+        var inp = e.target;
+        if (!inp.hasAttribute('data-price-min') && !inp.hasAttribute('data-price-max')) return;
+        clearTimeout(priceTimer);
+        priceTimer = setTimeout(function () {
+          applyPriceRange();
+        }, 350);
+      });
+      function applyPriceRange() {
+        var minInp = document.querySelector('[data-price-min]');
+        var maxInp = document.querySelector('[data-price-max]');
+        var minVal = minInp ? parseFloat(minInp.value) || 0 : 0;
+        var maxVal = maxInp ? parseFloat(maxInp.value) || 0 : 0;
+        var maxLimit = maxInp ? parseFloat(maxInp.getAttribute('max')) || 0 : 0;
+        var baseUrl = window.location.pathname + window.location.search;
+        /* strip existing price params */
+        baseUrl = baseUrl.replace(/[?&]filter\.v\.price\.gte=[^&]*/g, '').replace(/[?&]filter\.v\.price\.lte=[^&]*/g, '').replace(/&&/g, '&').replace(/\?&/, '?').replace(/[?&]$/, '');
+        var sep = baseUrl.indexOf('?') === -1 ? '?' : '&';
+        var url = baseUrl;
+        if (minVal > 0) { url += sep + 'filter.v.price.gte=' + minVal; sep = '&'; }
+        if (maxVal > 0 && maxVal < maxLimit) { url += sep + 'filter.v.price.lte=' + maxVal; sep = '&'; }
+        if (url !== window.location.pathname + window.location.search) {
+          ajaxNavigate(url);
+        }
+      }
 
       window.addEventListener('popstate', function (e) {
         ajaxNavigate(window.location.href, false);
@@ -525,10 +494,54 @@
       });
     }
 
+    /* ════════════════════════════════════════════
+       QUICK-ADD TO CART (AJAX)
+       ════════════════════════════════════════════ */
+    function initQuickAdd() {
+      var adding = false;
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.bt-card__quick-add');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var variantId = btn.getAttribute('data-variant-id');
+        if (!variantId || adding) return;
+        adding = true;
+        btn.classList.add('is-loading');
+        btn.disabled = true;
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: 1 })
+        })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (cart) {
+          btn.classList.remove('is-loading');
+          btn.classList.add('is-added');
+          btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          var countEl = document.querySelector('[data-cart-count]');
+          if (countEl) countEl.textContent = cart.item_count;
+          setTimeout(function () {
+            btn.classList.remove('is-added');
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg><span class="bt-sr-only">Add to cart</span>';
+            btn.disabled = false;
+            adding = false;
+          }, 1800);
+        })
+        .catch(function (err) {
+          console.warn('quick-add failed:', err);
+          btn.classList.remove('is-loading');
+          btn.disabled = false;
+          adding = false;
+        });
+      });
+    }
+
     function initAll() {
       initPopovers();
       initDetails();
       initMobileSidebar();
+      initQuickAdd();
     }
 
     initAll();
@@ -883,15 +896,63 @@
     font-variant-numeric: oldstyle-nums;
   }
 
-  /* Price popover reuses .bt-sort__* classes — align with sibling
-     filter group values (same padding-top, full-width button). */
-  .bt-price-popover { display: block; }
-  .bt-price-popover .bt-sort__button {
-    width: 100%;
-    justify-content: space-between;
+  /* Price range — native from/to inputs, merchant-configurable via Search & Discovery */
+  .bt-price-range {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--bt-space-xs);
     margin-top: var(--bt-space-xs);
   }
-  /* menu width set by JS to match button — no min-width override needed */
+  .bt-price-range__field {
+    flex: 1;
+    min-width: 0;
+  }
+  .bt-price-range__label {
+    display: block;
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    margin-bottom: 4px;
+  }
+  .bt-price-range__input-wrap {
+    display: flex;
+    align-items: center;
+    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border);
+    border-radius: var(--bt-radius-sm);
+    overflow: hidden;
+  }
+  .bt-price-range__currency {
+    padding: 0 8px;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    background: var(--bt-color-surface);
+    border-right: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border);
+    user-select: none;
+  }
+  .bt-price-range__input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    outline: none;
+    background: var(--bt-color-bg);
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text);
+    -moz-appearance: textfield;
+  }
+  .bt-price-range__input:focus,
+  .bt-price-range__input:focus-visible {
+    outline: none;
+  }
+  .bt-price-range__input::-webkit-inner-spin-button,
+  .bt-price-range__input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .bt-price-range__sep {
+    padding-bottom: 8px;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    flex-shrink: 0;
+  }
 
   /* ════════════════════════════════════════════
      EMPTY STATE

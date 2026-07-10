@@ -24,6 +24,8 @@
 | **[12-FEATURE-DESCRIPTIONS.md](12-FEATURE-DESCRIPTIONS.md)** | 项目功能详细描述：F01–F17 每个功能的用途、实现方式、关联功能 | AI / 开发者 / 产品 |
 | **[13-BUG-LOG.md](13-BUG-LOG.md)** | Bug 日志：历史 bug 记录（原因→修复→文件→结果），防止重复踩坑 | AI / 开发者 |
 | **[16-API-REFERENCE.md](16-API-REFERENCE.md)** | ★ API 参考 & 项目技巧：认证、GraphQL 常用操作、REST 备选、脚本模板、避坑速查 | AI / 开发者 |
+| **[17-STORE-OPERATIONS.md](17-STORE-OPERATIONS.md)** | ★ 商店操作：推送、预览、编辑器、API Token、打包等常用命令 | AI / 开发者 |
+| **[18-AUDIT-METHODOLOGY.md](18-AUDIT-METHODOLOGY.md)** | ★ 功能审计方法：泛用的交互链路追踪法，适用于任何页面/功能 | AI / 开发者 |
 
 ---
 
@@ -57,6 +59,8 @@
 | 每个功能完整描述 | [[12-FEATURE-DESCRIPTIONS]] |
 | 历史 bug 记录 | [[13-BUG-LOG]] |
 | ★ API 认证、GraphQL 操作、脚本模板、避坑 | [[16-API-REFERENCE]] |
+| ★ 推送主题、打开预览/编辑器、API Token | [[17-STORE-OPERATIONS]] |
+| ★ 代码写完了，怎么验证功能真正可用 | [[18-AUDIT-METHODOLOGY]] |
 
 ---
 

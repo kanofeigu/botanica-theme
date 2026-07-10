@@ -1,0 +1,134 @@
+# Botanica v3 — 商店操作指令
+
+> 位置：`E:\ccfold\shopify\important\17-STORE-OPERATIONS.md`
+> 用途：推送主题、打开预览/编辑器、获取 API token 等日常操作
+> 最后更新：2026-07-10
+
+---
+
+## 商店信息
+
+| 项目 | 值 |
+|------|---|
+| 商店名 | kano-u93kwgf9.myshopify.com |
+| 主题 ID | 153451266239 |
+| 主题名 | botanica-3-0-0 |
+| 角色 | live（已发布） |
+
+---
+
+## 推送主题
+
+```bash
+# 必须加 --allow-live（因为主题是 live 状态，否则会弹交互确认）
+shopify theme push --path botanica --store kano-u93kwgf9.myshopify.com --theme 153451266239 --allow-live --json
+```
+
+> ⚠ `--allow-live` 只在主题已经是 live 时需要。如果是 dev 主题不需要。
+> ⚠ 不要混用 push/pull/dev，会丢 section group blocks（见 BUG-005）。
+
+---
+
+## 打开预览页面
+
+预览 URL 规则：`https://<store>/?preview_theme_id=<theme_id>`
+
+```bash
+# Windows — 在默认浏览器打开
+start "" "https://kano-u93kwgf9.myshopify.com/?preview_theme_id=153451266239"
+```
+
+或者直接打开某个页面预览：
+```bash
+start "" "https://kano-u93kwgf9.myshopify.com/collections/all-plants"
+```
+
+> 当前主题是 live 状态，直接访问商店 URL 即可看到最新推送效果，不需要 `?preview_theme_id` 参数。
+
+---
+
+## 打开主题编辑器
+
+编辑器 URL 规则：`https://admin.shopify.com/store/<store-handle>/themes/<theme_id>/editor`
+
+```bash
+# Windows — 在默认浏览器打开
+start "" "https://admin.shopify.com/store/kano-u93kwgf9/themes/153451266239/editor"
+```
+
+---
+
+## 获取 API Token（24h 过期）
+
+```bash
+curl -X POST https://kano-u93kwgf9.myshopify.com/admin/oauth/access_token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  -d "client_id=dce5a09c5535810dc0c67b0f13e3c8c6" \
+  -d "client_secret=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"
+```
+
+返回 `shpua_` token，有效期 24 小时。每次新会话可能需要重新获取。
+
+---
+
+## GraphQL 查询
+
+```bash
+TOKEN="shpua_xxx"
+
+# 查询
+curl -s -X POST "https://kano-u93kwgf9.myshopify.com/admin/api/2025-01/graphql.json" \
+  -H "X-Shopify-Access-Token: $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ products(first: 10) { edges { node { id title } } } }"}'
+
+# 修改（mutation）
+curl -s -X POST "https://kano-u93kwgf9.myshopify.com/admin/api/2025-01/graphql.json" \
+  -H "X-Shopify-Access-Token: $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"mutation { ... }"}'
+```
+
+---
+
+## 代码验证
+
+```bash
+# 单文件检查
+shopify theme check --path botanica
+
+# 完整验证管线（theme check + CSS 链接 + JSON/BOM）
+powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1
+```
+
+---
+
+## 主题打包
+
+```bash
+shopify theme package --path botanica
+```
+
+---
+
+## 快速双开（预览 + 编辑器）
+
+```bash
+start "" "https://kano-u93kwgf9.myshopify.com/collections/all-plants" && start "" "https://admin.shopify.com/store/kano-u93kwgf9/themes/153451266239/editor"
+```
+
+---
+
+## 常见问题
+
+| 问题 | 解决 |
+|------|------|
+| `shopify theme push` 弹交互确认 | 加 `--allow-live` |
+| push 后前台不更新 | 检查是否开了密码保护（password_enabled） |
+| API token 过期 | 重新获取（curl 见上） |
+| push/pull 后导航 blocks 丢失 | 只用 push，不要 pull（BUG-005） |
+
+---
+
+*关联文档：[[16-API-REFERENCE]] [[13-BUG-LOG]]*

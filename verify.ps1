@@ -89,8 +89,8 @@ $globalLinkedSet = [regex]::Matches($allLiquidContent, "'([a-zA-Z0-9_\-]+\.css)'
   ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
 
 foreach ($w in $globalWhitelist) {
-  if ($globalLinkedSet -notcontains $w) {
-    Write-Output ("  WARN: whitelist item not linked anywhere: " + $w + " — verify whether it still exists")
+  if (($globalLinkedSet -notcontains $w) -and (Test-Path -LiteralPath "$root\assets\$w")) {
+    Write-Output ("  WARN: whitelist CSS file exists but is not linked anywhere: " + $w)
   }
 }
 
@@ -153,7 +153,11 @@ foreach ($f in $jsonFiles) {
     $jsonIssues += [PSCustomObject]@{ File = $f.FullName; Problem = 'BOM detected' }
   }
   try {
-    $null = Get-Content -LiteralPath $f.FullName -Raw -Encoding utf8 | ConvertFrom-Json
+    $raw = Get-Content -LiteralPath $f.FullName -Raw -Encoding utf8
+    # Strip JSONC comments (Shopify supports them; PowerShell's parser does not)
+    $raw = $raw -replace '/\*[\s\S]*?\*/', ''  # block comments first
+    $raw = $raw -replace '(?m)^\s*//.*$', ''   # line comments (start-of-line only, safe from URLs)
+    $null = $raw | ConvertFrom-Json
   } catch {
     $jsonIssues += [PSCustomObject]@{ File = $f.FullName; Problem = ('JSON parse error: ' + $_.Exception.Message) }
   }
