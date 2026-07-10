@@ -1,0 +1,71 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "rich-text-header": {
+      "type": "rich-text",
+      "blocks": {
+        "eyebrow_blog": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "The Field Journal"
+          }
+        },
+        "heading_blog": {
+          "type": "heading",
+          "settings": {
+            "text": "Plant science, care guides & botanical stories"
+          }
+        },
+        "text_blog": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From photosynthesis deep-dives to troubleshooting yellow leaves — every article is written by our greenhouse team to help you grow with confidence.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_blog",
+        "heading_blog",
+        "text_blog"
+      ],
+      "settings": {
+        "padding_top": 44,
+        "padding_bottom": 12
+      }
+    },
+    "main": {
+      "type": "main-blog",
+      "settings": {
+        "articles_per_page": 6,
+        "columns_desktop": 3
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "New articles, straight to your inbox",
+        "description": "Plant science stories and care guides delivered monthly. No spam — just chlorophyll.",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "apps": {
+      "type": "apps",
+      "settings": {}
+    }
+  },
+  "order": [
+    "rich-text-header",
+    "main",
+    "newsletter",
+    "apps"
+  ]
+}

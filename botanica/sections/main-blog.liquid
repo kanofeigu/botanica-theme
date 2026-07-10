@@ -1,0 +1,124 @@
+{% comment %} main-blog.liquid — Editorial blog listing. Cover images, tag badges. Zero Dawn code. {% endcomment %}
+<div class="bt-section bt-blog" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+    <h1 class="bt-blog__title bt-h1 bt-text-center">{{ blog.title }}</h1>
+
+    {%- if blog.all_tags.size > 0 -%}
+      <div class="bt-blog__tags">
+        <a href="{{ blog.url }}" class="bt-badge{% unless current_tags %} bt-badge--primary{% else %} bt-badge--outline{% endunless %}">{{ 'blogs.article.view_all' | t }}</a>
+        {%- for tag in blog.all_tags -%}
+          <a href="{{ blog.url }}/tagged/{{ tag | handleize }}" class="bt-badge{% if current_tags contains tag %} bt-badge--primary{% else %} bt-badge--outline{% endif %}">{{ tag }}</a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- paginate blog.articles by section.settings.articles_per_page -%}
+      <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
+        {%- for article in blog.articles -%}
+          <article class="bt-card bt-blog-card">
+            <div class="bt-card__media bt-blog-card__media">
+              <a href="{{ article.url }}" aria-label="{{ article.title | escape }}">
+                {%- if article.image -%}
+                  {{ article.image | image_url: width: 800 | image_tag:
+                    loading: 'lazy',
+                    widths: '300, 400, 600, 800',
+                    sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                    alt: article.title | escape
+                  }}
+                {%- else -%}
+                  {%- assign cover_idx = forloop.index0 | modulo: 3 -%}
+                  {%- if cover_idx == 0 -%}
+                    <img src="{{ 'blog-cover-monstera.svg' | asset_url }}" alt="{{ article.title | escape }}" class="bt-blog-card__fallback" loading="lazy" width="800" height="500">
+                  {%- elsif cover_idx == 1 -%}
+                    <img src="{{ 'blog-cover-fungi.svg' | asset_url }}" alt="{{ article.title | escape }}" class="bt-blog-card__fallback" loading="lazy" width="800" height="500">
+                  {%- else -%}
+                    <img src="{{ 'blog-cover-toxicity.svg' | asset_url }}" alt="{{ article.title | escape }}" class="bt-blog-card__fallback" loading="lazy" width="800" height="500">
+                  {%- endif -%}
+                {%- endif -%}
+              </a>
+              {%- if article.tags.size > 0 -%}
+                <span class="bt-badge bt-blog-card__tag">{{ article.tags.first }}</span>
+              {%- endif -%}
+            </div>
+            <div class="bt-card__body">
+              <p class="bt-eyebrow">{{ article.published_at | date: '%B %d, %Y' }}</p>
+              <h2 class="bt-card__title">
+                <a href="{{ article.url }}">{{ article.title }}</a>
+              </h2>
+              {%- if article.excerpt_or_content.size > 0 -%}
+                <p class="bt-blog-card__excerpt">{{ article.excerpt_or_content | strip_html | truncatewords: 25 }}</p>
+              {%- endif -%}
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}
+        <div class="bt-blog__pagination">{% render 'pagination', paginate: paginate %}</div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-blog__title {
+    margin-bottom: var(--bt-space-md);
+  }
+  .bt-blog__tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--bt-space-2xs);
+    margin-bottom: var(--bt-space-xl);
+  }
+  .bt-blog__tags .bt-badge {
+    text-decoration: none;
+    transition: all var(--bt-duration-fast);
+  }
+  .bt-blog-card__media {
+    aspect-ratio: 8 / 5;
+    position: relative;
+    overflow: hidden;
+    background: var(--bt-color-surface);
+  }
+  .bt-blog-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--bt-duration-slow) var(--bt-ease-out);
+  }
+  .bt-blog-card__fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--bt-color-surface);
+  }
+  .bt-blog-card:hover .bt-blog-card__media img {
+    transform: scale(1.04);
+  }
+  .bt-blog-card__tag {
+    position: absolute;
+    top: var(--bt-space-2xs);
+    left: var(--bt-space-2xs);
+    z-index: 2;
+  }
+  .bt-blog-card__excerpt {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    line-height: var(--bt-lh-body);
+  }
+  .bt-blog__pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--bt-space-xl);
+  }
+  @media (max-width: 749px) {
+    .bt-blog-card__media { aspect-ratio: 8 / 5; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_blog.name", "settings": [
+  { "type": "range", "id": "articles_per_page", "min":3,"max":12,"step":3,"default":6,"label":"t:sections.main_blog.settings.articles_per_page.label" },
+  { "type": "range", "id": "columns_desktop", "min":1,"max":4,"step":1,"default":3,"label":"t:sections.main_blog.settings.columns_desktop.label" }
+], "presets": [{ "name": "t:sections.main_blog.name" }] }
+{% endschema %}

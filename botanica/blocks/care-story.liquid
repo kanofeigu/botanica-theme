@@ -1,0 +1,52 @@
+{% comment %}
+  blocks/care-story.liquid — Plant origin story / field note block
+  Editorial blockquote with source attribution.
+{% endcomment %}
+{%- if block.settings.story_text != blank -%}
+  <div class="bt-care-story" {{ block.shopify_attributes }}>
+    {%- if block.settings.story_label != blank -%}
+      <p class="bt-care-story__eyebrow bt-eyebrow">{{ block.settings.story_label | escape }}</p>
+    {%- endif -%}
+    <blockquote class="bt-care-story__quote">
+      {{ block.settings.story_text }}
+      {%- if block.settings.story_source != blank -%}
+        <cite class="bt-care-story__source">{{ block.settings.story_source | escape }}</cite>
+      {%- endif -%}
+    </blockquote>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-care-story {
+    padding: 1.25rem 0;
+  }
+  .bt-care-story__quote {
+    margin: 0;
+    padding: 1rem 0 0;
+    border-left: 3px solid var(--bt-color-secondary, #C97D5A);
+    padding-left: 1rem;
+    font-style: italic;
+    color: var(--bt-color-text, #2E2A24);
+    line-height: 1.7;
+  }
+  .bt-care-story__source {
+    display: block;
+    margin-top: 0.75rem;
+    font-style: normal;
+    font-size: var(--bt-fs-small);
+    color: var(--bt-color-text-muted, #4D4840);
+    font-weight: 600;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Care story",
+  "settings": [
+    { "type": "text", "id": "story_label", "label": "Label", "default": "Field note" },
+    { "type": "richtext", "id": "story_text", "label": "Story text", "default": "<p>Origin story about this plant.</p>" },
+    { "type": "text", "id": "story_source", "label": "Source attribution", "default": "From our growers" }
+  ],
+  "presets": [{ "name": "Care story" }]
+}
+{% endschema %}

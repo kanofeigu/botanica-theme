@@ -1,0 +1,232 @@
+{% comment %}
+  blocks/buy-buttons.liquid — Add to cart + dynamic checkout buttons
+  Wrapped in a cream-surface panel for visual hierarchy (Hey Rooted pattern).
+  Designed for use within a product section context where product_form_id
+  and form variables are defined by the wrapping form.
+{% endcomment %}
+<div class="bt-buy-panel" {{ block.shopify_attributes }} id="buy-buttons-{{ section.id }}" data-main-atc>
+  {%- if block.settings.show_quantity -%}
+    <div class="bt-buy-panel__quantity">
+      <label class="bt-field__label" for="Quantity-{{ section.id }}">
+        {{ 'products.product.quantity.label' | t }}
+      </label>
+      <div class="bt-qty__controls">
+        <button type="button" class="bt-qty__btn" name="minus" aria-label="{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <input
+          type="number"
+          name="quantity"
+          id="Quantity-{{ section.id }}"
+          class="bt-qty__input"
+          value="1"
+          min="1"
+          {% comment %}theme-check-disable UndefinedObject{% endcomment %}
+          form="{{ product_form_id }}"
+          {% comment %}theme-check-enable UndefinedObject{% endcomment %}
+        >
+        <button type="button" class="bt-qty__btn" name="plus" aria-label="{{ 'products.product.quantity.increase' | t: product: product.title | escape }}">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="bt-buy-panel__actions">
+    <button
+      type="submit"
+      name="add"
+      class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block"
+      data-atc-button
+      {% comment %}theme-check-disable UndefinedObject{% endcomment %}
+      form="{{ product_form_id }}"
+      {% comment %}theme-check-enable UndefinedObject{% endcomment %}
+      {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+      aria-label="{{ 'products.product.add_to_cart' | t }}"
+    >
+      <span class="bt-buy-panel__atc-label" data-atc-label>
+        {%- liquid
+          assign atc_icon = ''
+          if block.settings.show_cart_icon
+            assign atc_icon = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M1 1h2.5l1.7 9h9.3l2.5-7H5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="16" r="1.5" fill="currentColor"/><circle cx="14" cy="16" r="1.5" fill="currentColor"/></svg>'
+          endif
+        -%}
+        {%- if product.selected_or_first_available_variant.available -%}
+          {{ atc_icon }}
+          <span>{{ 'products.product.add_to_cart' | t }}</span>
+        {%- else -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- endif -%}
+      </span>
+      <span class="bt-buy-panel__spinner bt-sr-only" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9" stroke-linecap="round"/></svg>
+      </span>
+    </button>
+
+    {%- if block.settings.show_dynamic_checkout and product.selected_or_first_available_variant.available -%}
+      <div class="bt-buy-panel__dynamic">
+        {% comment %}theme-check-disable UndefinedObject{% endcomment %}
+        {{ form | payment_button }}
+        {% comment %}theme-check-enable UndefinedObject{% endcomment %}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if block.settings.show_trust_badges -%}
+    <div class="bt-buy-panel__trust">
+      <span class="bt-buy-panel__trust-item">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1L2 3.5v3c0 3.3 2.1 6.3 5 6.9 2.9-.7 5-3.7 5-6.9v-3L7 1Z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7l2 2 3-4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+        {{ 'products.product.secure_checkout' | t }}
+      </span>
+    </div>
+  {%- endif -%}
+</div>
+
+{% javascript %}
+  (function () {
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.bt-qty__btn');
+      if (!btn) return;
+      var controls = btn.closest('.bt-qty__controls');
+      if (!controls) return;
+      var input = controls.querySelector('input[type="number"]');
+      if (!input) return;
+      var min = parseInt(input.getAttribute('min') || '1', 10);
+      if (isNaN(min) || min < 1) min = 1;
+      var max = parseInt(input.getAttribute('max') || '', 10);
+      if (isNaN(max) || max < 1) max = 9999;  /* no/zero max attr = effectively unlimited */
+      var cur = parseInt(input.value || '1', 10);
+      if (isNaN(cur) || cur < 1) cur = min;
+      if (btn.getAttribute('name') === 'plus') {
+        cur = Math.min(cur + 1, max);
+      } else if (btn.getAttribute('name') === 'minus') {
+        cur = Math.max(cur - 1, min);
+      }
+      input.value = cur;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  /* ── Buy panel — cream surface background matching Hey Rooted pattern ── */
+  .bt-buy-panel {
+    background: var(--bt-color-surface);
+    border-radius: var(--bt-radius-card);
+    padding: var(--bt-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-sm);
+  }
+  .bt-buy-panel__quantity { display: flex; align-items: center; gap: var(--bt-space-sm); }
+  .bt-buy-panel__quantity .bt-field__label {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text-muted);
+    white-space: nowrap;
+  }
+  .bt-qty__controls {
+    display: inline-flex;
+    align-items: center;
+    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    border-radius: var(--bt-radius-input);
+    overflow: hidden;
+    background: var(--bt-color-bg);
+  }
+  .bt-qty__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: var(--bt-color-text);
+    cursor: pointer;
+    transition: background var(--bt-duration-fast);
+  }
+  .bt-qty__btn:hover { background: var(--bt-color-primary-tint); }
+  .bt-qty__input {
+    width: 60px;
+    height: 44px;
+    border: none;
+    border-left: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    border-right: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    text-align: center;
+    font-size: var(--bt-fs-body);
+    font-family: var(--bt-font-body);
+    -moz-appearance: textfield;
+    background: var(--bt-color-bg);
+  }
+  .bt-qty__input::-webkit-inner-spin-button,
+  .bt-qty__input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .bt-buy-panel__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-buy-panel__atc-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-buy-panel__dynamic { min-height: 0; }
+  .bt-buy-panel__spinner { display: none; }
+  .bt-buy-panel__atc-label { transition: opacity var(--bt-duration-fast); }
+  .bt-buy-panel__actions [disabled] .bt-buy-panel__atc-label { opacity: 0.7; }
+  @keyframes bt-buy-spin { to { transform: rotate(360deg); } }
+  .bt-buy-panel__spinner svg { animation: bt-buy-spin 0.9s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { .bt-buy-panel__spinner svg { animation: none; } }
+
+  /* ── Trust badges ── */
+  .bt-buy-panel__trust {
+    display: flex;
+    justify-content: center;
+    gap: var(--bt-space-md);
+    padding-top: var(--bt-space-2xs);
+    border-top: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+  }
+  .bt-buy-panel__trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.buy_buttons.name",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_quantity",
+      "label": "t:blocks.buy_buttons.settings.show_quantity.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_icon",
+      "label": "t:blocks.buy_buttons.settings.show_cart_icon.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "t:blocks.buy_buttons.settings.dynamic_checkout.label",
+      "default": false,
+      "info": "t:blocks.buy_buttons.settings.dynamic_checkout.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "t:blocks.buy_buttons.settings.trust_badges.label",
+      "default": false
+    }
+  ],
+  "presets": [{ "name": "t:blocks.buy_buttons.name" }]
+}
+{% endschema %}

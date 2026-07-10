@@ -1,0 +1,54 @@
+{% layout none %}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="{{ settings.colors_background }}">
+  <link rel="canonical" href="{{ canonical_url }}">
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+  {%- endif -%}
+  {%- assign formatted_balance = gift_card.balance | money_without_trailing_zeros -%}
+  <title>{{ 'gift_cards.issued.title' | t: value: formatted_balance, shop: shop.name }}</title>
+  {% style %}
+    :root {
+      --bt-color-bg: {{ settings.colors_background }};
+      --bt-color-surface: {{ settings.colors_surface }};
+      --bt-color-text: {{ settings.colors_text }};
+      --bt-color-primary: {{ settings.colors_primary }};
+      --bt-color-primary-contrast: {{ settings.colors_primary_contrast }};
+      --bt-radius-card: {{ settings.card_corner_radius }}px;
+      --bt-radius-btn: {{ settings.button_corner_radius }}px;
+      --bt-font-heading: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+      --bt-font-body: {{ settings.body_font.family }}, {{ settings.body_font.fallback_families }};
+      --bt-space-sm: 16px; --bt-space-md: 24px; --bt-space-xl: 48px;
+    }
+  {% endstyle %}
+  <meta name="description" content="{{ 'gift_cards.issued.subtext' | t }}">
+  {{ content_for_header }}
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,-apple-system,sans-serif;background:var(--bt-color-bg);color:var(--bt-color-text);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center}
+    .bt-gift{max-width:480px;padding:32px;background:var(--bt-color-surface);border-radius:14px;box-shadow:0 4px 16px rgba(46,42,36,.08)}
+    .bt-gift h1{font-family:Georgia,serif;font-size:clamp(1.4rem,2.5vw,2rem);margin-bottom:12px}
+    .bt-gift__amount{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;color:var(--bt-color-primary);margin-bottom:16px}
+    .bt-gift p{margin-bottom:8px;font-size:.875rem;opacity:.75}
+    .bt-gift img{max-width:200px;margin:16px auto}
+    .bt-gift__qr{margin-top:16px}
+    @media print{body{background:white}.bt-gift{box-shadow:none}}
+  </style>
+</head>
+<body>
+  <div class="bt-gift">
+    <h1>{{ shop.name }}</h1>
+    <p class="bt-gift__amount">{{ gift_card.balance | money }}</p>
+    <p>{{ 'gift_cards.issued.subtext' | t }}</p>
+    {%- if gift_card.expired -%}
+      <p>{{ 'gift_cards.issued.expired' | t: expiry: gift_card.expires_on | date: '%B %d, %Y' }}</p>
+    {%- endif -%}
+    <div class="bt-gift__qr">{{ gift_card.qr_code }}</div>
+    <a href="{{ shop.url }}" style="display:inline-block;margin-top:16px;color:var(--bt-color-primary);font-weight:600;font-size:.875rem">{{ shop.name }}</a>
+  </div>
+</body>
+</html>

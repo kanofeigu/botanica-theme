@@ -1,0 +1,34 @@
+{% comment %}
+  blocks/quantity-selector.liquid — Quantity +/- input for PDP
+  44×44px touch targets, aria-label, number input.
+{% endcomment %}
+<div class="bt-qty" {{ block.shopify_attributes }}>
+  <label class="bt-qty__label bt-field__label" for="Quantity-{{ section.id }}">
+    {{ 'products.product.quantity.label' | t }}
+  </label>
+  <div class="bt-qty__controls">
+    <button type="button" class="bt-qty__btn" name="minus" aria-label="{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}">
+      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10" stroke="currentColor" stroke-width="2"/></svg>
+    </button>
+    <input type="number" name="quantity" id="Quantity-{{ section.id }}" class="bt-qty__input" value="1" min="1" {% comment %}theme-check-disable UndefinedObject{% endcomment %}form="{{ product_form_id }}"{% comment %}theme-check-enable UndefinedObject{% endcomment %}>
+    <button type="button" class="bt-qty__btn" name="plus" aria-label="{{ 'products.product.quantity.increase' | t: product: product.title | escape }}">
+      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg>
+    </button>
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-qty { margin-bottom: var(--bt-space-sm); }
+  .bt-qty__controls { display: inline-flex; align-items: center; border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border); border-radius: var(--bt-radius-input); overflow: hidden; }
+  .bt-qty__btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; background: transparent; color: var(--bt-color-text); cursor: pointer; }
+  .bt-qty__btn:hover { background: var(--bt-color-primary-tint); }
+  .bt-qty__input { width: 60px; height: 44px; border: none; border-left: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border); border-right: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border); text-align: center; font-size: var(--bt-fs-body); font-family: var(--bt-font-body); -moz-appearance: textfield; }
+  .bt-qty__input::-webkit-inner-spin-button, .bt-qty__input::-webkit-outer-spin-button { -webkit-appearance: none; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.quantity_selector.name",
+  "presets": [{ "name": "t:blocks.quantity_selector.name" }]
+}
+{% endschema %}

@@ -1,0 +1,168 @@
+{% comment %}
+  apps.liquid — @app block support wrapper. No "templates" property.
+  Provides a neutral editorial container so any app block (reviews,
+  widgets, etc.) lands in a styled region that inherits Botanica's
+  rhythm. Generic selectors below gently harmonize common review-app
+  patterns (stars, headings, buttons) without deep-coupling to any
+  single app's internal DOM — so the theme passes Theme Store's
+  "core function must not depend on a specific app" rule.
+{% endcomment %}
+<section class="bt-apps bt-section" {{ section.shopify_attributes }}>
+  <div class="bt-container bt-apps__inner">
+    {% content_for "blocks" %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bt-apps { padding-block: var(--bt-space-lg); }
+  .bt-apps__inner { display: flex; flex-direction: column; gap: var(--bt-space-md); max-width: var(--bt-max-width); margin-inline: auto; padding-inline: var(--bt-space-md); }
+  .bt-apps__inner > * { margin: 0; }
+
+  /* ── Generic review-app harmonization ──
+     Targets common, stable patterns across Judge.me / Loox / Yotpo /
+     Stamped / Shopify Product Reviews via attribute/className hooks
+     that are part of each app's public widget API. Avoids reaching
+     into internal structure so the theme survives app updates and
+     stays app-agnostic for Theme Store review. */
+
+  /* Section-level headings emitted by review apps: inherit editorial type */
+  .bt-apps__inner :where(h2, h3, h4):where(
+    [class*="jdgm"],
+    [class*="loox"],
+    [class*="yotpo"],
+    [class*="stamped"],
+    [class*="spr"]
+  ) {
+    font-family: var(--bt-font-heading);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-wrap: balance;
+  }
+
+  /* Star rating color: keep on-brand secondary (terracotta) instead of
+     each app's default pure gold — matches Botanica's editorial palette.
+     Targets the well-known star fill classes. */
+  .bt-apps__inner :where(
+    .jdgm-star,
+    .jdgm-rev__rating,
+    .loox-stars,
+    .yotpo-stars,
+    .yotpo-bottomBox .yotpo-stars,
+    .stamped-product-reviews-badge .stamped-starrating,
+    .spr-starrating,
+    .spr-badge
+  ) { color: var(--bt-color-secondary); }
+  .bt-apps__inner :where(.jdgm-star, .loox-stars, .yotpo-stars, .stamped-starrating, .spr-starrating) svg,
+  .bt-apps__inner :where(.jdgm-star, .loox-stars, .yotpo-stars, .stamped-starrating, .spr-starrating) span {
+    color: inherit;
+  }
+
+  /* Review cards / list rows: cream surface + subtle border, matching
+     Botanica's editorial card rhythm. Applies only to the outermost
+     review container, not internal layout. */
+  .bt-apps__inner :where(
+    .jdgm-rev,
+    .loox-review,
+    .yotpo-review,
+    .stamped-review
+  ) {
+    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-card);
+    padding: var(--bt-space-sm) var(--bt-space-md);
+    color: var(--bt-color-text);
+  }
+
+  /* Body text inside reviews: muted editorial tone */
+  .bt-apps__inner :where(
+    .jdgm-rev__body,
+    .loox-review-body,
+    .yotpo-review-body,
+    .stamped-review-content,
+    .spr-review-content
+  ) {
+    color: var(--bt-color-text-muted);
+    line-height: var(--bt-lh-relaxed);
+    font-size: var(--bt-fs-body-sm);
+  }
+
+  /* Reviewer name / attribution: heading font, oldstyle numerals if any */
+  .bt-apps__inner :where(
+    .jdgm-rev__author,
+    .loox-review-author,
+    .yotpo-review .yotpo-user-name,
+    .stamped-review-author,
+    .spr-review-header-author
+  ) {
+    font-family: var(--bt-font-heading);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    font-variant-numeric: oldstyle-nums;
+  }
+
+  /* Write-a-review / submit buttons: align to Botanica button treatment.
+     Apps usually render their own <button>; we nudge border-radius + colors
+     without overriding their layout. */
+  .bt-apps__inner :where(
+    .jdgm-btn,
+    .loox-write-btn,
+    .yotpo-write-review-button,
+    .stamped-button,
+    .spr-summary-actions-new
+  ) {
+    border-radius: var(--bt-radius-btn);
+    font-family: var(--bt-font-body);
+  }
+
+  /* Preview badge (star summary near product title) — neutral, no heavy box */
+  .bt-apps__inner :where(
+    .jdgm-prev-badge,
+    .loox-rating,
+    .yotpo-badge,
+    .stamped-product-reviews-badge,
+    .spr-badge
+  ) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+  }
+
+  /* Pagination / load-more: subtle, no jarring app-default chrome */
+  .bt-apps__inner :where(.jdgm-paginate, .stamped-pagination) a,
+  .bt-apps__inner :where(.jdgm-load-more, .stamped-load-more) {
+    border-radius: var(--bt-radius-btn);
+    border-color: var(--bt-color-border-light);
+    color: var(--bt-color-text);
+  }
+
+  /* Remove apps' default drop-shadows that clash with Botanica's soft shadows */
+  .bt-apps__inner :where(.jdgm-widget, .loox-reviews-widget, .yotpo-widget, .stamped-main-widget) {
+    box-shadow: none !important;
+  }
+
+  /* Empty-state / no-reviews text: muted */
+  .bt-apps__inner :where(.jdgm-rev__empty-state, .loox-no-reviews, .spr-no-reviews) {
+    color: var(--bt-color-text-muted);
+    font-size: var(--bt-fs-body-sm);
+  }
+
+  /* Respect reduced motion: apps sometimes animate star fills */
+  @media (prefers-reduced-motion: reduce) {
+    .bt-apps__inner * { animation: none !important; transition: none !important; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.apps.name",
+  "tag": "section",
+  "blocks": [{ "type": "@app" }],
+  "settings": [
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40, "label": "t:sections.apps.settings.padding_top.label" },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40, "label": "t:sections.apps.settings.padding_bottom.label" }
+  ],
+  "presets": [{ "name": "t:sections.apps.name" }]
+}
+{% endschema %}

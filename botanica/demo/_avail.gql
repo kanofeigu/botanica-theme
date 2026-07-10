@@ -1,0 +1,12 @@
+query {
+  products(first: 3, query: "vendor:Botanica") {
+    nodes {
+      title
+      handle
+      status
+      totalInventory
+      tracksInventory
+      availableForSale
+    }
+  }
+}

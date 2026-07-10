@@ -1,0 +1,328 @@
+{% comment %} main-product.liquid — Original PDP, theme blocks + @app. Zero Dawn code.
+  Wires variant-selects.js (custom element from variant-picker.liquid) into
+  the form via data-* hooks: data-variant-id (hidden id), data-aria-live
+  (price/availability SR announce), data-main-atc (CTA button from
+  buy-buttons), data-gallery-main (image swap on variant pick). {% endcomment %}
+{%- liquid
+  assign selected_product = section.settings.product | default: product
+  assign first_variant = selected_product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+  assign sticky_care_class = ''
+  if section.settings.sticky_care
+    assign sticky_care_class = ' bt-product__info--sticky-care'
+  endif
+-%}
+
+<section class="bt-product bt-section" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+    <div class="bt-product__grid bt-product__grid--{{ section.settings.gallery_layout }}">
+
+      <bt-product-gallery class="bt-product__gallery" role="region" aria-label="{{ 'products.product.media.gallery' | t }}">
+        <div class="bt-product__main-media" data-gallery-main data-gallery-zoom>
+          {%- if selected_product.featured_media -%}
+            {{ selected_product.featured_media | image_url: width: 1000 | image_tag:
+              loading: 'eager', fetchpriority: 'high',
+              widths: '400, 600, 800, 1000, 1200',
+              sizes: '(min-width: 990px) 50vw, 100vw',
+              alt: selected_product.featured_media.alt | default: selected_product.title
+            }}
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'bt-product__placeholder' }}
+          {%- endif -%}
+          <button type="button" class="bt-product__zoom-btn" data-zoom-open aria-label="{{ 'products.product.media.open_media' | t }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+          </button>
+          {%- comment -%} Editorial silhouette overlay (only Botanica) {%- endcomment -%}
+          <span class="bt-product__silhouette bt-product__silhouette--tl" aria-hidden="true"></span>
+          <span class="bt-product__silhouette bt-product__silhouette--br" aria-hidden="true"></span>
+          <span class="bt-product__specimen-tag" aria-hidden="true">
+            <span class="bt-product__specimen-num">{{ first_variant.sku | default: 'No. 0000' }}</span>
+          </span>
+        </div>
+        {%- if selected_product.media.size > 1 -%}
+          <div class="bt-product__thumbnails" role="list" aria-label="{{ 'products.product.media.thumbnail_list' | t }}">
+            {%- for media in selected_product.media -%}
+              {%- liquid
+                assign thumb_image = media.preview_image | default: media
+                assign media_src = media | image_url: width: 1000
+                assign media_full = media | image_url: width: 1600
+                assign media_srcset = media | image_url: width: 400 | append: ' 400w, ' | append: media | image_url: width: 600 | append: ' 600w, ' | append: media | image_url: width: 800 | append: ' 800w, ' | append: media | image_url: width: 1000 | append: ' 1000w, ' | append: media | image_url: width: 1200 | append: ' 1200w'
+              -%}
+              <button
+                type="button"
+                class="bt-product__thumb{% if forloop.first %} is-active{% endif %}"
+                data-media-id="{{ media.id }}"
+                data-media-src="{{ media_src }}"
+                data-media-full="{{ media_full }}"
+                data-media-srcset="{{ media_srcset }}"
+                data-media-sizes="(min-width: 990px) 50vw, 100vw"
+                data-media-alt="{{ media.alt | default: selected_product.title | escape }}"
+                data-gallery-thumb
+                role="listitem"
+                aria-label="{{ 'products.product.media.image_available' | t: index: forloop.index }}"
+              >
+                {{ thumb_image | image_url: width: 120 | image_tag: loading: 'lazy', widths: '80, 120', alt: media.alt | default: selected_product.title }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </bt-product-gallery>
+
+      <dialog id="bt-gallery-zoom-{{ section.id }}" class="bt-zoom-dialog" aria-modal="true" aria-label="{{ 'products.product.media.gallery' | t }}">
+        <button type="button" class="bt-zoom-dialog__close" data-zoom-close aria-label="{{ 'accessibility.close' | t }}">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M5 5l12 12M17 5L5 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        {% comment %}theme-check-disable ImgWidthAndHeight{% endcomment %}
+        <img class="bt-zoom-dialog__img" data-zoom-image alt="">
+        {% comment %}theme-check-enable ImgWidthAndHeight{% endcomment %}
+        <button type="button" class="bt-zoom-dialog__nav bt-zoom-dialog__nav--prev" data-zoom-prev aria-label="{{ 'products.product.media.previous' | t }}">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="bt-zoom-dialog__nav bt-zoom-dialog__nav--next" data-zoom-next aria-label="{{ 'products.product.media.next' | t }}">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </dialog>
+
+      <div class="bt-product__info{{ sticky_care_class }}">
+        {%- form 'product', selected_product, id: product_form_id, class: 'bt-product__form' -%}
+          <input type="hidden" name="id" value="{{ first_variant.id }}" data-variant-id>
+          <div class="bt-product__aria-live" aria-live="polite" role="status" data-aria-live></div>
+          {% content_for "blocks" %}
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'gallery.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'variant-selects.js' | asset_url }}" defer="defer"></script>
+<script>
+  window.theme = window.theme || {};
+  window.theme.variantI18n = {
+    inStock: {{ 'products.product.inventory_in_stock' | t | json }},
+    soldOut: {{ 'products.product.sold_out' | t | json }},
+    unavailable: {{ 'products.product.unavailable' | t | json }},
+    addToCart: {{ 'products.product.add_to_cart' | t | json }}
+  };
+</script>
+
+{% stylesheet %}
+  .bt-product__grid { display: grid; gap: var(--bt-space-xl); align-items: start; }
+  /* Default: gallery on left (main image on top + thumbnails horizontal strip below), info on right */
+  .bt-product__grid--thumb_below { grid-template-columns: 1.1fr 1fr; }
+  .bt-product__grid--thumb_below .bt-product__gallery { flex-direction: column; }
+  .bt-product__grid--thumb_below .bt-product__thumbnails { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; }
+  .bt-product__grid--thumb_left { grid-template-columns: 5fr 6fr; }
+  .bt-product__grid--thumb_left .bt-product__gallery { flex-direction: row; }
+  .bt-product__grid--thumb_left .bt-product__thumbnails { flex-direction: column; overflow-y: auto; max-height: 580px; }
+  .bt-product__grid--thumb_left .bt-product__thumb { width: 64px; height: 90px; }
+  .bt-product__grid--stacked { grid-template-columns: 1fr; }
+  .bt-product__gallery { display: flex; flex-direction: column; gap: var(--bt-space-sm); position: sticky; top: 100px; }
+
+  /* ── Main media: 4:5 portrait (Hey Rooted-style) ── */
+  .bt-product__main-media {
+    position: relative;
+    border-radius: var(--bt-radius-card);
+    overflow: hidden;
+    background: var(--bt-color-surface);
+    aspect-ratio: 4 / 5;
+    box-shadow: var(--bt-shadow-md);
+    cursor: zoom-in;
+  }
+  .bt-product__main-media img { width: 100%; height: 100%; object-fit: cover; transition: opacity var(--bt-duration-base) var(--bt-ease-out); }
+  /* Paper texture overlay on gallery */
+  .bt-product__main-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Zoom button (revealed on hover/focus) */
+  .bt-product__zoom-btn {
+    position: absolute;
+    top: var(--bt-space-2xs);
+    right: var(--bt-space-2xs);
+    z-index: 5;
+    width: 40px; height: 40px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(var(--bt-color-bg-rgb), 0.82);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-pill);
+    color: var(--bt-color-text);
+    cursor: pointer;
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-product__main-media:hover .bt-product__zoom-btn,
+  .bt-product__main-media:focus-within .bt-product__zoom-btn { opacity: 1; }
+
+  /* ── Editorial silhouettes (only Botanica, never Hey Rooted) ── */
+  .bt-product__silhouette {
+    position: absolute;
+    width: 140px;
+    height: auto;
+    pointer-events: none;
+    opacity: 0.06;
+    z-index: 3;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+  .bt-product__silhouette--tl {
+    top: -8px;
+    left: -14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160' fill='none' stroke='%232E2A24' stroke-width='1'%3E%3Cpath d='M50 12c-18 0-30 22-30 46 0 5 .7 10 1.8 15 6 22 22 46 32 65 10-19 24-43 30-65 1-5 1.7-10 1.7-15 .1-24-12-46-35.5-46z'/%3E%3Cpath d='M50 12v148'/%3E%3Cpath d='M50 60 L20 50 M50 80 L30 70 M50 100 L24 90'/%3E%3C/svg%3E");
+    transform: rotate(-4deg);
+  }
+  .bt-product__silhouette--br {
+    bottom: -22px;
+    right: -18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160' fill='none' stroke='%232E2A24' stroke-width='1'%3E%3Cpath d='M50 12c-18 0-30 22-30 46 0 5 .7 10 1.8 15 6 22 22 46 32 65 10-19 24-43 30-65 1-5 1.7-10 1.7-15 .1-24-12-46-35.5-46z'/%3E%3Cpath d='M50 12v148'/%3E%3Cpath d='M50 60 L20 50 M50 80 L30 70 M50 100 L24 90'/%3E%3C/svg%3E");
+    transform: scaleX(-1) rotate(-6deg);
+  }
+
+  /* Specimen tag — small latin-catalog number on gallery */
+  .bt-product__specimen-tag {
+    position: absolute;
+    bottom: var(--bt-space-sm);
+    right: var(--bt-space-sm);
+    z-index: 4;
+    padding: 4px 10px;
+    background: rgba(var(--bt-color-bg-rgb), 0.78);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-tag);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-specimen);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bt-color-text-muted);
+    backdrop-filter: blur(2px);
+  }
+  .bt-product__specimen-num { font-variant-numeric: oldstyle-nums; }
+
+  /* ── Info column: clean vertical stack (no alternating card surfaces) ── */
+  .bt-product__info { display: flex; flex-direction: column; gap: var(--bt-space-md); }
+  .bt-product__form { display: flex; flex-direction: column; gap: var(--bt-space-md); }
+  .bt-product__form > * { margin: 0; }
+  /* Let each block own its surface; neutralize the shopify-block wrapper */
+  .bt-product__form .shopify-block { margin: 0; padding: 0; background: transparent; border: none; }
+  /* Tighter rhythm between the first editorial blocks (eyebrow/title/price) */
+  .bt-product__form .shopify-block:first-child { margin-bottom: calc(var(--bt-space-2xs) * -1); }
+
+  /* ── Sticky care panel ── */
+  .bt-product__info--sticky-care .bt-care-table {
+    position: sticky;
+    top: calc(80px + var(--bt-space-md));
+    z-index: 1;
+  }
+  .bt-product__placeholder { width: 100%; height: 100%; background: var(--bt-color-surface); }
+  .bt-product__thumbnails { display: flex; gap: var(--bt-space-2xs); overflow-x: auto; padding: 4px; scrollbar-width: thin; }
+  .bt-product__thumb { flex-shrink: 0; width: 72px; height: 90px; border-radius: var(--bt-radius-sm); overflow: hidden; border: 2px solid transparent; cursor: pointer; padding: 0; background: var(--bt-color-bg); transition: border-color var(--bt-duration-fast); }
+  .bt-product__thumb.is-active, .bt-product__thumb:hover { border-color: var(--bt-color-primary); }
+  .bt-product__thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .bt-product__aria-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+  /* ── Zoom dialog (native <dialog>) ── */
+  dialog.bt-zoom-dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: none;
+    max-height: none;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    inset: 0;
+  }
+  dialog.bt-zoom-dialog::backdrop { background: rgba(var(--bt-color-text-rgb), 0.85); }
+  .bt-zoom-dialog__img {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    max-width: 92vw;
+    max-height: 86vh;
+    object-fit: contain;
+    border-radius: var(--bt-radius-sm);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  .bt-zoom-dialog__close {
+    position: absolute;
+    top: var(--bt-space-md);
+    right: var(--bt-space-md);
+    z-index: 2;
+    width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(var(--bt-color-bg-rgb), 0.7);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-pill);
+    color: var(--bt-color-text);
+    cursor: pointer;
+  }
+  .bt-zoom-dialog__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 48px; height: 48px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(var(--bt-color-bg-rgb), 0.7);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-pill);
+    color: var(--bt-color-text);
+    cursor: pointer;
+  }
+  .bt-zoom-dialog__nav--prev { left: var(--bt-space-md); }
+  .bt-zoom-dialog__nav--next { right: var(--bt-space-md); }
+  .bt-zoom-dialog__nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* Responsive */
+  @media (max-width: 989px) {
+    .bt-product__grid--thumb_below,
+    .bt-product__grid--thumb_left { grid-template-columns: 1fr; }
+    .bt-product__grid--thumb_below .bt-product__gallery,
+    .bt-product__grid--thumb_left .bt-product__gallery { position: static; }
+    .bt-product__grid--thumb_left .bt-product__thumbnails { flex-direction: row; max-height: none; }
+  }
+  @media (max-width: 749px) {
+    .bt-product__silhouette { display: none; }
+    .bt-product__specimen-tag { font-size: 0.6rem; padding: 2px 6px; }
+    .bt-product__zoom-btn { opacity: 1; }
+    .bt-zoom-dialog__nav { width: 40px; height: 40px; }
+    .bt-zoom-dialog__nav--prev { left: var(--bt-space-2xs); }
+    .bt-zoom-dialog__nav--next { right: var(--bt-space-2xs); }
+  }
+
+  /* Reduced motion: freeze media swap-fade transition */
+  @media (prefers-reduced-motion: reduce) {
+    .bt-product__main-media img { transition: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_product.name", "tag": "section", "blocks": [{ "type": "@theme" }, { "type": "@app" }], "settings": [
+  { "type": "product", "id": "product", "label": "t:sections.main_product.settings.product.label" },
+  { "type": "select", "id": "gallery_layout", "label": "t:sections.main_product.settings.gallery_layout.label", "options": [{"value":"thumb_left","label":"t:sections.main_product.settings.gallery_layout.options__1.label"},{"value":"thumb_below","label":"t:sections.main_product.settings.gallery_layout.options__2.label"},{"value":"stacked","label":"t:sections.main_product.settings.gallery_layout.options__3.label"}], "default": "thumb_below" },
+  { "type": "checkbox", "id": "sticky_care", "label": "t:sections.main_product.settings.sticky_care.label", "default": true },
+  { "type": "range", "id": "padding_top", "min":0,"max":100,"step":4,"default":40,"unit":"px","label":"t:sections.main_product.settings.padding_top.label" },
+  { "type": "range", "id": "padding_bottom", "min":0,"max":100,"step":4,"default":40,"unit":"px","label":"t:sections.main_product.settings.padding_bottom.label" }
+], "presets": [{"name":"t:sections.main_product.name","blocks":[
+  {"type":"specimen-eyebrow"},
+  {"type":"product-title"},
+  {"type":"product-price"},
+  {"type":"variant-picker","settings":{"picker_type":"swatch","swatch_option_index":"1"}},
+  {"type":"size-guide-link"},
+  {"type":"buy-buttons","settings":{"show_dynamic_checkout":false,"show_quantity":true,"show_cart_icon":false,"show_trust_badges":false}},
+  {"type":"care-icons"},
+  {"type":"pickup-availability"},
+  {"type":"editorial-quote"},
+  {"type":"collapsible-specs","settings":{"title":"Plant details","open_by_default":true}},
+  {"type":"collapsible-specs","settings":{"title":"Complete care guide","open_by_default":true}},
+  {"type":"collapsible-specs","settings":{"title":"Shipping & returns","open_by_default":false}},
+  {"type":"share"},
+  {"type":"complementary-products"},
+  {"type":"product-description"}
+]}] }
+{% endschema %}

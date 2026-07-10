@@ -1,0 +1,102 @@
+{% comment %} footer.liquid — Botanica v3 original footer with brand, links, newsletter blocks. {% endcomment %}
+<footer class="bt-footer" role="contentinfo">
+  <div class="bt-footer__inner bt-container">
+    <div class="bt-footer__grid bt-grid bt-grid--{{ section.settings.column_count }}">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'brand' -%}
+            <div class="bt-footer__brand" {{ block.shopify_attributes }}>
+              {%- if settings.logo != blank -%}
+                {{ settings.logo | image_url: width: 120 | image_tag: alt: shop.name, loading: 'lazy' }}
+              {%- endif -%}
+              {%- if block.settings.tagline != blank -%}
+                <p class="bt-footer__tagline">{{ block.settings.tagline }}</p>
+              {%- endif -%}
+            </div>
+          {%- when 'links' -%}
+            <div class="bt-footer__col" {{ block.shopify_attributes }}>
+              <h3 class="bt-footer__col-title">{{ block.settings.title }}</h3>
+              <ul class="bt-footer__links">
+                {%- for link in block.settings.menu.links -%}
+                  <li><a href="{{ link.url }}" class="bt-footer__link">{{ link.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- when 'newsletter' -%}
+            <div class="bt-footer__col" {{ block.shopify_attributes }}>
+              <h3 class="bt-footer__col-title">{{ block.settings.title }}</h3>
+              {%- if block.settings.text != blank -%}
+                <p class="bt-footer__text">{{ block.settings.text }}</p>
+              {%- endif -%}
+              {%- form 'customer', class: 'bt-footer__form' -%}
+                <input type="hidden" name="contact[tags]" value="newsletter">
+                <div class="bt-footer__form-row">
+                  <input type="email" name="contact[email]" class="bt-input bt-footer__input" value="{{ form.email }}" placeholder="{{ block.settings.placeholder }}" aria-label="{{ block.settings.placeholder }}" required autocomplete="email">
+                  <button type="submit" class="bt-btn bt-btn--primary bt-footer__submit" name="commit">{{ block.settings.button_label }}</button>
+                </div>
+                {%- if form.posted_successfully? -%}
+                  <p class="bt-form-success" role="alert">{{ 'general.newsletter_form.confirmation' | t }}</p>
+                {%- endif -%}
+              {%- endform -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+    <div class="bt-footer__bottom">
+      <div class="bt-footer__social">
+        {%- if settings.social_instagram_link != blank -%}
+          <a href="{{ settings.social_instagram_link }}" class="bt-footer__social-link" target="_blank" rel="noopener" aria-label="{{ 'general.social.links.instagram' | t }}">{% render 'icon-instagram' %}</a>
+        {%- endif -%}
+        {%- if settings.social_facebook_link != blank -%}
+          <a href="{{ settings.social_facebook_link }}" class="bt-footer__social-link" target="_blank" rel="noopener" aria-label="{{ 'general.social.links.facebook' | t }}">{% render 'icon-facebook' %}</a>
+        {%- endif -%}
+        {%- if settings.social_pinterest_link != blank -%}
+          <a href="{{ settings.social_pinterest_link }}" class="bt-footer__social-link" target="_blank" rel="noopener" aria-label="{{ 'general.social.links.pinterest' | t }}">{% render 'icon-pinterest' %}</a>
+        {%- endif -%}
+      </div>
+      <div class="bt-footer__copyright">
+        <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ powered_by_link }}</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% stylesheet %}
+  .bt-footer { background: var(--bt-color-surface); border-top: 1px solid var(--bt-color-border-light); padding-block: var(--bt-space-xl) var(--bt-space-lg); }
+  .bt-footer__grid { margin-bottom: var(--bt-space-xl); }
+  .bt-footer__col-title { font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-semibold); margin-bottom: var(--bt-space-sm); color: var(--bt-color-text); }
+  .bt-footer__links { list-style: none; display: flex; flex-direction: column; gap: var(--bt-space-2xs); }
+  .bt-footer__link { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); text-decoration: none; transition: color var(--bt-duration-fast); }
+  .bt-footer__link:hover { color: var(--bt-color-primary); }
+  .bt-footer__tagline, .bt-footer__text { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); max-width: 30ch; }
+  .bt-footer__form-row { display: flex; gap: var(--bt-space-2xs); }
+  .bt-footer__input { min-width: 0; }
+  .bt-footer__submit { flex-shrink: 0; }
+  .bt-footer__bottom { display: flex; flex-direction: column; align-items: center; gap: var(--bt-space-sm); padding-top: var(--bt-space-md); border-top: 1px solid var(--bt-color-border-light); }
+  .bt-footer__social { display: flex; gap: var(--bt-space-xs); }
+  .bt-footer__social-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: var(--bt-color-text-muted); border-radius: var(--bt-radius-sm); transition: color var(--bt-duration-fast), background var(--bt-duration-fast); }
+  .bt-footer__social-link:hover { color: var(--bt-color-primary); background: var(--bt-color-primary-tint); }
+  .bt-footer__copyright { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); text-align: center; }
+  .bt-footer__copyright a { color: var(--bt-color-text-muted); }
+  @media (min-width: 750px) { .bt-footer__bottom { flex-direction: row; justify-content: space-between; } }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.footer.name", "class": "section-footer", "settings": [
+  { "type": "select", "id": "column_count", "label": "t:sections.footer.settings.columns.label", "options": [{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"}], "default": "3" }
+], "blocks": [
+  { "type": "brand", "name": "t:sections.footer.blocks.brand.name", "settings": [
+    { "type": "text", "id": "tagline", "label": "t:sections.footer.blocks.brand.settings.tagline.label", "default": "Plants for real interiors" }
+  ]},
+  { "type": "links", "name": "t:sections.footer.blocks.links.name", "settings": [
+    { "type": "text", "id": "title", "label": "t:sections.footer.blocks.links.settings.title.label", "default": "Quick links" },
+    { "type": "link_list", "id": "menu", "label": "t:sections.footer.blocks.links.settings.menu.label" }
+  ]},
+  { "type": "newsletter", "name": "t:sections.footer.blocks.newsletter.name", "settings": [
+    { "type": "text", "id": "title", "label": "t:sections.footer.blocks.newsletter.settings.title.label", "default": "Care guide" },
+    { "type": "text", "id": "text", "label": "t:sections.footer.blocks.newsletter.settings.text.label", "default": "Weekly plant care, delivered free." },
+    { "type": "text", "id": "placeholder", "label": "t:sections.footer.blocks.newsletter.settings.placeholder.label", "default": "your@email.com" },
+    { "type": "text", "id": "button_label", "label": "t:sections.footer.blocks.newsletter.settings.button_label.label", "default": "Subscribe" }
+  ]}
+], "presets": [{"name":"t:sections.footer.name","blocks":[{"type":"brand","settings":{"tagline":"Plants for real interiors"}},{"type":"links","settings":{"title":"Shop","menu":"main-menu"}},{"type":"newsletter","settings":{"title":"Care guide","text":"Weekly plant care, delivered free.","placeholder":"your@email.com","button_label":"Subscribe"}}]}] }
+{% endschema %}

@@ -1,0 +1,142 @@
+/* ───────────────────────────────────────────
+   Botanica v3 — Design Tokens
+   CSS custom properties from color_palette injection.
+   All-original. Zero Dawn code.
+   ─────────────────────────────────────────── */
+
+:root {
+  /* ── Color palette tokens ──
+     Source of truth is theme.liquid {% style %} which injects
+     settings.colors_* → --bt-color-* (merchant-editable color_palette).
+     RGB channels fall back to the same hex values for shadow/scrim
+     composition; merchant color changes update --bt-color-*-* -rgb too. */
+  --bt-color-bg: #F5F1E8;
+  --bt-color-surface: #FAF7EF;
+  --bt-color-text: #2E2A24;
+  --bt-color-text-muted: #4D4840;
+  --bt-color-primary: #4A6B4F;
+  --bt-color-primary-contrast: #FFFFFF;
+  --bt-color-secondary: #C97D5A;
+  --bt-color-border: #2E2A24;
+
+  /* RGB channels — kept here only as fallback; theme.liquid overrides
+     the matching --bt-color-*-rgb tokens from settings for hover/scrim. */
+  --bt-color-bg-rgb: 245, 241, 232;
+  --bt-color-text-rgb: 46, 42, 36;
+  --bt-color-primary-rgb: 74, 107, 79;
+  --bt-color-secondary-rgb: 201, 125, 90;
+  --bt-color-primary-contrast-rgb: 255, 255, 255;
+
+  /* Derived — color-mix() with hardcoded fallbacks for older Safari */
+  --bt-color-primary-hover: #3A573F;
+  --bt-color-primary-active: #2E4733;
+  --bt-color-primary-tint: #EDF3EE;
+  --bt-color-secondary-hover: #B56A48;
+  --bt-color-secondary-tint: #FAF2EE;
+  --bt-color-surface-hover: #F2EDE0;
+  --bt-color-border-light: rgba(var(--bt-color-text-rgb), 0.12);
+  --bt-color-border-medium: rgba(var(--bt-color-text-rgb), 0.25);
+  --bt-color-scrim: rgba(var(--bt-color-text-rgb), 0.4);
+
+  @supports (color: color-mix(in srgb, black 50%, white)) {
+    --bt-color-primary-hover: color-mix(in srgb, var(--bt-color-primary) 85%, black);
+    --bt-color-primary-active: color-mix(in srgb, var(--bt-color-primary) 75%, black);
+    --bt-color-primary-tint: color-mix(in srgb, var(--bt-color-primary) 8%, transparent);
+    --bt-color-secondary-hover: color-mix(in srgb, var(--bt-color-secondary) 85%, black);
+    --bt-color-secondary-tint: color-mix(in srgb, var(--bt-color-secondary) 10%, transparent);
+    --bt-color-surface-hover: color-mix(in srgb, var(--bt-color-surface) 96%, var(--bt-color-text));
+    --bt-color-border-light: color-mix(in srgb, var(--bt-color-border) 15%, transparent);
+    --bt-color-border-medium: color-mix(in srgb, var(--bt-color-border) 30%, transparent);
+  }
+
+  /* Focus ring */
+  --bt-color-focus-ring: var(--bt-color-primary);
+  --bt-focus-ring-width: 3px;
+  --bt-focus-ring-offset: 2px;
+
+  /* ── Typography ── */
+  --bt-font-heading: Fraunces, Georgia, 'Times New Roman', serif;
+  --bt-font-body: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --bt-fs-display: clamp(3.2rem, 5vw, 5.6rem);
+  --bt-fs-h1: clamp(2.2rem, 3.5vw, 3.2rem);
+  --bt-fs-h2: clamp(1.8rem, 2.5vw, 2.4rem);
+  --bt-fs-h3: clamp(1.4rem, 1.8vw, 1.8rem);
+  --bt-fs-h4: clamp(1.15rem, 1.4vw, 1.4rem);
+  --bt-fs-body: 1rem;
+  --bt-fs-body-sm: 0.875rem;
+  --bt-fs-body-xs: 0.75rem;
+  --bt-fs-eyebrow: 0.72rem;
+  --bt-fs-specimen: 0.68rem;
+  --bt-fs-badge: 0.75rem;
+
+  --bt-lh-heading: 1.15;
+  --bt-lh-body: 1.6;
+  --bt-lh-relaxed: 1.75;
+  --bt-fw-normal: 400;
+  --bt-fw-medium: 500;
+  --bt-fw-semibold: 600;
+  --bt-fw-bold: 700;
+
+  /* ── Spacing ── */
+  --bt-space-3xs: 4px;
+  --bt-space-2xs: 8px;
+  --bt-space-xs: 12px;
+  --bt-space-sm: 16px;
+  --bt-space-md: 24px;
+  --bt-space-lg: 32px;
+  --bt-space-xl: 48px;
+  --bt-space-2xl: 64px;
+  --bt-space-3xl: 80px;
+  --bt-space-section: clamp(2.5rem, 6vw, 5rem);
+
+  /* ── Radii ── */
+  --bt-radius-tag: 2px;
+  --bt-radius-btn: 4px;
+  --bt-radius-input: 4px;
+  --bt-radius-card: 14px;
+  --bt-radius-sm: 4px;
+  --bt-radius-md: 8px;
+  --bt-radius-pill: 9999px;
+
+  /* ── Shadows (warm brown tones) ── */
+  --bt-shadow-sm: 0 1px 3px rgba(var(--bt-color-text-rgb), 0.06);
+  --bt-shadow-md: 0 4px 16px rgba(var(--bt-color-text-rgb), 0.08);
+  --bt-shadow-lg: 0 12px 40px rgba(var(--bt-color-text-rgb), 0.10);
+  --bt-shadow-card-hover: 0 16px 48px rgba(var(--bt-color-text-rgb), 0.12);
+
+  /* ── Duration & easing ── */
+  --bt-duration-fast: 150ms;
+  --bt-duration-base: 300ms;
+  --bt-duration-slow: 500ms;
+  --bt-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --bt-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --bt-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Borders ── */
+  --bt-border-width: 1.5px;
+  --bt-border-style: solid;
+
+  /* ── Layout ── */
+  --bt-max-width: 1300px;
+  --bt-page-gutter: clamp(1rem, 4vw, 2.5rem);
+  --bt-grid-gap: 24px;
+  --bt-content-max: 65ch;
+
+  /* ── Z-index scale ── */
+  --bt-z-dropdown: 10;
+  --bt-z-sticky: 20;
+  --bt-z-drawer: 30;
+  --bt-z-modal-backdrop: 40;
+  --bt-z-modal: 50;
+  --bt-z-toast: 60;
+}
+
+/* ── Reduced motion override ── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --bt-duration-fast: 0ms;
+    --bt-duration-base: 0ms;
+    --bt-duration-slow: 0ms;
+  }
+}

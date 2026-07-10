@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3D2E2A"/>
+      <stop offset="100%" stop-color="#5B3A30"/>
+    </linearGradient>
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg3)"/>
+  <rect width="800" height="500" filter="url(#noise)" opacity="0.08"/>
+  <!-- Crystal structures (calcium oxalate) -->
+  <g transform="translate(300,200)">
+    <polygon points="0,-60 20,-20 60,-10 20,10 10,50 -10,20 -50,10 -10,-10" fill="#FAF7EF" opacity="0.12"/>
+    <polygon points="0,-60 20,-20 0,0" fill="#C97D5A" opacity="0.15"/>
+    <polygon points="0,-60 -10,-10 -50,10" fill="#C97D5A" opacity="0.1"/>
+  </g>
+  <g transform="translate(500,280)">
+    <polygon points="0,-40 15,-15 40,-5 15,8 5,35 -5,15 -30,8 -5,-8" fill="#FAF7EF" opacity="0.1"/>
+    <polygon points="0,-40 15,-15 0,0" fill="#C97D5A" opacity="0.12"/>
+  </g>
+  <g transform="translate(180,320)">
+    <polygon points="0,-30 10,-10 30,-5 10,5 5,25 -5,10 -20,5 -5,-5" fill="#FAF7EF" opacity="0.08"/>
+  </g>
+  <!-- Danger/warning aesthetic lines -->
+  <g stroke="#C97D5A" stroke-width="1" opacity="0.3">
+    <line x1="0" y1="80" x2="300" y2="80"/>
+    <line x1="500" y1="100" x2="800" y2="100"/>
+    <line x1="0" y1="120" x2="200" y2="120"/>
+    <line x1="600" y1="140" x2="800" y2="140"/>
+  </g>
+  <!-- Plant silhouette -->
+  <g transform="translate(580,200)" fill="#1a1210" opacity="0.5">
+    <ellipse cx="0" cy="0" rx="60" ry="90" transform="rotate(-5)"/>
+    <ellipse cx="-30" cy="-40" rx="35" ry="60" transform="rotate(-20 -30 -40)"/>
+    <ellipse cx="40" cy="-50" rx="40" ry="70" transform="rotate(15 40 -50)"/>
+    <ellipse cx="10" cy="-80" rx="30" ry="50" transform="rotate(-5 10 -80)"/>
+  </g>
+  <rect width="800" height="500" fill="rgba(30,20,18,0.35)"/>
+  <text x="60" y="410" fill="#F5F1E8" font-family="Georgia,serif" font-size="28">The Evolutionary</text>
+  <text x="60" y="445" fill="#C97D5A" font-family="Georgia,serif" font-size="36" font-weight="bold">Arms Race</text>
+  <line x1="60" y1="460" x2="170" y2="460" stroke="#C97D5A" stroke-width="2" opacity="0.8"/>
+</svg>

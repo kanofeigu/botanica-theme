@@ -1,0 +1,99 @@
+{% comment %}
+  blocks/care-table.liquid — Plant care table container
+  Wraps care-row blocks in a proper <table> for accessibility.
+  Uses {% content_for "blocks" %} for merchants to add/order care rows.
+{% endcomment %}
+{%- liquid
+  assign title = block.settings.title | default: 'Plant care guide'
+  assign has_rows = false
+  for child in section.blocks
+    if child.type == 'care-row'
+      assign has_rows = true
+      break
+    endif
+  endfor
+-%}
+{%- if has_rows -%}
+  <div class="bt-care-table" {{ block.shopify_attributes }}>
+    {%- if title != blank -%}
+      <h3 class="bt-care-table__title bt-eyebrow">{{ title }}</h3>
+    {%- endif -%}
+    <table class="bt-care-table__table">
+      <caption class="bt-sr-only">{{ title | default: 'Care guide' }}</caption>
+      <tbody>
+        {%- for child in section.blocks -%}
+          {%- if child.type == 'care-row' -%}
+            {%- liquid
+              assign icon = child.settings.icon | default: 'light'
+              assign label = child.settings.label | default: ''
+              assign value = child.settings.value | default: ''
+              assign show_meter = child.settings.show_meter | default: false
+              assign level = child.settings.level | default: 0 | plus: 0
+            -%}
+            <tr {{ child.shopify_attributes }}>
+              <td class="bt-care-table__icon">
+                {%- case icon -%}
+                  {%- when 'light' -%}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  {%- when 'water' -%}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3C7 8 4 11 4 13.5a6 6 0 0 0 12 0C16 11 13 8 10 3Z" stroke="currentColor" stroke-width="1.5"/></svg>
+                  {%- when 'humidity' -%}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 10a5 5 0 0 1 10 0c0 3-5 7-5 7s-5-4-5-7Z" stroke="currentColor" stroke-width="1.5"/></svg>
+                  {%- when 'size' -%}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 2h5v5M18 2l-6 6M18 18h-5v-5M2 18l6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  {%- when 'toxicity' -%}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v5M10 14v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  {%- when 'temperature' -%}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2v8M6 10a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z" stroke="currentColor" stroke-width="1.5"/><path d="M10 2a2 2 0 0 1 2 2v6a2 2 0 0 1-4 0V4a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.5"/></svg>
+                  {%- else -%}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/></svg>
+                {%- endcase -%}
+              </td>
+              <td class="bt-care-table__label">{{ label }}</td>
+              <td class="bt-care-table__value">{{ value }}</td>
+              {%- if show_meter -%}
+                <td class="bt-care-table__meter" aria-hidden="true">
+                  {%- for i in (1..3) -%}
+                    <span class="bt-meter__dot{% if i <= level %} is-on{% endif %}"></span>
+                  {%- endfor -%}
+                </td>
+              {%- endif -%}
+            </tr>
+          {%- endif -%}
+        {%- endfor -%}
+      </tbody>
+    </table>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-care-table {
+    margin-top: var(--bt-space-md);
+  }
+  .bt-care-table__title {
+    margin-bottom: var(--bt-space-2xs);
+  }
+  .bt-care-table__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.care_table.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:blocks.care_table.settings.title.label",
+      "default": "Plant care guide"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.care_table.name"
+    }
+  ]
+}
+{% endschema %}

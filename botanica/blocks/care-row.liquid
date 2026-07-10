@@ -1,0 +1,150 @@
+{% comment %}
+  blocks/care-row.liquid — Single plant care data row
+  ★ CRITICAL COMPLIANCE: All data from block settings, NOT custom metafields.
+  Merchants fill in label, value, meter level in the theme editor.
+  Optional: advanced merchants can connect to dynamic sources manually.
+{% endcomment %}
+{%- liquid
+  assign icon = block.settings.icon | default: 'light'
+  assign label = block.settings.label
+  assign value = block.settings.value
+  assign show_meter = block.settings.show_meter
+  assign level = block.settings.level | plus: 0
+-%}
+{%- if label != blank and value != blank -%}
+  <div class="bt-care__row" {{ block.shopify_attributes }} role="row">
+    <dt class="bt-care__key" role="rowheader">
+      <span class="bt-care__icon" aria-hidden="true">
+        {%- case icon -%}
+          {%- when 'light' -%}
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M10 1v3M10 16v3M3 10H0M20 10h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          {%- when 'water' -%}
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 18c-3-4-7-6-7-10a7 7 0 1114 0c0 4-4 6-7 10z" stroke="currentColor" stroke-width="1.5"/></svg>
+          {%- when 'humidity' -%}
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10c0-3 5-8 5-8s5 5 5 8a5 5 0 11-10 0z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="14" r="2" fill="currentColor"/></svg>
+          {%- when 'size' -%}
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 3h14v14H3z" stroke="currentColor" stroke-width="1.5"/><path d="M3 3l5 5m9-5l-5 5" stroke="currentColor" stroke-width="1.5"/></svg>
+          {%- when 'toxicity' -%}
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1l7 10H3l7-10z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="15" r="2" fill="currentColor"/></svg>
+          {%- when 'temperature' -%}
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2v10M10 16v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
+        {%- endcase -%}
+      </span>
+      <span>{{ label }}</span>
+    </dt>
+    <dd class="bt-care__val" role="cell">
+      {%- if show_meter -%}
+        <span class="bt-meter" role="img" aria-label="{{ value }} — {{ level }} out of 3">
+          {%- for i in (1..3) -%}
+            <span class="bt-meter__dot{% if i <= level %} is-on{% endif %}" aria-hidden="true"></span>
+          {%- endfor -%}
+        </span>
+        <span class="bt-sr-only">{{ value }}</span>
+      {%- else -%}
+        {{ value }}
+      {%- endif -%}
+    </dd>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-care__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bt-space-2xs) 0;
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-care__row:last-child {
+    border-bottom: none;
+  }
+  .bt-care__key {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: 500;
+    color: var(--bt-color-text-muted);
+  }
+  .bt-care__icon {
+    display: flex;
+    align-items: center;
+    color: var(--bt-color-secondary);
+    flex-shrink: 0;
+  }
+  .bt-care__val {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: 600;
+    color: var(--bt-color-text);
+    text-align: right;
+  }
+  .bt-meter {
+    display: inline-flex;
+    gap: 4px;
+    vertical-align: middle;
+  }
+  .bt-meter__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bt-color-border-light);
+    transition: background var(--bt-duration-fast);
+  }
+  .bt-meter__dot.is-on {
+    background: var(--bt-color-primary);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.care_row.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:blocks.care_row.settings.icon.label",
+      "options": [
+        { "value": "light", "label": "t:blocks.care_row.settings.icon.options__1.label" },
+        { "value": "water", "label": "t:blocks.care_row.settings.icon.options__2.label" },
+        { "value": "humidity", "label": "t:blocks.care_row.settings.icon.options__3.label" },
+        { "value": "size", "label": "t:blocks.care_row.settings.icon.options__4.label" },
+        { "value": "toxicity", "label": "t:blocks.care_row.settings.icon.options__5.label" },
+        { "value": "temperature", "label": "t:blocks.care_row.settings.icon.options__6.label" }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:blocks.care_row.settings.label.label",
+      "default": "Light"
+    },
+    {
+      "type": "text",
+      "id": "value",
+      "label": "t:blocks.care_row.settings.value.label",
+      "default": "Bright indirect"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_meter",
+      "label": "t:blocks.care_row.settings.show_meter.label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "level",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "default": 2,
+      "label": "t:blocks.care_row.settings.level.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.care_row.name"
+    }
+  ]
+}
+{% endschema %}

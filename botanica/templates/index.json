@@ -1,0 +1,495 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "botanical-ambience": {
+      "type": "botanical-ambience",
+      "settings": {
+        "show_leaves": true,
+        "show_spores": true,
+        "show_vines": true,
+        "show_silhouettes": true,
+        "leaf_opacity": 55,
+        "spore_opacity": 45
+      }
+    },
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "layout": "split",
+        "eyebrow": "Issue 01 — Field guide",
+        "heading": "Bring the outside in",
+        "text": "Curated indoor plants selected for their beauty, resilience, and ability to transform any space into a living sanctuary.",
+        "button_label": "Explore the collection",
+        "button_link": "/collections/all-plants"
+      }
+    },
+    "rich-text-intro": {
+      "type": "rich-text",
+      "blocks": {
+        "eyebrow_intro": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Our philosophy"
+          }
+        },
+        "heading_intro": {
+          "type": "heading",
+          "settings": {
+            "text": "Plants make us better"
+          }
+        },
+        "text_intro": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We believe every home deserves life. Our plants are hand-selected from trusted growers, shipped in eco-friendly packaging, and backed by our care guarantee. No matter your space or experience level, there's a plant here for you.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_intro",
+        "heading_intro",
+        "text_intro"
+      ],
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 12
+      }
+    },
+    "collection-list": {
+      "type": "collection-list",
+      "settings": {
+        "heading": "Shop by category",
+        "collections": [
+          "easy-care",
+          "moderate-care",
+          "expert-care",
+          "low-light",
+          "bright-light",
+          "pet-safe"
+        ],
+        "collections_per_page": 6,
+        "columns_desktop": "3",
+        "show_product_count": true,
+        "padding_top": 12,
+        "padding_bottom": 40
+      }
+    },
+    "shop-by-care": {
+      "type": "shop-by-care",
+      "blocks": {
+        "easy": {
+          "type": "care-card",
+          "settings": {
+            "icon": "easy",
+            "badge_text": "Beginner friendly",
+            "title": "Easy care",
+            "description": "Thrives on neglect. Perfect for beginners, busy schedules, and low-light corners.",
+            "light_level": 1,
+            "water_level": 1,
+            "card_tint": "easy"
+          }
+        },
+        "medium": {
+          "type": "care-card",
+          "settings": {
+            "icon": "medium",
+            "badge_text": "Some attention",
+            "title": "Moderate",
+            "description": "Needs a bit more light and a consistent watering schedule. Rewards you with stunning growth.",
+            "light_level": 2,
+            "water_level": 2,
+            "card_tint": "medium"
+          }
+        },
+        "expert": {
+          "type": "care-card",
+          "settings": {
+            "icon": "expert",
+            "badge_text": "For the dedicated",
+            "title": "Expert",
+            "description": "Rare specimens that require specific conditions. The ultimate reward for passionate collectors.",
+            "light_level": 3,
+            "water_level": 3,
+            "card_tint": "expert"
+          }
+        }
+      },
+      "block_order": [
+        "easy",
+        "medium",
+        "expert"
+      ],
+      "settings": {
+        "heading": "Shop by care level",
+        "description": "Whether you have a green thumb or are just starting your plant journey, we have the perfect companion for your space."
+      }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Shop the collection",
+        "collection": "all-plants",
+        "products_to_show": 8,
+        "columns_desktop": "4"
+      }
+    },
+    "image-with-text": {
+      "type": "image-with-text",
+      "blocks": {
+        "eyebrow_iwt": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Care promise"
+          }
+        },
+        "heading_iwt": {
+          "type": "heading",
+          "settings": {
+            "text": "Every plant comes with a care guide"
+          }
+        },
+        "text_iwt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We don't just ship plants — we ship knowledge. Every order includes a detailed care card specific to your plant's needs: light, water, humidity, and troubleshooting tips. Plus, you get lifetime access to our plant doctor service.</p>"
+          }
+        },
+        "button_iwt": {
+          "type": "button-group",
+          "settings": {
+            "label": "Learn more",
+            "style": "outline"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_iwt",
+        "heading_iwt",
+        "text_iwt",
+        "button_iwt"
+      ],
+      "settings": {
+        "layout": "text_first",
+        "image_aspect": "4-5",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "plant-spotlight": {
+      "type": "plant-spotlight",
+      "blocks": {
+        "eyebrow_01": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Monstera deliciosa"
+          }
+        },
+        "heading_01": {
+          "type": "heading",
+          "settings": {
+            "text": "Swiss cheese plant"
+          }
+        },
+        "media_01": {
+          "type": "spotlight-media",
+          "settings": {
+            "label": "Specimen #042 — Araceae",
+            "show_texture": true
+          }
+        },
+        "text_01": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The iconic Monstera — instantly recognizable by its fenestrated leaves and climbing habit. A statement plant that rewards attentive care with dramatic growth.</p>"
+          }
+        },
+        "care_table_01": {
+          "type": "care-table",
+          "settings": {
+            "title": "Care at a glance"
+          }
+        },
+        "care_light": {
+          "type": "care-row",
+          "settings": {
+            "icon": "light",
+            "label": "Light",
+            "value": "Bright indirect",
+            "show_meter": true,
+            "level": 3
+          }
+        },
+        "care_water": {
+          "type": "care-row",
+          "settings": {
+            "icon": "water",
+            "label": "Water",
+            "value": "Weekly",
+            "show_meter": true,
+            "level": 2
+          }
+        },
+        "care_humidity": {
+          "type": "care-row",
+          "settings": {
+            "icon": "humidity",
+            "label": "Humidity",
+            "value": "Moderate to high",
+            "show_meter": true,
+            "level": 3
+          }
+        },
+        "care_size": {
+          "type": "care-row",
+          "settings": {
+            "icon": "size",
+            "label": "Mature size",
+            "value": "Up to 200cm",
+            "show_meter": true,
+            "level": 3
+          }
+        },
+        "care_toxicity": {
+          "type": "care-row",
+          "settings": {
+            "icon": "toxicity",
+            "label": "Toxicity",
+            "value": "Toxic to pets",
+            "show_meter": false,
+            "level": 0
+          }
+        },
+        "quote_01": {
+          "type": "editorial-quote",
+          "settings": {
+            "quote": "The Monstera is the gateway plant — the one that turns a casual buyer into a lifelong collector. Its leaves tell the story of its care.",
+            "attribution": "Hannah Lee, botanist"
+          }
+        },
+        "button_01": {
+          "type": "button-group",
+          "settings": {
+            "label": "View Monstera collection",
+            "style": "primary"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_01",
+        "heading_01",
+        "media_01",
+        "text_01",
+        "care_table_01",
+        "care_light",
+        "care_water",
+        "care_humidity",
+        "care_size",
+        "care_toxicity",
+        "quote_01",
+        "button_01"
+      ],
+      "settings": {}
+    },
+    "multicolumn": {
+      "type": "multicolumn",
+      "blocks": {
+        "col_1": {
+          "type": "column",
+          "settings": {
+            "title": "Hand-selected",
+            "text": "Every plant is inspected by our team before shipping to ensure it arrives healthy and thriving."
+          }
+        },
+        "col_2": {
+          "type": "column",
+          "settings": {
+            "title": "Care guarantee",
+            "text": "Each order includes a detailed care guide. If your plant struggles, our plant doctor team is here to help."
+          }
+        },
+        "col_3": {
+          "type": "column",
+          "settings": {
+            "title": "Eco packaging",
+            "text": "100% recyclable, plastic-free packaging. Carbon-neutral shipping on every order."
+          }
+        },
+        "col_4": {
+          "type": "column",
+          "settings": {
+            "title": "Free shipping",
+            "text": "Free standard shipping on orders over $50. Plants arrive within 3–5 business days."
+          }
+        }
+      },
+      "block_order": [
+        "col_1",
+        "col_2",
+        "col_3",
+        "col_4"
+      ],
+      "settings": {
+        "heading": "The Botanica difference",
+        "columns_desktop": "4",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "size-guide": {
+      "type": "size-guide",
+      "blocks": {
+        "mini": {
+          "type": "size-card",
+          "settings": {
+            "title": "Mini",
+            "height_cm": 15,
+            "pot_cm": 8,
+            "description": "Palm-sized. Desks, nightstands, and tiny corners"
+          }
+        },
+        "desk": {
+          "type": "size-card",
+          "settings": {
+            "title": "Desk",
+            "height_cm": 35,
+            "pot_cm": 14,
+            "description": "Windowsills, bookshelves, and side tables"
+          }
+        },
+        "floor": {
+          "type": "size-card",
+          "settings": {
+            "title": "Floor",
+            "height_cm": 75,
+            "pot_cm": 22,
+            "description": "Next to sofas, armchairs, and consoles"
+          }
+        },
+        "statement": {
+          "type": "size-card",
+          "settings": {
+            "title": "Statement",
+            "height_cm": 130,
+            "pot_cm": 36,
+            "description": "Room corners, entryways, and double-height spaces"
+          }
+        }
+      },
+      "block_order": [
+        "mini",
+        "desk",
+        "floor",
+        "statement"
+      ],
+      "settings": {
+        "heading": "Find your size",
+        "description": "From windowsill companions to living room centerpieces — every plant has its place."
+      }
+    },
+    "care-blog-teaser": {
+      "type": "care-blog-teaser",
+      "blocks": {
+        "card_01": {
+          "type": "manual_card",
+          "settings": {
+            "tag": "Photosynthesis",
+            "title": "The secret life of chlorophyll: how plants turn sunlight into energy",
+            "excerpt": "Photosynthesis is not just a chapter from your high school textbook — it is the engine driving every leaf in your home. Here is how it actually works.",
+            "link": "/blogs/plant-care-journal-1"
+          }
+        },
+        "card_02": {
+          "type": "manual_card",
+          "settings": {
+            "tag": "Mycology",
+            "title": "Mycorrhizal networks: the hidden fungal internet beneath your potting mix",
+            "excerpt": "Your plant's roots are not working alone. Trillions of fungi form a symbiotic web that delivers water and nutrients across the soil ecosystem.",
+            "link": "/blogs/plant-care-journal-1"
+          }
+        },
+        "card_03": {
+          "type": "manual_card",
+          "settings": {
+            "tag": "Evolution",
+            "title": "The evolutionary arms race: how houseplants developed toxicity to survive",
+            "excerpt": "Calcium oxalate crystals, latex sap, and alkaloids — the chemical weapons your peaceful-looking houseplants have been quietly perfecting for millions of years.",
+            "link": "/blogs/plant-care-journal-1"
+          }
+        }
+      },
+      "block_order": [
+        "card_01",
+        "card_02",
+        "card_03"
+      ],
+      "settings": {
+        "heading": "The Field Journal",
+        "blog": "plant-care-journal-1",
+        "use_manual": false,
+        "show_excerpt": true,
+        "show_date": true,
+        "show_author": true
+      }
+    },
+    "rich-text-closing": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_close": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to grow?"
+          }
+        },
+        "text_close": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Join thousands of plant parents who trust Botanica for quality, beauty, and expert guidance.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_close",
+        "text_close"
+      ],
+      "settings": {
+        "padding_top": 20,
+        "padding_bottom": 8
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "The Field Journal",
+        "description": "Plant care guides, new arrivals, and seasonal tips delivered to your inbox every month."
+      }
+    },
+    "apps": {
+      "type": "apps",
+      "settings": {}
+    }
+  },
+  "order": [
+    "botanical-ambience",
+    "hero",
+    "rich-text-intro",
+    "collection-list",
+    "shop-by-care",
+    "featured-collection",
+    "image-with-text",
+    "plant-spotlight",
+    "multicolumn",
+    "size-guide",
+    "care-blog-teaser",
+    "rich-text-closing",
+    "newsletter",
+    "apps"
+  ]
+}

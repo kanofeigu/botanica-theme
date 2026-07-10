@@ -1,0 +1,112 @@
+{% comment %}
+  blocks/care-panel.liquid — Care panel with icon rows
+  Data from block settings — zero custom metafields.
+{% endcomment %}
+<div class="bt-care-panel" {{ block.shopify_attributes }}>
+  {%- if block.settings.panel_title != blank -%}
+    <h3 class="bt-care-panel__title">{{ block.settings.panel_title | escape }}</h3>
+  {%- endif -%}
+  <div class="bt-care-panel__grid">
+    {%- if block.settings.care_light != blank -%}
+      <div class="bt-care-panel__item">
+        <svg class="bt-care-panel__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="bt-care-panel__label">Light</span>
+        <span class="bt-care-panel__value">{{ block.settings.care_light | escape }}</span>
+      </div>
+    {%- endif -%}
+    {%- if block.settings.care_water != blank -%}
+      <div class="bt-care-panel__item">
+        <svg class="bt-care-panel__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3C7 8 4 11 4 13.5a6 6 0 0 0 12 0C16 11 13 8 10 3Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="bt-care-panel__label">Water</span>
+        <span class="bt-care-panel__value">{{ block.settings.care_water | escape }}</span>
+      </div>
+    {%- endif -%}
+    {%- if block.settings.care_humidity != blank -%}
+      <div class="bt-care-panel__item">
+        <svg class="bt-care-panel__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 10a5 5 0 0 1 10 0c0 3-5 7-5 7s-5-4-5-7Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="bt-care-panel__label">Humidity</span>
+        <span class="bt-care-panel__value">{{ block.settings.care_humidity | escape }}</span>
+      </div>
+    {%- endif -%}
+    {%- if block.settings.care_size != blank -%}
+      <div class="bt-care-panel__item">
+        <svg class="bt-care-panel__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 2h5v5M18 2l-6 6M18 18h-5v-5M2 18l6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="bt-care-panel__label">Mature size</span>
+        <span class="bt-care-panel__value">{{ block.settings.care_size | escape }}</span>
+      </div>
+    {%- endif -%}
+    {%- if block.settings.care_toxicity != blank -%}
+      <div class="bt-care-panel__item">
+        <svg class="bt-care-panel__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v5M10 14v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="bt-care-panel__label">Toxicity</span>
+        <span class="bt-care-panel__value">{{ block.settings.care_toxicity | escape }}</span>
+      </div>
+    {%- endif -%}
+    {%- if block.settings.care_food != blank -%}
+      <div class="bt-care-panel__item">
+        <svg class="bt-care-panel__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2v5M7 5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M5 9h10l-1 9H6l-1-9Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="bt-care-panel__label">Food</span>
+        <span class="bt-care-panel__value">{{ block.settings.care_food | escape }}</span>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-care-panel {
+    background: var(--bt-color-surface, #FAF7EF);
+    border-radius: var(--bt-radius-card, 14px);
+    padding: 1.5rem;
+  }
+  .bt-care-panel__title {
+    font-family: var(--bt-font-heading, Fraunces, serif);
+    font-size: var(--bt-fs-h4);
+    margin: 0 0 1rem;
+    color: var(--bt-color-text, #2E2A24);
+  }
+  .bt-care-panel__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .bt-care-panel__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .bt-care-panel__icon {
+    flex-shrink: 0;
+    color: var(--bt-color-primary, #4A6B4F);
+  }
+  .bt-care-panel__label {
+    font-size: var(--bt-fs-small);
+    color: var(--bt-color-text-muted, #4D4840);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-width: 60px;
+  }
+  .bt-care-panel__value {
+    font-size: var(--bt-fs-small);
+    color: var(--bt-color-text, #2E2A24);
+    font-weight: 500;
+    width: 100%;
+    padding-left: 28px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Care panel",
+  "settings": [
+    { "type": "text", "id": "panel_title", "label": "Panel title", "default": "Care at a glance" },
+    { "type": "text", "id": "care_light", "label": "Light", "default": "Bright, indirect" },
+    { "type": "text", "id": "care_water", "label": "Water", "default": "When top 2cm dry" },
+    { "type": "text", "id": "care_humidity", "label": "Humidity", "default": "50–60%" },
+    { "type": "text", "id": "care_size", "label": "Mature size", "default": "Up to 120cm indoors" },
+    { "type": "text", "id": "care_toxicity", "label": "Toxicity", "default": "Mild — keep from pets" },
+    { "type": "text", "id": "care_food", "label": "Food", "default": "Monthly in growing season" }
+  ],
+  "presets": [{ "name": "Care panel" }]
+}
+{% endschema %}

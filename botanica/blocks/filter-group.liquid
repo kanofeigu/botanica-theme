@@ -1,0 +1,81 @@
+{% comment %}
+  blocks/filter-group.liquid — Curated sidebar filter / navigation block.
+  Renders a heading and list of links for the collection sidebar.
+  For Shopify-native filtering, the main-collection-product-grid section handles it.
+  Zero Dawn code. All-original.
+{% endcomment %}
+{%- liquid
+  assign heading = block.settings.heading
+  assign link_list = block.settings.link_list
+  assign show_count = block.settings.show_count
+-%}
+
+{%- if heading != blank and link_list != blank -%}
+  <div class="bt-filter-group" {{ block.shopify_attributes }}>
+    <h3 class="bt-filter-group__heading">{{ heading }}</h3>
+    <ul class="bt-filter-group__links" role="list">
+      {%- for link in link_list.links -%}
+        <li>
+          <a
+            href="{{ link.url }}"
+            class="bt-filter-group__link{% if link.current or link.active %} is-active{% endif %}"
+            {% if link.current %}aria-current="page"{% endif %}
+          >
+            {{ link.title }}
+            {%- if show_count and link.object and link.object.all_products_count -%}
+              <span class="bt-filter-group__count" aria-hidden="true">{{ link.object.all_products_count }}</span>
+            {%- endif -%}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-filter-group { margin-bottom: var(--bt-space-md); }
+  .bt-filter-group__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    margin-bottom: var(--bt-space-xs);
+    color: var(--bt-color-text);
+  }
+  .bt-filter-group__links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-3xs);
+  }
+  .bt-filter-group__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--bt-space-3xs) 0;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    text-decoration: none;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-filter-group__link:hover,
+  .bt-filter-group__link.is-active {
+    color: var(--bt-color-primary);
+    font-weight: var(--bt-fw-medium);
+  }
+  .bt-filter-group__count {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    opacity: 0.7;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.filter_group.name",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "t:blocks.filter_group.settings.heading.label", "default": "Filter by" },
+    { "type": "link_list", "id": "link_list", "label": "t:blocks.filter_group.settings.link_list.label" },
+    { "type": "checkbox", "id": "show_count", "label": "t:blocks.filter_group.settings.show_count.label", "default": false }
+  ],
+  "presets": [{ "name": "t:blocks.filter_group.name" }]
+}
+{% endschema %}

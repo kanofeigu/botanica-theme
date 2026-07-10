@@ -1,0 +1,209 @@
+{% comment %}
+  blocks/care-card.liquid — Care difficulty card for shop-by-care
+  Icon + badge + title + description + light/water meter preview + collection link.
+  Used in shop-by-care section. 3 cards: Easy / Moderate / Expert.
+{% endcomment %}
+{%- liquid
+  assign icon = block.settings.icon | default: 'easy'
+  assign badge = block.settings.badge_text
+  assign title = block.settings.title
+  assign description = block.settings.description
+  assign light_level = block.settings.light_level | plus: 0
+  assign water_level = block.settings.water_level | plus: 0
+  assign collection_handle = block.settings.collection
+  assign link_label = block.settings.link_label | default: 'Shop collection'
+  assign tint = block.settings.card_tint | default: 'none'
+-%}
+{%- if title != blank -%}
+  <article class="bt-care-card bt-care-card--{{ tint }} bt-lift bt-specimen-border" {{ block.shopify_attributes }}>
+    <div class="bt-care-card__icon" aria-hidden="true">
+      {%- case icon -%}
+        {%- when 'easy' -%}
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5"/><path d="M14 20l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {%- when 'medium' -%}
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 6c-3 6-8 9-8 14a8 8 0 0016 0c0-5-5-8-8-14z" stroke="currentColor" stroke-width="1.5"/><path d="M20 22v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        {%- when 'expert' -%}
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 4l16 28H4L20 4z" stroke="currentColor" stroke-width="1.5"/><path d="M20 16v8M20 28v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      {%- endcase -%}
+    </div>
+    {%- if badge != blank -%}
+      <span class="bt-care-card__badge bt-badge">{{ badge | escape }}</span>
+    {%- endif -%}
+    <h3 class="bt-care-card__title">{{ title | escape }}</h3>
+    {%- if description != blank -%}
+      <p class="bt-care-card__desc">{{ description | escape }}</p>
+    {%- endif -%}
+    <div class="bt-care-card__meters" aria-hidden="true">
+      <div class="bt-care-card__meter">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span class="bt-care-card__dots">
+          {%- for i in (1..3) -%}
+            <span class="bt-care-card__dot{% if i <= light_level %} is-on{% endif %}"></span>
+          {%- endfor -%}
+        </span>
+      </div>
+      <div class="bt-care-card__meter">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C5 6 3 8 3 10.5a5 5 0 0010 0C13 8 11 6 8 2z" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span class="bt-care-card__dots">
+          {%- for i in (1..3) -%}
+            <span class="bt-care-card__dot{% if i <= water_level %} is-on{% endif %}"></span>
+          {%- endfor -%}
+        </span>
+      </div>
+    </div>
+    {%- if collection_handle != blank -%}
+      <a href="{{ collections[collection_handle].url | default: '#' }}" class="bt-care-card__link bt-btn bt-btn--outline">
+        {{ link_label | escape }}
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    {%- endif -%}
+  </article>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-care-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--bt-space-xl) var(--bt-space-md);
+    background: var(--bt-color-surface);
+    border-radius: var(--bt-radius-card);
+    text-align: center;
+    gap: var(--bt-space-sm);
+    transition: transform var(--bt-duration-base) var(--bt-ease-out), box-shadow var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-care-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--bt-shadow-card-hover);
+  }
+  .bt-care-card--easy { background: color-mix(in srgb, var(--bt-color-primary) 5%, var(--bt-color-surface)); }
+  .bt-care-card--medium { background: color-mix(in srgb, var(--bt-color-secondary) 5%, var(--bt-color-surface)); }
+  .bt-care-card--expert { background: color-mix(in srgb, var(--bt-color-text) 4%, var(--bt-color-surface)); }
+  .bt-care-card__icon {
+    color: var(--bt-color-primary);
+    margin-bottom: var(--bt-space-2xs);
+  }
+  .bt-care-card--medium .bt-care-card__icon { color: var(--bt-color-secondary); }
+  .bt-care-card--expert .bt-care-card__icon { color: var(--bt-color-text-muted); }
+  .bt-care-card__badge { margin-bottom: 0; }
+  .bt-care-card__title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h3);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    margin: 0;
+  }
+  .bt-care-card__desc {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    max-width: 30ch;
+    margin: 0;
+  }
+  .bt-care-card__meters {
+    display: flex;
+    gap: var(--bt-space-md);
+    margin: var(--bt-space-2xs) 0;
+  }
+  .bt-care-card__meter {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--bt-color-text-muted);
+  }
+  .bt-care-card__dots {
+    display: flex;
+    gap: 3px;
+  }
+  .bt-care-card__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bt-color-border-light);
+  }
+  .bt-care-card__dot.is-on { background: var(--bt-color-primary); }
+  .bt-care-card__link {
+    margin-top: var(--bt-space-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bt-space-3xs);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.care_card.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:blocks.care_card.settings.icon.label",
+      "options": [
+        { "value": "easy", "label": "t:blocks.care_card.settings.icon.options__1.label" },
+        { "value": "medium", "label": "t:blocks.care_card.settings.icon.options__2.label" },
+        { "value": "expert", "label": "t:blocks.care_card.settings.icon.options__3.label" }
+      ],
+      "default": "easy"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "t:blocks.care_card.settings.badge_text.label",
+      "default": "Beginner friendly"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:blocks.care_card.settings.title.label",
+      "default": "Easy care"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "t:blocks.care_card.settings.description.label",
+      "default": "Thrives on neglect — perfect for beginners and busy plant parents."
+    },
+    {
+      "type": "range",
+      "id": "light_level",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "default": 1,
+      "label": "t:blocks.care_card.settings.light_level.label"
+    },
+    {
+      "type": "range",
+      "id": "water_level",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "default": 1,
+      "label": "t:blocks.care_card.settings.water_level.label"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:blocks.care_card.settings.collection.label"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:blocks.care_card.settings.link_label.label",
+      "default": "Shop collection"
+    },
+    {
+      "type": "select",
+      "id": "card_tint",
+      "label": "t:blocks.care_card.settings.card_tint.label",
+      "options": [
+        { "value": "none", "label": "t:blocks.care_card.settings.card_tint.options__1.label" },
+        { "value": "easy", "label": "t:blocks.care_card.settings.card_tint.options__2.label" },
+        { "value": "medium", "label": "t:blocks.care_card.settings.card_tint.options__3.label" },
+        { "value": "expert", "label": "t:blocks.care_card.settings.card_tint.options__4.label" }
+      ],
+      "default": "none"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.care_card.name" }]
+}
+{% endschema %}

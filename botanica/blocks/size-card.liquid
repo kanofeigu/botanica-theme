@@ -1,0 +1,159 @@
+{% comment %}
+  blocks/size-card.liquid — Plant size comparison card
+  Height + pot diameter + merchant-uploadable image (SVG fallback).
+  Configurable cm/inch; block stores cm natively.
+  Used in size-guide section and product spotlight.
+{% endcomment %}
+{%- liquid
+  assign title = block.settings.title
+  assign height_cm = block.settings.height_cm | plus: 0
+  assign pot_cm = block.settings.pot_cm | plus: 0
+  assign description = block.settings.description
+  assign image = block.settings.image
+  if height_cm < 1
+    assign height_cm = 30
+  endif
+  if pot_cm < 1
+    assign pot_cm = 12
+  endif
+  assign height_in = height_cm | divided_by: 2.54 | round: 1
+  assign pot_in = pot_cm | divided_by: 2.54 | round: 1
+-%}
+<div class="bt-size-card bt-lift" {{ block.shopify_attributes }}>
+  {% render 'specimen-tag',
+    number: height_cm | append: 'cm',
+    label: 'Plant size',
+    value: title
+  %}
+  {%- if image != blank -%}
+    <div class="bt-size-card__visual">
+      {{ image | image_url: width: 400 | image_tag:
+        loading: 'lazy',
+        widths: '200, 400, 600',
+        sizes: '(max-width: 749px) 280px, (max-width: 989px) 220px, 360px',
+        alt: title,
+        class: 'bt-size-card__img'
+      }}
+    </div>
+  {%- endif -%}
+  <div class="bt-size-card__info">
+    {%- if title != blank -%}
+      <h4 class="bt-size-card__title">{{ title | escape }}</h4>
+    {%- endif -%}
+    <dl class="bt-size-card__specs">
+      <div class="bt-size-card__spec">
+        <dt>{{ 'products.product.height' | t }}</dt>
+        <dd>{{ height_cm }}cm / {{ height_in }}"</dd>
+      </div>
+      <div class="bt-size-card__spec">
+        <dt>{{ 'products.product.pot_diameter' | t }}</dt>
+        <dd>{{ pot_cm }}cm / {{ pot_in }}"</dd>
+      </div>
+    </dl>
+    {%- if description != blank -%}
+      <p class="bt-size-card__desc">{{ description | escape }}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-size-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--bt-space-md);
+    background: var(--bt-color-surface);
+    border-radius: var(--bt-radius-card);
+    gap: var(--bt-space-sm);
+    text-align: center;
+  }
+  .bt-size-card__visual {
+    width: 100%;
+    max-width: 320px;
+  }
+  .bt-size-card__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--bt-radius-md);
+    background: var(--bt-color-surface-hover);
+  }
+  .bt-size-card__title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    margin: 0;
+  }
+  .bt-size-card__specs {
+    display: flex;
+    gap: var(--bt-space-md);
+    margin: var(--bt-space-2xs) 0;
+  }
+  .bt-size-card__spec dt {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .bt-size-card__spec dd {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    margin: 0;
+  }
+  .bt-size-card__desc {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    max-width: 30ch;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.size_card.name",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:blocks.size_card.settings.image.label",
+      "info": "t:blocks.size_card.settings.image.info"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:blocks.size_card.settings.title.label",
+      "default": "Desk size"
+    },
+    {
+      "type": "range",
+      "id": "height_cm",
+      "min": 10,
+      "max": 250,
+      "step": 5,
+      "default": 30,
+      "unit": "cm",
+      "label": "t:blocks.size_card.settings.height_cm.label"
+    },
+    {
+      "type": "range",
+      "id": "pot_cm",
+      "min": 5,
+      "max": 80,
+      "step": 1,
+      "default": 14,
+      "unit": "cm",
+      "label": "t:blocks.size_card.settings.pot_cm.label"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "t:blocks.size_card.settings.description.label",
+      "default": "Perfect for desks, shelves, and windowsills"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.size_card.name" }]
+}
+{% endschema %}

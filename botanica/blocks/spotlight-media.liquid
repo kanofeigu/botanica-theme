@@ -1,0 +1,113 @@
+{% comment %}
+  blocks/spotlight-media.liquid — Featured image block for plant spotlight
+  4:5 picture frame with paper texture overlay + specimen label tag.
+  Editorial botanical illustration aesthetic.
+{% endcomment %}
+{%- liquid
+  assign image = block.settings.image
+  assign label = block.settings.label
+  assign show_texture = block.settings.show_texture | default: true
+-%}
+{%- if image != blank -%}
+  <div class="bt-spotlight-media" {{ block.shopify_attributes }}>
+    <div class="bt-spotlight-media__frame"
+      {%- if show_texture -%}
+        style="--bt-spotlight-texture: radial-gradient(ellipse at 70% 30%, rgba(var(--bt-color-bg-rgb),0.15) 0%, transparent 70%)"
+      {%- endif -%}
+    >
+      {{ image | image_url: width: 800 | image_tag:
+        loading: 'lazy',
+        widths: '400, 600, 800, 1000',
+        sizes: '(min-width: 990px) 50vw, 100vw',
+        alt: image.alt,
+        class: 'bt-spotlight-media__img'
+      }}
+      {%- if show_texture -%}
+        <div class="bt-spotlight-media__texture" aria-hidden="true"></div>
+      {%- endif -%}
+    </div>
+    {%- if label != blank -%}
+      <div class="bt-spotlight-media__tag" aria-hidden="true">
+        <span class="bt-eyebrow">{{ label | escape }}</span>
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-spotlight-media {
+    position: relative;
+    margin: var(--bt-space-md) 0;
+  }
+  .bt-spotlight-media__frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--bt-radius-card);
+    overflow: hidden;
+    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-color-border-light);
+  }
+  .bt-spotlight-media__frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bt-spotlight-texture, none);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .bt-spotlight-media__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .bt-spotlight-media__texture {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(var(--bt-color-bg-rgb), 0.02) 2px, rgba(var(--bt-color-bg-rgb), 0.02) 4px);
+  }
+  .bt-spotlight-media__tag {
+    position: absolute;
+    bottom: var(--bt-space-sm);
+    left: var(--bt-space-sm);
+    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-tag);
+    padding: 4px 12px;
+    z-index: 2;
+  }
+  .bt-spotlight-media__tag .bt-eyebrow {
+    margin-bottom: 0;
+    font-size: var(--bt-fs-specimen);
+    color: var(--bt-color-text);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.spotlight_media.name",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:blocks.spotlight_media.settings.image.label"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:blocks.spotlight_media.settings.label.label",
+      "default": "Specimen No. 0142"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_texture",
+      "label": "t:blocks.spotlight_media.settings.show_texture.label",
+      "default": true
+    }
+  ],
+  "presets": [{ "name": "t:blocks.spotlight_media.name" }]
+}
+{% endschema %}

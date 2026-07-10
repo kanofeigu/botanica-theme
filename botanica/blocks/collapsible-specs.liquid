@@ -1,0 +1,119 @@
+{% comment %}
+  blocks/collapsible-specs.liquid — Collapsible row using native <details>.
+  Borderless accordion (Hey Rooted pattern). Supports inline content
+  or a linked page as the body. open_by_default lets a merchant preview
+  the body on first paint — useful for "Plant details" / "Complete
+  care guide" accordions on PDP where default-closed hides vital info.
+{% endcomment %}
+{%- if block.settings.title != blank -%}
+  <details class="bt-collapsible" {{ block.shopify_attributes }}{% if block.settings.open_by_default %} open{% endif %}>
+    <summary class="bt-collapsible__summary">
+      <span class="bt-collapsible__title">{{ block.settings.title | escape }}</span>
+      <span class="bt-collapsible__icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" class="bt-collapsible__icon-plus">
+          <path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg width="14" height="14" viewBox="0 0 14 14" class="bt-collapsible__icon-minus">
+          <path d="M2 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+    </summary>
+    <div class="bt-collapsible__content bt-rich-text">
+      {%- if block.settings.content != blank -%}
+        {{ block.settings.content }}
+      {%- endif -%}
+      {%- if block.settings.page != blank -%}
+        {{ block.settings.page.content }}
+      {%- endif -%}
+    </div>
+  </details>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-collapsible {
+    border: none;
+    border-bottom: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    padding: 0;
+    margin: 0;
+  }
+  .bt-collapsible:first-of-type {
+    border-top: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+  }
+
+  .bt-collapsible__summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--bt-space-sm) 0;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-collapsible__summary:hover {
+    color: var(--bt-color-primary);
+  }
+  .bt-collapsible__summary::-webkit-details-marker { display: none; }
+  .bt-collapsible__summary::marker { display: none; content: none; }
+
+  .bt-collapsible__title {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.01em;
+  }
+
+  .bt-collapsible__icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-collapsible__icon-plus { display: block; }
+  .bt-collapsible__icon-minus { display: none; }
+  .bt-collapsible[open] .bt-collapsible__icon-plus { display: none; }
+  .bt-collapsible[open] .bt-collapsible__icon-minus { display: block; }
+
+  .bt-collapsible__content {
+    padding: 0 0 var(--bt-space-md);
+    font-size: var(--bt-fs-body-sm);
+    line-height: var(--bt-lh-relaxed);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-collapsible__content p + p { margin-top: var(--bt-space-2xs); }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.collapsible_specs.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:blocks.collapsible_specs.settings.title.label",
+      "default": "Shipping and returns"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "t:blocks.collapsible_specs.settings.content.label"
+    },
+    {
+      "type": "page",
+      "id": "page",
+      "label": "t:blocks.collapsible_specs.settings.page.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "t:blocks.collapsible_specs.settings.open_by_default.label",
+      "info": "t:blocks.collapsible_specs.settings.open_by_default.info",
+      "default": false
+    }
+  ],
+  "presets": [{ "name": "t:blocks.collapsible_specs.name" }]
+}
+{% endschema %}

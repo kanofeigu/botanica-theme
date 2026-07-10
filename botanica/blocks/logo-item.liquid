@@ -1,0 +1,75 @@
+{% comment %}
+  blocks/logo-item.liquid — Logo item for logo list section
+  Image with optional link and alt text.
+{% endcomment %}
+{%- liquid
+  assign image = block.settings.logo
+  assign link = block.settings.link
+  assign alt = block.settings.alt | default: block.settings.logo.alt | default: 'Partner logo'
+-%}
+{%- if image != blank -%}
+  <div class="bt-logo-item" {{ block.shopify_attributes }}>
+    {%- if link != blank -%}
+      <a href="{{ link }}" class="bt-logo-item__link" target="_blank" rel="noopener" aria-label="{{ alt | escape }}">
+    {%- endif -%}
+      {{ image | image_url: width: 200 | image_tag:
+        loading: 'lazy',
+        widths: '100, 150, 200',
+        sizes: '150px',
+        alt: alt,
+        class: 'bt-logo-item__img'
+      }}
+    {%- if link != blank -%}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--bt-space-sm);
+  }
+  .bt-logo-item__img {
+    max-width: 150px;
+    max-height: 60px;
+    width: auto;
+    height: auto;
+    opacity: 0.7;
+    filter: grayscale(100%);
+    transition: opacity var(--bt-duration-base), filter var(--bt-duration-base);
+  }
+  .bt-logo-item__link:hover .bt-logo-item__img,
+  .bt-logo-item__link:focus-visible .bt-logo-item__img {
+    opacity: 1;
+    filter: grayscale(0%);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.logo_item.name",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "t:blocks.logo_item.settings.logo.label",
+      "info": "t:blocks.logo_item.settings.logo.info"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:blocks.logo_item.settings.link.label",
+      "info": "t:blocks.logo_item.settings.link.info"
+    },
+    {
+      "type": "text",
+      "id": "alt",
+      "label": "t:blocks.logo_item.settings.alt.label"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.logo_item.name" }]
+}
+{% endschema %}

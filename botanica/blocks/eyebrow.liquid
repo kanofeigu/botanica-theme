@@ -1,0 +1,38 @@
+{% comment %}
+  blocks/eyebrow.liquid — Reusable eyebrow/label block
+  Used across sections for editorial specimen labels, category tags, etc.
+{% endcomment %}
+<p class="bt-eyebrow" {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</p>
+
+{% stylesheet %}
+  .bt-eyebrow {
+    display: inline-block;
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-eyebrow);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bt-color-secondary);
+    opacity: 0.85;
+    margin-bottom: var(--bt-space-2xs);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.eyebrow.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:blocks.eyebrow.settings.text.label",
+      "default": "Botanical field guide"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.eyebrow.name"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,57 @@
+{% comment %}
+  snippets/specimen-tag.liquid — Vintage botanical specimen identification tag
+  Looks like an archival label pinned to a specimen drawing.
+  Usage: {% render 'specimen-tag', number: 1, label: 'Origin', value: 'Southeast Asia' %}
+{% endcomment %}
+{%- liquid
+  assign number = number | default: '001'
+  assign label = label | default: 'Specimen'
+  assign value = value | default: ''
+-%}
+<div class="bt-specimen-tag" aria-hidden="true">
+  <span class="bt-specimen-tag__number">{{ number }}</span>
+  {%- if value != blank -%}
+    <span class="bt-specimen-tag__label">{{ label }}</span>
+    <span class="bt-specimen-tag__value">{{ value }}</span>
+  {%- else -%}
+    <span class="bt-specimen-tag__label">{{ label }}</span>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .bt-specimen-tag {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    padding: 6px 10px;
+    background: var(--bt-color-bg);
+    border: 1px solid var(--bt-color-border-medium);
+    border-radius: var(--bt-radius-tag);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-specimen);
+    letter-spacing: 0.05em;
+    color: var(--bt-color-text-muted);
+    white-space: nowrap;
+  }
+  .bt-specimen-tag__number {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    letter-spacing: 0.08em;
+    font-variant-numeric: oldstyle-nums;
+    line-height: 1;
+  }
+  .bt-specimen-tag__label {
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    text-transform: uppercase;
+    color: var(--bt-color-text-muted);
+    opacity: 0.7;
+  }
+  .bt-specimen-tag__value {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text);
+  }
+{% endstylesheet %}

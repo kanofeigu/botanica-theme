@@ -1,0 +1,18 @@
+{% comment %} main-page.liquid — Original page section. Zero Dawn code. {% endcomment %}
+<div class="bt-section bt-page" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+    <div class="bt-rich-text" style="max-width: var(--bt-content-max); margin-inline: auto;">
+      <h1 class="bt-h1">{{ page.title }}</h1>
+      <div>{{ page.content }}</div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-page { background: var(--bt-color-bg); }
+  .bt-page .bt-h1 { margin-bottom: var(--bt-space-md); }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_page.name", "presets": [{ "name": "t:sections.main_page.name" }] }
+{% endschema %}

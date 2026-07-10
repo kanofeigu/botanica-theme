@@ -1,0 +1,182 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "eyebrow": {
+          "type": "specimen-eyebrow",
+          "settings": {}
+        },
+        "badges": {
+          "type": "product-badges",
+          "settings": {
+            "show_stock_badge": true,
+            "show_sale_badge": true
+          }
+        },
+        "title": {
+          "type": "product-title",
+          "settings": {}
+        },
+        "price": {
+          "type": "product-price",
+          "settings": {}
+        },
+        "variant_picker": {
+          "type": "variant-picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_option_index": "1"
+          }
+        },
+        "size_guide_link": {
+          "type": "size-guide-link",
+          "settings": {
+            "button_label": "Plant size guide",
+            "heading": "Find your fit",
+            "content": "<p>Heights are measured from the soil line to the top of foliage.</p><ul><li><strong>Small</strong> — ~25cm / 10\" tall, 10cm / 4\" pot. Desk, shelf, windowsill.</li><li><strong>Medium</strong> — ~40cm / 16\" tall, 15cm / 6\" pot. Side table, plant stand.</li><li><strong>Large</strong> — ~80cm / 31\" tall, 20cm / 8\" pot. Corner statement, entry.</li></ul>"
+          }
+        },
+        "buy": {
+          "type": "buy-buttons",
+          "settings": {
+            "show_quantity": true,
+            "show_cart_icon": false,
+            "show_dynamic_checkout": false,
+            "show_trust_badges": false
+          }
+        },
+        "care_quick": {
+          "type": "care-icons",
+          "settings": {
+            "heading": "Care at a glance",
+            "light_label": "Light",
+            "light_value": "Low to bright indirect",
+            "water_label": "Water",
+            "water_value": "Weekly",
+            "humidity_label": "Humidity",
+            "humidity_value": "High",
+            "toxicity_label": "Pet safe",
+            "toxicity_value": "Pet friendly"
+          }
+        },
+        "description": {
+          "type": "product-description",
+          "settings": {}
+        },
+        "field_note": {
+          "type": "editorial-quote",
+          "settings": {
+            "quote": "Every plant has a story — a native habitat, a discovery date, a journey to cultivation.",
+            "attribution": "Botanical Archives"
+          }
+        },
+        "details": {
+          "type": "collapsible-specs",
+          "settings": {
+            "title": "Plant details",
+            "content": "<p>Native habitat, growth habit, and notable characteristics. Read before committing to a long-term companion.</p>",
+            "open_by_default": true
+          }
+        },
+        "shipping": {
+          "type": "collapsible-specs",
+          "settings": {
+            "title": "Shipping & returns",
+            "content": "<p>Free standard shipping on orders over $50. Plants ship within 2–3 business days in eco-friendly, plastic-free packaging. 30-day satisfaction guarantee — we replace or refund any plant that arrives unhealthy.</p>",
+            "open_by_default": false
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        },
+        "upsell": {
+          "type": "complementary-products",
+          "settings": {
+            "heading": "Pairs well with…",
+            "max_products": 4
+          }
+        },
+        "pickup": {
+          "type": "pickup-availability",
+          "settings": {
+            "show_when_unavailable": false
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow",
+        "badges",
+        "title",
+        "price",
+        "variant_picker",
+        "size_guide_link",
+        "buy",
+        "care_quick",
+        "description",
+        "field_note",
+        "details",
+        "shipping",
+        "share",
+        "upsell",
+        "pickup"
+      ],
+      "settings": {
+        "gallery_layout": "thumb_below",
+        "sticky_care": false
+      }
+    },
+    "guarantee": {
+      "type": "risk-free-guarantee",
+      "settings": {
+        "heading": "Risk-Free Guarantee",
+        "body": "<p>In the (very) rare case you receive a damaged plant, our 14-day guarantee has you covered. We send replacements right away, and also share tips on how to revive any damaged foliage!</p>",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "care_guide": {
+      "type": "product-care-guide",
+      "settings": {
+        "eyebrow": "Care guide",
+        "heading": "Plant care guide",
+        "body": "<h3>Light</h3><p>Low to bright indirect light. Direct sunlight can scorch the leaves, so filter it with a sheer curtain.</p><h3>Water</h3><p>Keep the soil evenly moist but never soggy. Water when the top 2cm feels dry — about weekly in spring and summer, less in winter.</p><h3>Humidity</h3><p>This plant loves humidity. Set it on a pebble tray, group it with other plants, or use a humidifier to keep levels above 50%.</p><h3>Temperature</h3><p>18–27°C. Keep away from cold drafts and heating vents.</p><h3>Common problems</h3><ul><li><strong>Curling leaves</strong> — usually underwatering.</li><li><strong>Brown tips</strong> — low humidity or fluoride in tap water; use filtered water.</li><li><strong>Yellow leaves</strong> — overwatering; let the soil dry a touch more between waterings.</li></ul>",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "limit": 4,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "apps": {
+      "type": "apps",
+      "settings": {
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    }
+  },
+  "order": [
+    "main",
+    "guarantee",
+    "care_guide",
+    "recommendations",
+    "apps"
+  ]
+}

@@ -1,0 +1,345 @@
+{% comment %} card-product.liquid — Product card with Plant Atelier styling. Thin-border gallery frame, care/light chips in body, quick-add on hover. {% endcomment %}
+{%- liquid
+  assign ratio = image_ratio | default: '4-5'
+  assign aspect = '4 / 5'
+  if ratio == '1-1'
+    assign aspect = '1 / 1'
+  elsif ratio == '3-4'
+    assign aspect = '3 / 4'
+  endif
+  assign show_sale = show_sale_badge | default: settings.show_sale_badge
+  assign show_sold = show_sold_out_badge | default: settings.show_sold_out_badge
+  assign show_care = show_care_badge | default: settings.show_care_badge | default: false
+  assign show_light = show_light_badge | default: settings.show_light_badge | default: false
+
+  assign care_label = ''
+  assign care_class = ''
+  if product.tags contains 'easy-care'
+    assign care_label = 'Easy'
+    assign care_class = 'bt-chip--easy'
+  elsif product.tags contains 'medium-care'
+    assign care_label = 'Moderate'
+    assign care_class = 'bt-chip--medium'
+  elsif product.tags contains 'expert-care'
+    assign care_label = 'Expert'
+    assign care_class = 'bt-chip--expert'
+  endif
+
+  assign light_label = ''
+  assign light_dots = 0
+  if product.tags contains 'bright-light'
+    assign light_label = 'Bright'
+    assign light_dots = 3
+  elsif product.tags contains 'medium-light'
+    assign light_label = 'Medium'
+    assign light_dots = 2
+  elsif product.tags contains 'low-light'
+    assign light_label = 'Low'
+    assign light_dots = 1
+  endif
+-%}
+<div class="bt-card bt-card--product{% if show_secondary_image and product.media[1] != blank %} bt-card--swap{% endif %}">
+  <div class="bt-card__media" style="aspect-ratio: {{ aspect }}">
+    <a href="{{ product.url }}" aria-label="{{ product.title }}" class="bt-card__media-link">
+      {%- if product.featured_media -%}
+        {{ product.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,400,500,600', sizes: '(min-width: 990px) 33vw, 50vw', alt: product.featured_media.alt | default: product.title, class: 'bt-product-card__image' }}
+        {%- if show_secondary_image and product.media[1] != blank -%}
+          {{ product.media[1] | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,400,500,600', sizes: '(min-width: 990px) 33vw, 50vw', alt: product.media[1].alt | default: product.title, class: 'bt-product-card__image bt-card__secondary-image' }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'bt-card__placeholder' }}
+      {%- endif -%}
+    </a>
+
+    {%- if show_sale and product.compare_at_price > product.price -%}
+      <span class="bt-badge bt-card__sale-badge">{{ 'products.product.on_sale' | t }}</span>
+    {%- endif -%}
+    {%- if show_sold and product.available == false -%}
+      <span class="bt-badge bt-badge--outline bt-card__sale-badge">{{ 'products.product.sold_out' | t }}</span>
+    {%- endif -%}
+
+    {%- if product.available -%}
+      <button type="button" class="bt-card__quick-add" aria-label="{{ 'products.product.add_to_cart' | t: title: product.title }}">
+        {% render 'icon-plus' %}
+        <span class="bt-sr-only">{{ 'products.product.add_to_cart' | t }}</span>
+      </button>
+    {%- endif -%}
+
+    {%- if block and block.settings.show_quick_view -%}
+      {%- render 'quick-view-trigger', product: product -%}
+    {%- endif -%}
+  </div>
+
+  <div class="bt-card__body">
+    {%- if show_care and care_label != '' or show_light and light_dots > 0 -%}
+      <div class="bt-card__chips">
+        {%- if show_care and care_label != '' -%}
+          <span class="bt-chip {{ care_class }}">
+            {% render 'icon-leaf' %}
+            {{ care_label }}
+          </span>
+        {%- endif -%}
+        {%- if show_light and light_dots > 0 -%}
+          <span class="bt-chip bt-chip--light">
+            {% render 'icon-sun' %}
+            {{ light_label }}
+          </span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if show_vendor -%}
+      <p class="bt-card__vendor bt-eyebrow">{{ product.vendor }}</p>
+    {%- endif -%}
+
+    <h3 class="bt-card__title bt-product-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+
+    <div class="bt-card__price">
+      {%- if product.compare_at_price > product.price -%}
+        <s class="bt-card__compare-price">{{ product.compare_at_price | money }}</s>
+        <span class="bt-card__current-price">{{ product.price | money }}</span>
+      {%- else -%}
+        <span class="bt-card__current-price">{{ product.price | money }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* ── Product card (Plant Atelier style) ── */
+  .bt-card--product {
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-card);
+    background: var(--bt-color-surface);
+    transition: border-color var(--bt-duration-base) var(--bt-ease-out),
+                box-shadow var(--bt-duration-base) var(--bt-ease-out),
+                transform var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-card--product:hover {
+    border-color: var(--bt-color-border-medium);
+    box-shadow: var(--bt-shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .bt-card__media {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--bt-radius-card) var(--bt-radius-card) 0 0;
+    background: var(--bt-color-surface-hover);
+  }
+
+  .bt-card__media-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bt-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--bt-duration-slow) var(--bt-ease-out);
+  }
+  .bt-card--product:hover .bt-card__media img {
+    transform: scale(1.05);
+  }
+
+  .bt-card__placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--bt-color-surface);
+  }
+
+  /* ── Sale badge ── */
+  .bt-card__sale-badge {
+    position: absolute;
+    top: var(--bt-space-xs);
+    left: var(--bt-space-xs);
+    z-index: 2;
+  }
+
+  /* ── Quick-add button ── */
+  .bt-card__quick-add {
+    position: absolute;
+    bottom: var(--bt-space-sm);
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bt-color-bg);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--bt-duration-base) var(--bt-ease-out),
+                transform var(--bt-duration-base) var(--bt-ease-out),
+                background var(--bt-duration-fast) var(--bt-ease-out);
+    z-index: 2;
+    box-shadow: var(--bt-shadow-sm);
+    color: var(--bt-color-text);
+  }
+  .bt-card--product:hover .bt-card__quick-add {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .bt-card__quick-add:hover {
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+    border-color: var(--bt-color-primary);
+  }
+  .bt-card__quick-add svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ── Card body ── */
+  .bt-card--product .bt-card__body {
+    padding: var(--bt-space-sm) var(--bt-space-sm) var(--bt-space-md);
+    gap: var(--bt-space-2xs);
+  }
+
+  /* ── Care chips row ── */
+  .bt-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: var(--bt-space-3xs);
+  }
+
+  .bt-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    font-family: var(--bt-font-body);
+    font-size: 0.625rem;
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.5;
+    border-radius: var(--bt-radius-pill);
+    background: var(--bt-color-surface-hover);
+    color: var(--bt-color-text-muted);
+    border: 1px solid var(--bt-color-border-light);
+    white-space: nowrap;
+  }
+  .bt-chip svg {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+
+  .bt-chip--easy {
+    color: var(--bt-color-primary);
+    background: var(--bt-color-primary-tint);
+    border-color: rgba(var(--bt-color-primary-rgb), 0.2);
+  }
+  .bt-chip--medium {
+    color: var(--bt-color-secondary);
+    background: var(--bt-color-secondary-tint);
+    border-color: rgba(var(--bt-color-secondary-rgb), 0.2);
+  }
+  .bt-chip--expert {
+    color: var(--bt-color-text);
+    background: var(--bt-color-surface-hover);
+    border-color: rgba(var(--bt-color-text-rgb), 0.2);
+  }
+  .bt-chip--light {
+    gap: 3px;
+  }
+  .bt-chip--light svg {
+    color: var(--bt-color-secondary);
+  }
+
+  /* ── Vendor ── */
+  .bt-card__vendor {
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 0;
+  }
+
+  /* ── Title ── */
+  .bt-card--product .bt-card__title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-weight: var(--bt-fw-normal);
+    line-height: var(--bt-lh-heading);
+    margin: 0;
+  }
+  .bt-card--product .bt-card__title a {
+    text-decoration: none;
+    color: var(--bt-color-text);
+    transition: color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-card--product .bt-card__title a:hover {
+    color: var(--bt-color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.12em;
+    text-decoration-thickness: 1px;
+  }
+
+  /* ── Price ── */
+  .bt-card--product .bt-card__price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--bt-space-2xs);
+    margin-top: auto;
+  }
+  .bt-card__current-price {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+  }
+  .bt-card__compare-price {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    text-decoration: line-through;
+  }
+
+  /* ── Secondary image swap ── */
+  .bt-card--swap .bt-card__media img {
+    transition: opacity var(--bt-duration-base) var(--bt-ease-out),
+                transform var(--bt-duration-slow) var(--bt-ease-out);
+  }
+  .bt-card--swap .bt-card__secondary-image {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .bt-card--swap:hover .bt-card__media img:first-child {
+    opacity: 0;
+  }
+  .bt-card--swap:hover .bt-card__secondary-image {
+    opacity: 1;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 749px) {
+    .bt-card--product .bt-card__body {
+      padding: var(--bt-space-xs);
+    }
+    .bt-card__quick-add {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      width: 38px;
+      height: 38px;
+      bottom: var(--bt-space-xs);
+    }
+    .bt-chip {
+      font-size: 0.6rem;
+      padding: 1px 6px;
+    }
+  }
+
+  @media (hover: none) {
+    .bt-card__quick-add {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+{% endstylesheet %}

@@ -1,0 +1,71 @@
+{% comment %}
+  snippets/field-note.liquid — Botanical field journal entry
+  Vintage notebook aesthetic: terracotta left border, italic text, specimen label feel.
+  Usage: {% render 'field-note', text: '...', source: '...', show_icon: true %}
+{% endcomment %}
+{%- liquid
+  assign text = text | default: ''
+  assign source = source | default: ''
+  assign show_icon = show_icon | default: true
+-%}
+{%- if text != blank -%}
+  <div class="bt-field-note">
+    {%- if show_icon -%}
+      <div class="bt-field-note__icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="2" width="14" height="16" rx="1" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="7" y1="6" x2="14" y2="6" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+          <line x1="7" y1="9" x2="14" y2="9" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+          <line x1="7" y1="12" x2="12" y2="12" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    {%- endif -%}
+    <div class="bt-field-note__body">
+      <p class="bt-field-note__text">{{ text }}</p>
+      {%- if source != blank -%}
+        <cite class="bt-field-note__source">{{ source | escape }}</cite>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-field-note {
+    display: flex;
+    gap: var(--bt-space-sm);
+    padding: var(--bt-space-sm) var(--bt-space-md);
+    border-left: 3px solid var(--bt-color-secondary);
+    background:
+      linear-gradient(to right, rgba(var(--bt-color-secondary-rgb), 0.06), transparent 40%);
+    border-radius: 0 var(--bt-radius-sm) var(--bt-radius-sm) 0;
+  }
+  .bt-field-note__icon {
+    flex-shrink: 0;
+    color: var(--bt-color-secondary);
+    margin-top: 2px;
+  }
+  .bt-field-note__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-3xs);
+  }
+  .bt-field-note__text {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-style: italic;
+    color: var(--bt-color-text);
+    margin: 0;
+    line-height: var(--bt-lh-relaxed);
+    max-width: 55ch;
+  }
+  .bt-field-note__source {
+    font-size: var(--bt-fs-body-xs);
+    font-style: normal;
+    color: var(--bt-color-text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .bt-field-note__source::before {
+    content: '— ';
+  }
+{% endstylesheet %}

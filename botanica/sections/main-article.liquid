@@ -1,0 +1,428 @@
+{% comment %}
+  main-article.liquid — 3 switchable blog layouts:
+    • substack — Clean centered column, reading progress bar
+    • magazine — Editorial broadsheet, breakout images, drop cap
+    • sidebar  — Two-column with sticky TOC
+  Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign layout = section.settings.layout_style | default: 'substack'
+  assign show_progress = section.settings.show_progress_bar | default: true
+  assign show_share = section.settings.show_share | default: true
+-%}
+
+<article
+  class="bt-section bt-article bt-article--{{ layout }}"
+  {{ section.shopify_attributes }}
+  {% if show_progress %}data-article-progress{% endif %}
+>
+
+  {% comment %} ═══════ Reading progress bar (substack & magazine) ═══════ {% endcomment %}
+  {%- if show_progress and layout != 'sidebar' -%}
+    <div class="bt-article__progress" data-progress-bar aria-hidden="true">
+      <div class="bt-article__progress-fill" data-progress-fill></div>
+    </div>
+  {%- endif -%}
+
+  <div class="bt-container{% if layout == 'substack' %} bt-container--narrow{% endif %}">
+
+    {% comment %} ═══════ MAGAZINE: Issue masthead ═══════ {% endcomment %}
+    {%- if layout == 'magazine' -%}
+      <header class="bt-article__masthead">
+        <span class="bt-eyebrow">Field Journal · Issue No. {{ article.published_at | date: '%y' | append: article.id | slice: -3, 3 }}</span>
+        <span class="bt-article__dateline">{{ article.published_at | date: '%B %d, %Y' }}</span>
+      </header>
+    {%- endif -%}
+
+    {% comment %} ═══════ SIDEBAR: Two-column layout ═══════ {% endcomment %}
+    {%- if layout == 'sidebar' -%}
+    <div class="bt-article__layout">
+      <div class="bt-article__main">
+    {%- endif -%}
+
+    {% comment %} ═══════ Back link ═══════ {% endcomment %}
+    <a href="{{ blog.url }}" class="bt-article__back bt-interactive">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      {{ 'blogs.article.back_to_blog' | t }}
+    </a>
+
+    {% comment %} ═══════ Article header ═══════ {% endcomment %}
+    <header class="bt-article__header">
+      {%- if article.tags.size > 0 -%}
+        <span class="bt-badge bt-badge--secondary bt-article__tag">{{ article.tags.first }}</span>
+      {%- endif -%}
+      <h1 class="bt-article__title">{{ article.title }}</h1>
+      <div class="bt-article__meta">
+        <span>{{ article.published_at | date: '%B %d, %Y' }}</span>
+        {%- if article.author != blank -%}
+          <span class="bt-article__meta-sep" aria-hidden="true">·</span>
+          <span>{{ 'blogs.article.by_author' | t: author: article.author }}</span>
+        {%- endif -%}
+      </div>
+    </header>
+
+    {% comment %} ═══════ Hero image ═══════ {% endcomment %}
+    {%- if article.image -%}
+      <figure class="bt-article__hero{% if layout == 'magazine' %} bt-article__hero--breakout{% endif %}">
+        {{ article.image | image_url: width: 1600 | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '400, 600, 800, 1200, 1600',
+          sizes: '(min-width: 1200px) 1100px, 100vw',
+          alt: article.title
+        }}
+        {%- if layout == 'magazine' -%}
+          <figcaption class="bt-article__hero-cap">{{ article.title }} — {{ article.published_at | date: '%B %Y' }}</figcaption>
+        {%- endif -%}
+      </figure>
+    {%- endif -%}
+
+    {% comment %} ═══════ Article body ═══════ {% endcomment %}
+    <div class="bt-article__body bt-rich-text">
+      {{ article.content }}
+    </div>
+
+    {% comment %} ═══════ Footer ═══════ {% endcomment %}
+    <footer class="bt-article__footer">
+      {%- if article.tags.size > 0 -%}
+        <div class="bt-article__tags">
+          {%- for tag in article.tags -%}
+            <a href="{{ blog.url }}/tagged/{{ tag | handleize }}" class="bt-badge bt-badge--outline">{{ tag }}</a>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if show_share -%}
+        <div class="bt-article__share-row">
+          <span class="bt-article__share-label">Share this article</span>
+          <div class="bt-article__share">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: article.url | url_encode }}" class="bt-article__share-link bt-interactive" target="_blank" rel="noopener" aria-label="{{ 'general.social.alt_text.share_on_facebook' | t }}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.77 7.46H14.5v-1.9c0-.97.6-1.2 1.04-1.2h2.35V.85L14.54.8C10.44.8 9.5 3.87 9.5 5.83v1.63H7v4.28h2.5v13.4h5.04v-13.4h3.38l.85-4.28z"/></svg>
+            </a>
+            <a href="https://twitter.com/intent/tweet?text={{ article.title | url_encode }}&url={{ shop.url | append: article.url | url_encode }}" class="bt-article__share-link bt-interactive" target="_blank" rel="noopener" aria-label="{{ 'general.social.alt_text.share_on_twitter' | t }}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <button type="button" class="bt-article__share-link bt-interactive" data-copy-url="{{ shop.url | append: article.url }}" aria-label="{{ 'general.share.copy_to_clipboard' | t }}" onclick="navigator.clipboard.writeText(this.dataset.copyUrl);this.classList.add('is-copied');setTimeout(()=>this.classList.remove('is-copied'),1500)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="bt-article__copied-tip">Copied!</span>
+            </button>
+          </div>
+        </div>
+      {%- endif -%}
+    </footer>
+
+    {% comment %} ═══════ SIDEBAR: Close main column ═══════ {% endcomment %}
+    {%- if layout == 'sidebar' -%}
+      </div>
+      <aside class="bt-article__sidebar">
+        <div class="bt-article__sidebar-sticky">
+          {%- if article.author != blank -%}
+            <div class="bt-article__author-card">
+              <div class="bt-article__author-avatar" aria-hidden="true">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+              </div>
+              <div>
+                <p class="bt-article__author-name">{{ article.author }}</p>
+                <p class="bt-article__author-label">Botanical writer</p>
+              </div>
+            </div>
+          {%- endif -%}
+          <div class="bt-article__toc" data-article-toc>
+            <p class="bt-article__sidebar-heading">In this article</p>
+            <nav class="bt-article__toc-nav" data-toc-list>
+              <p class="bt-article__toc-empty">Scroll to discover headings</p>
+            </nav>
+          </div>
+        </div>
+      </aside>
+    </div>
+    {%- endif -%}
+
+  </div>
+</article>
+
+{% comment %} ═══════ Previous / Next ═══════ {% endcomment %}
+{%- if blog.next_article or blog.previous_article -%}
+<div class="bt-section bt-article__siblings">
+  <div class="bt-container">
+    <div class="bt-article__siblings-grid">
+      {%- if blog.previous_article -%}
+        <a href="{{ blog.previous_article.url }}" class="bt-article__sibling bt-interactive">
+          <span class="bt-eyebrow">{{ 'blogs.article.previous_article' | t }}</span>
+          <span class="bt-article__sibling-title">{{ blog.previous_article.title }}</span>
+        </a>
+      {%- endif -%}
+      {%- if blog.next_article -%}
+        <a href="{{ blog.next_article.url }}" class="bt-article__sibling bt-article__sibling--next bt-interactive">
+          <span class="bt-eyebrow">{{ 'blogs.article.next_article' | t }}</span>
+          <span class="bt-article__sibling-title">{{ blog.next_article.title }}</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+{%- endif -%}
+
+{% javascript %}
+  /* ═══════ Reading progress bar ═══════ */
+  (function () {
+    var bar = document.querySelector('[data-progress-bar]');
+    if (!bar) return;
+    var fill = bar.querySelector('[data-progress-fill]');
+    window.addEventListener('scroll', function () {
+      var scrollTop = window.scrollY;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0;
+      if (fill) fill.style.width = pct + '%';
+    }, { passive: true });
+  })();
+
+  /* ═══════ TOC generation (sidebar layout) ═══════ */
+  (function () {
+    var article = document.querySelector('.bt-article__body');
+    var tocNav = document.querySelector('[data-toc-list]');
+    if (!article || !tocNav) return;
+    var headings = article.querySelectorAll('h2, h3');
+    if (!headings.length) return;
+    tocNav.innerHTML = '';
+    headings.forEach(function (h, i) {
+      var id = h.id || ('section-' + i);
+      if (!h.id) h.id = id;
+      var link = document.createElement('a');
+      link.href = '#' + id;
+      link.className = 'bt-article__toc-link bt-interactive';
+      link.style.paddingLeft = (h.tagName === 'H3' ? '16px' : '0');
+      link.style.fontSize = (h.tagName === 'H3' ? 'var(--bt-fs-body-sm)' : 'var(--bt-fs-body)');
+      link.textContent = h.textContent;
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      tocNav.appendChild(link);
+    });
+  })();
+
+  /* ═══════ Drop cap injection (magazine layout) ═══════ */
+  (function () {
+    var body = document.querySelector('.bt-article--magazine .bt-article__body');
+    if (!body) return;
+    var firstP = body.querySelector('p:first-of-type');
+    if (!firstP || !firstP.textContent.trim()) return;
+    var text = firstP.textContent.trim();
+    if (text.length < 2) return;
+    var firstChar = text.charAt(0);
+    var rest = text.slice(1);
+    firstP.innerHTML = '<span class="bt-article__drop-cap">' + firstChar + '</span>' + rest;
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  /* ═══════════════════════════════════
+     SHARED STYLES (all layouts)
+     ═══════════════════════════════════ */
+  .bt-article__back {
+    display: inline-flex; align-items: center; gap: var(--bt-space-2xs);
+    font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text-muted); text-decoration: none;
+    margin-bottom: var(--bt-space-lg); transition: color var(--bt-duration-fast);
+  }
+  .bt-article__back:hover { color: var(--bt-color-primary); }
+  .bt-article__header { margin-bottom: var(--bt-space-lg); }
+  .bt-article__tag { margin-bottom: var(--bt-space-sm); }
+  .bt-article__title {
+    font-family: var(--bt-font-heading); font-size: var(--bt-fs-h1);
+    font-weight: var(--bt-fw-normal); line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text); text-wrap: balance;
+    font-variant-numeric: oldstyle-nums; margin: 0 0 var(--bt-space-sm);
+  }
+  .bt-article__meta {
+    display: flex; align-items: center; gap: var(--bt-space-2xs);
+    font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted);
+  }
+  .bt-article__meta-sep { opacity: 0.4; }
+  .bt-article__hero {
+    margin: 0 0 var(--bt-space-xl); border-radius: var(--bt-radius-card);
+    overflow: hidden; background: var(--bt-color-bg);
+  }
+  .bt-article__hero img { width: 100%; height: auto; max-height: 500px; object-fit: contain; display: block; }
+  .bt-article__hero-cap {
+    padding: var(--bt-space-2xs) var(--bt-space-sm); font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted); font-style: italic; text-align: center;
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-article__body {
+    font-size: var(--bt-fs-body); line-height: var(--bt-lh-relaxed); color: var(--bt-color-text);
+  }
+  .bt-article__body h2 {
+    font-family: var(--bt-font-heading); font-size: var(--bt-fs-h2); font-weight: var(--bt-fw-normal);
+    margin: var(--bt-space-xl) 0 var(--bt-space-sm); color: var(--bt-color-text); scroll-margin-top: var(--bt-space-xl);
+  }
+  .bt-article__body h3 {
+    font-family: var(--bt-font-heading); font-size: var(--bt-fs-h3); font-weight: var(--bt-fw-semibold);
+    margin: var(--bt-space-lg) 0 var(--bt-space-xs); color: var(--bt-color-text); scroll-margin-top: var(--bt-space-xl);
+  }
+  .bt-article__body p { margin-bottom: var(--bt-space-md); text-wrap: pretty; }
+  .bt-article__body ul, .bt-article__body ol { margin: 0 0 var(--bt-space-md); padding-inline-start: 1.5em; }
+  .bt-article__body li { margin-bottom: var(--bt-space-2xs); }
+  .bt-article__body blockquote {
+    margin: var(--bt-space-lg) 0; padding: var(--bt-space-sm) var(--bt-space-md);
+    border-left: 3px solid var(--bt-color-secondary); background: var(--bt-color-surface);
+    border-radius: 0 var(--bt-radius-sm) var(--bt-radius-sm) 0;
+    font-style: italic; color: var(--bt-color-text-muted);
+  }
+  .bt-article__body img { border-radius: var(--bt-radius-card); margin: var(--bt-space-lg) 0; max-width: 100%; }
+
+  /* Footer */
+  .bt-article__footer { margin-top: var(--bt-space-xl); padding-top: var(--bt-space-md); border-top: 1px solid var(--bt-color-border-light); }
+  .bt-article__tags { display: flex; flex-wrap: wrap; gap: var(--bt-space-2xs); margin-bottom: var(--bt-space-md); }
+  .bt-article__share-row { display: flex; align-items: center; gap: var(--bt-space-md); flex-wrap: wrap; }
+  .bt-article__share-label { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); }
+  .bt-article__share { display: flex; gap: var(--bt-space-xs); align-items: center; }
+  .bt-article__share-link {
+    width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; color: var(--bt-color-text-muted); background: var(--bt-color-surface);
+    border: 1px solid var(--bt-color-border-light); text-decoration: none; cursor: pointer;
+    position: relative; transition: all var(--bt-duration-fast);
+  }
+  .bt-article__share-link:hover { color: var(--bt-color-primary); border-color: var(--bt-color-primary); background: var(--bt-color-primary-tint); }
+  .bt-article__copied-tip {
+    position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+    font-size: 0.65rem; background: var(--bt-color-text); color: var(--bt-color-bg);
+    padding: 2px 8px; border-radius: var(--bt-radius-pill); opacity: 0;
+    pointer-events: none; transition: opacity var(--bt-duration-fast); white-space: nowrap;
+  }
+  .bt-article__share-link.is-copied .bt-article__copied-tip { opacity: 1; }
+
+  /* Progress bar */
+  .bt-article__progress { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 1000; background: var(--bt-color-border-light); }
+  .bt-article__progress-fill { height: 100%; background: var(--bt-color-primary); width: 0%; transition: width 100ms linear; }
+
+  /* Siblings */
+  .bt-article__siblings { background: var(--bt-color-surface); border-top: 1px solid var(--bt-color-border-light); }
+  .bt-article__siblings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-space-lg); }
+  .bt-article__sibling { display: flex; flex-direction: column; gap: var(--bt-space-3xs); text-decoration: none; color: var(--bt-color-text); padding: var(--bt-space-sm) 0; }
+  .bt-article__sibling--next { text-align: right; align-items: flex-end; }
+  .bt-article__sibling-title { font-family: var(--bt-font-heading); font-size: var(--bt-fs-h4); font-weight: var(--bt-fw-medium); transition: color var(--bt-duration-fast); }
+  .bt-article__sibling:hover .bt-article__sibling-title { color: var(--bt-color-primary); }
+
+  /* ═══════════════════════════════════
+     STYLE 1: SUBSTACK CLEAN
+     ═══════════════════════════════════ */
+  .bt-article--substack { max-width: 720px; margin-inline: auto; }
+  .bt-article--substack .bt-article__body { font-size: calc(var(--bt-fs-body) * 1.1); line-height: 1.75; }
+  .bt-article--substack .bt-article__body p { margin-bottom: var(--bt-space-lg); }
+  .bt-article--substack .bt-article__title { font-size: var(--bt-fs-display); line-height: 1.1; }
+  .bt-article--substack .bt-article__hero { border-radius: 0; margin-inline: calc(-50vw + 360px); width: calc(100vw - 40px); max-width: none; }
+
+  /* ═══════════════════════════════════
+     STYLE 2: MAGAZINE EDITORIAL
+     ═══════════════════════════════════ */
+  .bt-article--magazine { max-width: 800px; margin-inline: auto; }
+  .bt-article--magazine .bt-article__masthead {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-bottom: var(--bt-space-sm); margin-bottom: var(--bt-space-xl);
+    border-bottom: 2px solid var(--bt-color-text);
+  }
+  .bt-article--magazine .bt-article__dateline { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .bt-article--magazine .bt-article__title { font-size: var(--bt-fs-display); line-height: 1.1; }
+  .bt-article--magazine .bt-article__hero--breakout {
+    border-radius: 0; margin-inline: calc(-50vw + 400px); width: calc(100vw - 40px);
+    max-width: none; max-height: 550px;
+  }
+  .bt-article--magazine .bt-article__hero--breakout img { max-height: 550px; width: 100%; object-fit: cover; }
+  .bt-article--magazine .bt-article__body { font-size: calc(var(--bt-fs-body) * 1.05); line-height: 1.75; }
+  .bt-article--magazine .bt-article__body p { margin-bottom: var(--bt-space-md); }
+  .bt-article--magazine .bt-article__body h2 {
+    text-align: center; font-size: var(--bt-fs-h2); padding-top: var(--bt-space-sm);
+  }
+  .bt-article--magazine .bt-article__body blockquote {
+    margin: var(--bt-space-lg) calc(-50vw + 400px); padding: var(--bt-space-lg) var(--bt-space-xl);
+    border: none; border-top: 1px solid var(--bt-color-secondary);
+    border-bottom: 1px solid var(--bt-color-secondary);
+    background: transparent; font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h3); font-style: normal; text-align: center;
+    width: calc(100vw - 40px);
+  }
+  .bt-article--magazine .bt-article__body img {
+    border-radius: 0; margin-inline: calc(-50vw + 400px); width: calc(100vw - 40px);
+    max-width: none;
+  }
+  /* Drop cap */
+  .bt-article__drop-cap {
+    float: left; font-family: var(--bt-font-heading); font-size: 4.5em;
+    line-height: 0.75; padding-right: 0.12em; padding-top: 0.04em;
+    color: var(--bt-color-primary); font-weight: var(--bt-fw-bold);
+  }
+
+  /* ═══════════════════════════════════
+     STYLE 3: SIDEBAR + TOC
+     ═══════════════════════════════════ */
+  .bt-article--sidebar { max-width: 1100px; margin-inline: auto; }
+  .bt-article--sidebar .bt-article__layout { display: grid; grid-template-columns: 1fr 280px; gap: var(--bt-space-xl); align-items: start; }
+  .bt-article--sidebar .bt-article__main { min-width: 0; }
+  .bt-article--sidebar .bt-article__body { max-width: none; }
+  .bt-article__sidebar-sticky { position: sticky; top: calc(80px + var(--bt-space-md)); display: flex; flex-direction: column; gap: var(--bt-space-lg); }
+  .bt-article__sidebar-heading { font-family: var(--bt-font-body); font-size: var(--bt-fs-body-xs); font-weight: var(--bt-fw-semibold); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bt-color-text-muted); margin: 0 0 var(--bt-space-xs); }
+  .bt-article__author-card { display: flex; align-items: center; gap: var(--bt-space-sm); padding: var(--bt-space-sm); background: var(--bt-color-surface); border-radius: var(--bt-radius-md); border: 1px solid var(--bt-color-border-light); }
+  .bt-article__author-avatar { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--bt-color-primary-tint); color: var(--bt-color-primary); border-radius: 50%; flex-shrink: 0; }
+  .bt-article__author-name { font-family: var(--bt-font-heading); font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-semibold); color: var(--bt-color-text); margin: 0; }
+  .bt-article__author-label { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); margin: 0; }
+  .bt-article__toc-nav { display: flex; flex-direction: column; gap: 4px; }
+  .bt-article__toc-link { display: block; text-decoration: none; color: var(--bt-color-text-muted); font-size: var(--bt-fs-body-sm); line-height: 1.4; padding: 3px 0; transition: color var(--bt-duration-fast); border-left: 2px solid transparent; padding-left: var(--bt-space-2xs); }
+  .bt-article__toc-link:hover, .bt-article__toc-link:focus-visible { color: var(--bt-color-primary); border-left-color: var(--bt-color-primary); }
+  .bt-article__toc-empty { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); margin: 0; }
+
+  /* ═══════════════════════════════════
+     RESPONSIVE
+     ═══════════════════════════════════ */
+  @media (max-width: 989px) {
+    .bt-article--sidebar .bt-article__layout { grid-template-columns: 1fr; }
+    .bt-article__sidebar-sticky { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--bt-space-sm); }
+    .bt-article--sidebar { max-width: 780px; }
+    .bt-article__author-card { flex: 1; min-width: 200px; }
+    .bt-article__toc { display: none; }
+  }
+  @media (max-width: 749px) {
+    .bt-article__title { font-size: var(--bt-fs-h2); }
+    .bt-article--substack .bt-article__title,
+    .bt-article--magazine .bt-article__title { font-size: var(--bt-fs-h1); }
+    .bt-article__hero { max-height: 360px; border-radius: 0; margin-inline: calc(var(--bt-page-gutter) * -1); }
+    .bt-article--substack .bt-article__hero { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; }
+    .bt-article--magazine .bt-article__hero--breakout { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; }
+    .bt-article--magazine .bt-article__body blockquote { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; padding: var(--bt-space-md) var(--bt-space-sm); font-size: var(--bt-fs-h4); }
+    .bt-article--magazine .bt-article__body img { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; }
+    .bt-article__siblings-grid { grid-template-columns: 1fr; gap: 0; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_article.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "t:sections.main_article.settings.layout_style.label",
+      "options": [
+        { "value": "substack", "label": "Substack — Clean reading" },
+        { "value": "magazine", "label": "Magazine — Editorial" },
+        { "value": "sidebar", "label": "Sidebar — With TOC" }
+      ],
+      "default": "substack"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "t:sections.main_article.settings.show_progress_bar.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "label": "t:sections.main_article.settings.show_share.label",
+      "default": true
+    }
+  ],
+  "presets": [{ "name": "t:sections.main_article.name" }]
+}
+{% endschema %}

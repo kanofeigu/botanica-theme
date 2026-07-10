@@ -1,0 +1,14 @@
+mutation {
+  productUpdate(product: {
+    id: "gid://shopify/Product/8493619052735"
+    variants: [{
+      id: "gid://shopify/ProductVariant/45824982417599"
+      price: "29.99"
+      compareAtPrice: "39.99"
+      sku: "TEST-SKU-001"
+    }]
+  }) {
+    product { id }
+    userErrors { field message }
+  }
+}

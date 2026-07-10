@@ -1,0 +1,53 @@
+/* SECTION-NAME.css — styles scoped to .section-name */
+
+/* ==============================================
+   Layout
+   ============================================== */
+.section-name {
+  display: block;
+}
+
+.section-name__grid {
+  display: grid;
+  gap: var(--grid-desktop-horizontal-spacing, 2rem);
+}
+
+.section-name__grid--2-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.section-name__grid--3-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.section-name__grid--4-col {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media screen and (max-width: 749px) {
+  .section-name__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==============================================
+   Item card
+   ============================================== */
+.section-name__item {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ==============================================
+   Typography
+   ============================================== */
+.section-name__title {
+  margin: 0 0 1.2rem;
+}
+
+.section-name__subtitle {
+  max-width: 64ch;
+  margin: 0 0 3.2rem;
+  color: rgba(var(--color-foreground), 0.7);
+}

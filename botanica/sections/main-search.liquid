@@ -1,0 +1,45 @@
+{% comment %} main-search.liquid — Original search with predictive results and theme blocks. Zero Dawn code. {% endcomment %}
+<div class="bt-search bt-section" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+    <h1 class="bt-h1 bt-text-center">{{ 'general.search.search' | t }}</h1>
+    <form action="{{ routes.search_url }}" method="get" class="bt-search__form" role="search">
+      <div class="bt-search__input-row">
+        <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}" class="bt-input bt-search__input" aria-label="{{ 'general.search.search' | t }}" autocomplete="off" required>
+        <input type="hidden" name="type" value="product">
+        <button type="submit" class="bt-btn bt-btn--primary">{% render 'icon-search' %}<span>{{ 'general.search.search' | t }}</span></button>
+      </div>
+    </form>
+    {%- if search.performed -%}
+      <div class="bt-search__results">
+        <p class="bt-search__count" role="status">{{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}</p>
+        {%- if search.results.size > 0 -%}
+          <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
+            {%- for item in search.results -%}
+              {%- if item.object_type == 'product' -%}
+                {% render 'card-product', product: item, show_secondary_image: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
+              {%- else -%}
+                <div class="bt-card"><div class="bt-card__body"><h3 class="bt-card__title"><a href="{{ item.url }}">{{ item.title }}</a></h3><p class="bt-card__price">{{ item.content | strip_html | truncate: 120 }}</p></div></div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <p class="bt-text-center">{{ 'general.search.no_results' | t }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-search__form { max-width: 600px; margin-inline: auto; margin-bottom: var(--bt-space-xl); }
+  .bt-search__input-row { display: flex; gap: var(--bt-space-xs); }
+  .bt-search__input { flex: 1; }
+  .bt-search__results { margin-top: var(--bt-space-lg); }
+  .bt-search__count { text-align: center; font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); margin-bottom: var(--bt-space-md); }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_search.name", "settings": [
+  { "type": "range", "id": "columns_desktop", "min":2,"max":4,"step":1,"default":3,"label":"t:sections.main_search.settings.columns_desktop.label" }
+] }
+{% endschema %}

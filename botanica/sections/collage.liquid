@@ -1,0 +1,160 @@
+{% comment %}
+  sections/collage.liquid — Image collage section
+  Asymmetric layout: 3 images in an editorial spread arrangement.
+  Uses image blocks. All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign heading = section.settings.heading
+  assign image_count = 0
+  for block in section.blocks
+    if block.settings.image != blank
+      assign image_count = image_count | plus: 1
+    endif
+  endfor
+-%}
+<section class="bt-section bt-collage" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+    {%- if heading != blank -%}
+      <h2 class="bt-collage__heading">{{ heading | escape }}</h2>
+    {%- endif -%}
+    {%- if image_count > 0 -%}
+      <div class="bt-collage__grid">
+        {%- for block in section.blocks -%}
+          {%- if block.settings.image != blank -%}
+            {%- liquid
+              assign layout_class = ''
+              case forloop.index
+                when 1
+                  assign layout_class = 'bt-collage__item--hero'
+                when 2
+                  assign layout_class = 'bt-collage__item--top'
+                when 3
+                  assign layout_class = 'bt-collage__item--bottom'
+                else
+                  assign layout_class = 'bt-collage__item--extra'
+              endcase
+            -%}
+            <div class="bt-collage__item {{ layout_class }}" {{ block.shopify_attributes }}>
+              {{ block.settings.image | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                widths: '400, 600, 800',
+                sizes: '(min-width: 990px) 50vw, 100vw',
+                alt: block.settings.image.alt | default: heading
+              }}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bt-collage__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-align: center;
+    margin: 0 0 var(--bt-space-lg);
+  }
+  .bt-collage__grid {
+    display: grid;
+    grid-template-areas:
+      "hero top"
+      "hero bottom";
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--bt-grid-gap);
+    min-height: 500px;
+  }
+  .bt-collage__item--hero {
+    grid-area: hero;
+  }
+  .bt-collage__item--top {
+    grid-area: top;
+  }
+  .bt-collage__item--bottom {
+    grid-area: bottom;
+  }
+  .bt-collage__item {
+    border-radius: var(--bt-radius-card);
+    overflow: hidden;
+    background: var(--bt-color-surface);
+  }
+  .bt-collage__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--bt-duration-slow) var(--bt-ease-out);
+  }
+  .bt-collage__item:hover img {
+    transform: scale(1.03);
+  }
+  @media (max-width: 749px) {
+    .bt-collage__grid {
+      grid-template-areas:
+        "hero"
+        "top"
+        "bottom";
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      min-height: auto;
+    }
+    .bt-collage__item {
+      aspect-ratio: 3 / 2;
+    }
+    .bt-collage__item--hero {
+      aspect-ratio: 4 / 5;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.collage.name",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.collage.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.collage.blocks.image.settings.image.label",
+          "info": "t:sections.collage.blocks.image.settings.image.info"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.collage.settings.heading.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.collage.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.collage.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{
+    "name": "t:sections.collage.name",
+    "blocks": [
+      { "type": "image" },
+      { "type": "image" },
+      { "type": "image" }
+    ]
+  }]
+}
+{% endschema %}

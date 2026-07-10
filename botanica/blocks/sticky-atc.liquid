@@ -1,0 +1,51 @@
+{% comment %}
+  blocks/sticky-atc.liquid — Sticky add-to-cart bar (mobile).
+  Appears when the main buy button scrolls out of view.
+  Uses IntersectionObserver via BtStickyATC custom element.
+  Keyboard accessible, 44px touch targets, aria-live for price.
+{% endcomment %}
+{%- liquid
+  assign current_product = product
+  assign first_variant = current_product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+-%}
+
+<bt-sticky-atc
+  class="bt-sticky-atc"
+  data-observe="buy-buttons-{{ section.id }}"
+  role="region"
+  aria-label="{{ 'products.product.add_to_cart' | t }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="bt-sticky-atc__info">
+    <div class="bt-sticky-atc__title">{{ current_product.title }}</div>
+    <div class="bt-sticky-atc__price" aria-live="polite">
+      {%- if current_product.compare_at_price > current_product.price -%}
+        <s style="color:var(--bt-color-text-muted);font-size:var(--bt-fs-body-xs);margin-right:4px">{{ current_product.compare_at_price | money }}</s>
+      {%- endif -%}
+      {{ first_variant.price | money }}
+    </div>
+  </div>
+  <button
+    type="submit"
+    form="{{ product_form_id }}"
+    name="add"
+    class="bt-btn bt-btn--primary bt-sticky-atc__btn"
+    {% unless first_variant.available %}disabled{% endunless %}
+    aria-label="{{ 'products.product.add_to_cart' | t }} — {{ current_product.title }}"
+  >
+    {%- if first_variant.available -%}
+      {{ 'products.product.add_to_cart' | t }}
+    {%- else -%}
+      {{ 'products.product.sold_out' | t }}
+    {%- endif -%}
+  </button>
+</bt-sticky-atc>
+
+{% schema %}
+{
+  "name": "t:blocks.sticky_atc.name",
+  "settings": [],
+  "presets": [{ "name": "t:blocks.sticky_atc.name" }]
+}
+{% endschema %}

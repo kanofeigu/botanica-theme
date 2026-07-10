@@ -1,0 +1,44 @@
+{% comment %}
+  blocks/text.liquid — Reusable rich text block
+  Body copy, editorial notes, descriptions.
+{% endcomment %}
+{%- if block.settings.text != blank -%}
+  <div class="bt-text-block" {{ block.shopify_attributes }}>
+    {{ block.settings.text }}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-text-block {
+    max-width: var(--bt-content-max);
+    color: var(--bt-color-text);
+    font-size: var(--bt-fs-body);
+    line-height: var(--bt-lh-relaxed);
+  }
+  .bt-text-block p {
+    text-wrap: pretty;
+    margin-bottom: 0.75em;
+  }
+  .bt-text-block p:last-child {
+    margin-bottom: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.text.name",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:blocks.text.settings.text.label",
+      "default": "<p>Rich text content goes here.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.text.name"
+    }
+  ]
+}
+{% endschema %}

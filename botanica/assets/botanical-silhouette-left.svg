@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 600" fill="none">
+  <!-- Tall plant silhouette — left side parallax -->
+  <!-- Main stems -->
+  <path d="M80 580 Q75 500 70 420 Q68 380 65 340 Q60 280 55 220 Q50 160 45 100 Q42 60 40 20"
+        stroke="#4A6B4F" stroke-width="4" stroke-linecap="round" opacity="0.12"/>
+  <path d="M120 580 Q125 500 130 400 Q135 320 140 250 Q145 180 150 130 Q152 90 155 50"
+        stroke="#4A6B4F" stroke-width="3.5" stroke-linecap="round" opacity="0.1"/>
+  <path d="M160 580 Q155 520 150 440 Q145 380 140 320 Q135 260 130 210 Q128 170 125 140"
+        stroke="#4A6B4F" stroke-width="3" stroke-linecap="round" opacity="0.08"/>
+
+  <!-- Large leaves on stem 1 -->
+  <g opacity="0.1">
+    <ellipse cx="55" cy="200" rx="45" ry="20" fill="#4A6B4F" transform="rotate(-30 55 200)"/>
+    <ellipse cx="65" cy="300" rx="40" ry="18" fill="#4A6B4F" transform="rotate(-25 65 300)"/>
+    <ellipse cx="50" cy="100" rx="30" ry="14" fill="#4A6B4F" transform="rotate(-20 50 100)"/>
+  </g>
+
+  <!-- Leaves on stem 2 -->
+  <g opacity="0.08">
+    <ellipse cx="135" cy="350" rx="50" ry="22" fill="#4A6B4F" transform="rotate(15 135 350)"/>
+    <ellipse cx="145" cy="220" rx="42" ry="18" fill="#4A6B4F" transform="rotate(20 145 220)"/>
+    <ellipse cx="150" cy="130" rx="28" ry="12" fill="#4A6B4F" transform="rotate(25 150 130)"/>
+  </g>
+
+  <!-- Small accent leaves -->
+  <g opacity="0.06">
+    <ellipse cx="130" cy="400" rx="18" ry="8" fill="#4A6B4F" transform="rotate(-10 130 400)"/>
+    <ellipse cx="60" cy="450" rx="14" ry="6" fill="#4A6B4F" transform="rotate(-35 60 450)"/>
+  </g>
+</svg>

@@ -1,0 +1,105 @@
+{% comment %}
+  blocks/water-meter.liquid — Refined water-drop meter
+  SVG droplet icon + 5 water-drop progressive fill visualization.
+  Drops fill with primary color to indicate watering frequency.
+  ⚠ Replaces "***" with real SVG drops. SR-only text for a11y.
+{% endcomment %}
+{%- liquid
+  assign label = block.settings.label | default: 'Water'
+  assign level = block.settings.level | plus: 0
+  if level < 0
+    assign level = 0
+  elsif level > 5
+    assign level = 5
+  endif
+  assign level_label = 'Low'
+  case level
+    when 0
+      assign level_label = 'None'
+    when 1
+      assign level_label = 'Minimal'
+    when 2
+      assign level_label = 'Low'
+    when 3
+      assign level_label = 'Moderate'
+    when 4
+      assign level_label = 'Regular'
+    when 5
+      assign level_label = 'Frequent'
+  endcase
+-%}
+<div class="bt-water-meter" {{ block.shopify_attributes }} role="img" aria-label="{{ label }}: {{ level_label }} — {{ level }} out of 5">
+  <span class="bt-water-meter__icon" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 3C8 9 5 12 5 15a7 7 0 0 0 14 0c0-3-3-6-7-12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M12 10v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </span>
+  <span class="bt-water-meter__label">{{ label | escape }}</span>
+  <span class="bt-water-meter__drops" aria-hidden="true">
+    {%- for i in (1..5) -%}
+      <svg width="14" height="16" viewBox="0 0 14 16" class="bt-water-meter__drop{% if i <= level %} is-on{% endif %}">
+        <path d="M7 1C4 6 2 8.5 2 11a5 5 0 0 0 10 0c0-2.5-2-5-5-10Z" fill="{% if i <= level %}var(--bt-color-primary){% else %}none{% endif %}" stroke="{% if i <= level %}var(--bt-color-primary){% else %}currentColor{% endif %}" stroke-width="1.2" stroke-linejoin="round" opacity="{% if i <= level %}1{% else %}0.3{% endif %}"/>
+      </svg>
+    {%- endfor -%}
+  </span>
+  <span class="bt-sr-only">{{ level_label }}</span>
+</div>
+
+{% stylesheet %}
+  .bt-water-meter {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    padding: var(--bt-space-2xs) 0;
+  }
+  .bt-water-meter__icon {
+    display: flex;
+    color: var(--bt-color-secondary);
+    flex-shrink: 0;
+  }
+  .bt-water-meter__label {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: 500;
+    color: var(--bt-color-text-muted);
+    min-width: 4em;
+  }
+  .bt-water-meter__drops {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+    align-items: center;
+  }
+  .bt-water-meter__drop {
+    transition: opacity var(--bt-duration-base), transform var(--bt-duration-base);
+  }
+  .bt-water-meter__drop.is-on {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.water_meter.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:blocks.water_meter.settings.label.label",
+      "default": "Water"
+    },
+    {
+      "type": "range",
+      "id": "level",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "t:blocks.water_meter.settings.level.label",
+      "info": "t:blocks.water_meter.settings.level.info"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.water_meter.name" }]
+}
+{% endschema %}

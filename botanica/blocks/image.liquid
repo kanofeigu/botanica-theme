@@ -1,0 +1,101 @@
+{% comment %}
+  blocks/image.liquid — Reusable image block
+  Supports aspect ratio, lazy loading, and alt text configuration.
+{% endcomment %}
+{%- liquid
+  assign image = block.settings.image
+  assign aspect = block.settings.aspect_ratio | default: 'auto'
+  assign fit = block.settings.image_fit | default: 'cover'
+  assign style_val = ''
+  if aspect != 'auto'
+    assign parts = aspect | split: '-'
+    assign style_val = 'aspect-ratio:' | append: parts[0] | append: ' / ' | append: parts[1]
+  endif
+-%}
+{%- if image != blank -%}
+  <figure class="bt-image-block" {{ block.shopify_attributes }}>
+    <div class="bt-image-block__frame"{% if style_val != blank %} style="{{ style_val }}"{% endif %}>
+      {{ image | image_url: width: 1200 | image_tag:
+        loading: 'lazy',
+        widths: '400, 600, 800, 1000, 1200',
+        sizes: '(min-width: 1300px) 1200px, 100vw',
+        alt: block.settings.alt_text | default: image.alt,
+        class: 'bt-image-block__img bt-image-block__img--' | append: fit
+      }}
+    </div>
+    {%- if block.settings.caption != blank -%}
+      <figcaption class="bt-image-block__caption">{{ block.settings.caption | escape }}</figcaption>
+    {%- endif -%}
+  </figure>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-image-block { margin: 0; }
+  .bt-image-block__frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--bt-radius-card);
+    background: var(--bt-color-surface);
+  }
+  .bt-image-block__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .bt-image-block__img--cover { object-fit: cover; }
+  .bt-image-block__img--contain { object-fit: contain; }
+  .bt-image-block__caption {
+    margin-top: var(--bt-space-2xs);
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.image.name",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:blocks.image.settings.image.label"
+    },
+    {
+      "type": "text",
+      "id": "alt_text",
+      "label": "t:blocks.image.settings.alt_text.label"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "t:blocks.image.settings.aspect_ratio.label",
+      "options": [
+        { "value": "auto", "label": "t:blocks.image.settings.aspect_ratio.options__1.label" },
+        { "value": "1-1", "label": "t:blocks.image.settings.aspect_ratio.options__2.label" },
+        { "value": "4-5", "label": "t:blocks.image.settings.aspect_ratio.options__3.label" },
+        { "value": "3-4", "label": "t:blocks.image.settings.aspect_ratio.options__4.label" },
+        { "value": "16-9", "label": "t:blocks.image.settings.aspect_ratio.options__5.label" },
+        { "value": "3-2", "label": "t:blocks.image.settings.aspect_ratio.options__6.label" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "t:blocks.image.settings.image_fit.label",
+      "options": [
+        { "value": "cover", "label": "t:blocks.image.settings.image_fit.options__1.label" },
+        { "value": "contain", "label": "t:blocks.image.settings.image_fit.options__2.label" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "t:blocks.image.settings.caption.label"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.image.name" }]
+}
+{% endschema %}

@@ -1,0 +1,31 @@
+{% comment %}
+  blocks/field-note.liquid — Editorial origin story / field note
+  Terracotta left border, editoral botanical style.
+{% endcomment %}
+{%- if block.settings.text != blank -%}
+  <blockquote class="bt-field-note" {{ block.shopify_attributes }}>
+    {{ block.settings.text }}
+  </blockquote>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-field-note {
+    margin: var(--bt-space-md) 0;
+    padding: var(--bt-space-sm) var(--bt-space-md);
+    border-left: 3px solid var(--bt-color-secondary);
+    font-family: var(--bt-font-heading);
+    font-style: italic;
+    color: var(--bt-color-text-muted);
+    line-height: var(--bt-lh-relaxed);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.field_note.name",
+  "settings": [
+    { "type": "richtext", "id": "text", "label": "t:blocks.field_note.settings.text.label", "default": "<p>Origin story / field notes about this plant.</p>" }
+  ],
+  "presets": [{ "name": "t:blocks.field_note.name" }]
+}
+{% endschema %}

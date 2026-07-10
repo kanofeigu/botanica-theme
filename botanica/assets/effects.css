@@ -1,0 +1,622 @@
+/* ───────────────────────────────────────────
+   Botanica v3 — Effects & Micro-interactions
+   Scroll-driven animations, View Transitions,
+   paper textures, specimen borders, micro-states.
+   All CSS-native. Zero JS for visual effects.
+   ⚠ All animations guarded: prefers-reduced-motion.
+   ─────────────────────────────────────────── */
+
+/* ════════════════════════════════════════════
+   PAPER TEXTURE OVERLAYS
+   Botanical editorial aesthetic — grain / noise
+   ════════════════════════════════════════════ */
+
+.bt-texture {
+  position: relative;
+}
+
+.bt-texture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* SVG noise filter — subtle paper grain */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  mix-blend-mode: multiply;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* ── Warmer, heavier texture variant (for hero / spotlight) ── */
+.bt-texture--warm::after {
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+}
+
+/* ════════════════════════════════════════════
+   SPECIMEN BORDERS
+   Botanical specimen-label aesthetic.
+   Double-border frame + corner label tag.
+   ════════════════════════════════════════════ */
+
+.bt-specimen-frame {
+  position: relative;
+  border: 2px solid var(--bt-color-border-medium);
+  outline: 6px solid var(--bt-color-bg);
+  outline-offset: -8px;
+  background: var(--bt-color-surface);
+}
+
+/* ── Corner specimen label (like vintage botanical prints) ── */
+.bt-specimen-label {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--bt-color-bg);
+  border: 1px solid var(--bt-color-border-medium);
+  font-family: var(--bt-font-body);
+  font-size: var(--bt-fs-specimen);
+  font-weight: var(--bt-fw-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bt-color-text-muted);
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.bt-specimen-label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bt-color-secondary);
+  flex-shrink: 0;
+}
+
+/* ── Specimen border for product cards ── */
+.bt-specimen-border {
+  border: 1px solid var(--bt-color-border-medium);
+  position: relative;
+}
+
+.bt-specimen-border::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--bt-color-border-light);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════
+   FIELD NOTE / EDITORIAL QUOTE BORDERS
+   Terracotta left border like a field journal
+   ════════════════════════════════════════════ */
+
+.bt-field-note {
+  border-left: 3px solid var(--bt-color-secondary);
+  padding-left: var(--bt-space-md);
+  font-style: italic;
+  color: var(--bt-color-text-muted);
+  max-width: var(--bt-content-max);
+}
+
+/* ════════════════════════════════════════════
+   SCROLL-DRIVEN ANIMATIONS
+   CSS animation-timeline: view() / scroll()
+   Progressive enhancement — unsupported browsers
+   see static content (no JS polyfill).
+   ════════════════════════════════════════════ */
+
+/* ── Base reveal: fade up on scroll enter ── */
+.bt-reveal {
+  animation: bt-reveal-up linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 100%;
+}
+
+@keyframes bt-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Fade only (subtle) ── */
+.bt-reveal--fade {
+  animation-name: bt-reveal-fade;
+}
+
+@keyframes bt-reveal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Slide in from left ── */
+.bt-reveal--left {
+  animation-name: bt-reveal-left;
+}
+
+@keyframes bt-reveal-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Slide in from right ── */
+.bt-reveal--right {
+  animation-name: bt-reveal-right;
+}
+
+@keyframes bt-reveal-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Scale up (for cards / spotlight images) ── */
+.bt-reveal--scale {
+  animation-name: bt-reveal-scale;
+}
+
+@keyframes bt-reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Stagger children: each direct child reveals in sequence ── */
+.bt-reveal-stagger > * {
+  animation: bt-reveal-up linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 100%;
+}
+
+/* Each child gets its own named timeline for staggering */
+.bt-reveal-stagger > :nth-child(2) { animation-range: entry 10% entry 100%; }
+.bt-reveal-stagger > :nth-child(3) { animation-range: entry 20% entry 100%; }
+.bt-reveal-stagger > :nth-child(4) { animation-range: entry 30% entry 100%; }
+.bt-reveal-stagger > :nth-child(5) { animation-range: entry 40% entry 100%; }
+.bt-reveal-stagger > :nth-child(6) { animation-range: entry 50% entry 100%; }
+
+/* ── Parallax: slow vertical shift on scroll ── */
+@supports (animation-timeline: scroll()) {
+  .bt-parallax {
+    animation: bt-parallax linear both;
+    animation-timeline: scroll();
+    animation-range: cover 0% cover 100%;
+  }
+
+  @keyframes bt-parallax {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-12%); }
+  }
+
+  .bt-parallax--slow {
+    animation-name: bt-parallax-slow;
+  }
+
+  @keyframes bt-parallax-slow {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-6%); }
+  }
+}
+
+/* ── Reduced motion: kill ALL scroll-driven animations ── */
+@media (prefers-reduced-motion: reduce) {
+  .bt-reveal,
+  .bt-reveal--fade,
+  .bt-reveal--left,
+  .bt-reveal--right,
+  .bt-reveal--scale,
+  .bt-reveal-stagger > *,
+  .bt-parallax,
+  .bt-parallax--slow {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Feature detect: unsupported browsers get static content ── */
+@supports not (animation-timeline: view()) {
+  .bt-reveal,
+  .bt-reveal--fade,
+  .bt-reveal--left,
+  .bt-reveal--right,
+  .bt-reveal--scale,
+  .bt-reveal-stagger > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════
+   CROSS-DOCUMENT VIEW TRANSITIONS
+   Product card → PDP morph transition.
+   Only active when browser supports it.
+   ════════════════════════════════════════════ */
+
+@view-transition {
+  navigation: auto;
+}
+
+/* ── Product card image morphs into PDP main image ── */
+.bt-product-card__image {
+  view-transition-name: bt-product-image;
+}
+
+.bt-product__main-media img {
+  view-transition-name: bt-pdp-image;
+}
+
+/* ── Product title morphs ── */
+.bt-product-card__title {
+  view-transition-name: bt-product-title;
+}
+
+.bt-product-title {
+  view-transition-name: bt-pdp-title;
+}
+
+/* ── Transition animation: 350ms spring ── */
+::view-transition-old(bt-product-image),
+::view-transition-old(bt-product-title) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-new(bt-product-image),
+::view-transition-new(bt-product-title) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Disable VT if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+  .bt-product-card__image,
+  .bt-product__main-media img,
+  .bt-product-card__title,
+  .bt-product-title {
+    view-transition-name: none;
+  }
+}
+
+/* ════════════════════════════════════════════
+   MICRO-INTERACTIONS
+   Subtle animations for common UI events.
+   All 4-state: hover / active / focus-visible / disabled
+   ════════════════════════════════════════════ */
+
+/* ── Underline reveal (link decoration slides in on hover) ── */
+.bt-link-underline {
+  position: relative;
+  text-decoration: none;
+  color: var(--bt-color-text);
+  transition: color var(--bt-duration-fast) var(--bt-ease-out);
+}
+
+.bt-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--bt-duration-base) var(--bt-ease-out);
+}
+
+.bt-link-underline:hover::after,
+.bt-link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.bt-link-underline:hover {
+  color: var(--bt-color-primary);
+}
+
+/* ── Image lift (subtle scale + shadow on hover) ── */
+.bt-lift {
+  transition: transform var(--bt-duration-base) var(--bt-ease-out),
+              box-shadow var(--bt-duration-base) var(--bt-ease-out);
+}
+
+.bt-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--bt-shadow-md);
+}
+
+.bt-lift:active {
+  transform: translateY(-2px);
+  box-shadow: var(--bt-shadow-sm);
+}
+
+/* ── Button press feedback (refined from base.css) ── */
+.bt-btn--press:active {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+
+/* ── Cart bounce (when item added) ── */
+@keyframes bt-cart-bounce {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.2); }
+  50%  { transform: scale(0.95); }
+  75%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.bt-cart-bounce {
+  animation: bt-cart-bounce 400ms var(--bt-ease-out);
+}
+
+/* ── Form error shake ── */
+@keyframes bt-shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+.bt-shake {
+  animation: bt-shake 400ms var(--bt-ease-out);
+}
+
+/* ── Form success pulse (green check flash) ── */
+@keyframes bt-pulse-success {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--bt-color-primary-rgb), 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(var(--bt-color-primary-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--bt-color-primary-rgb), 0); }
+}
+
+.bt-pulse-success {
+  animation: bt-pulse-success 600ms var(--bt-ease-out);
+}
+
+/* ── Skeleton loading shimmer (for async content) ── */
+@keyframes bt-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.bt-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bt-color-surface) 25%,
+    var(--bt-color-surface-hover) 50%,
+    var(--bt-color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: bt-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--bt-radius-sm);
+}
+
+/* ── Spin (for loading indicators) ── */
+@keyframes bt-spin {
+  to { transform: rotate(360deg); }
+}
+
+.bt-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--bt-color-border-light);
+  border-top-color: var(--bt-color-primary);
+  border-radius: 50%;
+  animation: bt-spin 600ms linear infinite;
+}
+
+/* ════════════════════════════════════════════
+   STICKY ELEMENTS
+   Enhanced sticky behavior for ATC / panels
+   ════════════════════════════════════════════ */
+
+/* ── Sticky ATC bar (mobile) ── */
+.bt-sticky-atc {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bt-color-bg);
+  border-top: 1px solid var(--bt-color-border-medium);
+  padding: var(--bt-space-sm) var(--bt-space-md);
+  z-index: var(--bt-z-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-sm);
+  transform: translateY(100%);
+  transition: transform var(--bt-duration-base) var(--bt-ease-out);
+  box-shadow: 0 -4px 16px rgba(var(--bt-color-text-rgb), 0.06);
+}
+
+.bt-sticky-atc.is-visible {
+  transform: translateY(0);
+}
+
+.bt-sticky-atc__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bt-sticky-atc__title {
+  font-family: var(--bt-font-heading);
+  font-size: var(--bt-fs-body-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.bt-sticky-atc__price {
+  font-size: var(--bt-fs-body-sm);
+  font-weight: var(--bt-fw-semibold);
+  color: var(--bt-color-text);
+}
+
+.bt-sticky-atc__btn {
+  flex-shrink: 0;
+  padding: 0.6em 1.5em;
+  min-height: 40px;
+}
+
+/* Utility to prevent sticky ATC from covering content */
+.bt-has-sticky-atc {
+  padding-bottom: 80px;
+}
+
+/* ════════════════════════════════════════════
+   QUICK VIEW DIALOG OVERRIDES
+   Styling for native <dialog> quick view
+   ════════════════════════════════════════════ */
+
+.bt-quick-view-dialog {
+  padding: 0;
+  border: none;
+  border-radius: var(--bt-radius-card);
+  background: var(--bt-color-bg);
+  max-width: min(960px, 95vw);
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: var(--bt-shadow-lg);
+}
+
+.bt-quick-view-dialog::backdrop {
+  background: rgba(var(--bt-color-text-rgb), 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.bt-quick-view-dialog[open] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.bt-quick-view__close {
+  position: absolute;
+  top: var(--bt-space-sm);
+  right: var(--bt-space-sm);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bt-color-bg);
+  border: 1px solid var(--bt-color-border-light);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 3;
+  transition: background var(--bt-duration-fast);
+}
+
+.bt-quick-view__close:hover {
+  background: var(--bt-color-surface-hover);
+}
+
+.bt-quick-view__media {
+  aspect-ratio: 4 / 5;
+  background: var(--bt-color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bt-quick-view__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bt-quick-view__info {
+  padding: var(--bt-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-space-sm);
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+@media (max-width: 749px) {
+  .bt-quick-view-dialog[open] {
+    grid-template-columns: 1fr;
+    max-height: 95vh;
+    border-radius: var(--bt-radius-card) var(--bt-radius-card) 0 0;
+    margin-top: auto;
+  }
+
+  .bt-quick-view__media {
+    aspect-ratio: 1 / 1;
+    max-height: 50vh;
+  }
+
+  .bt-quick-view__info {
+    padding: var(--bt-space-md);
+    max-height: none;
+  }
+}
+
+/* ════════════════════════════════════════════
+   MEGA MENU ENHANCEMENTS
+   Smooth open/close transitions
+   ════════════════════════════════════════════ */
+
+.bt-mega-menu__panel[hidden] {
+  display: none;
+}
+
+.bt-mega-menu__panel {
+  animation: bt-mega-in var(--bt-duration-base) var(--bt-ease-out) both;
+  transform-origin: top center;
+}
+
+@keyframes bt-mega-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ════════════════════════════════════════════
+   PRINT STYLES
+   ════════════════════════════════════════════ */
+
+@media print {
+  .bt-texture::after { display: none; }
+  .bt-sticky-atc { display: none; }
+}

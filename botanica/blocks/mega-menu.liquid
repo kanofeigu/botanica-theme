@@ -1,0 +1,145 @@
+{% comment %}
+  blocks/mega-menu.liquid — Mega menu dropdown theme block.
+  Renders a rich dropdown panel with image, links, and optional promotional card.
+  Zero Dawn code. All-original.
+{% endcomment %}
+{%- liquid
+  assign trigger_text = block.settings.trigger_text | default: 'Shop'
+  assign menu = block.settings.menu
+  assign promo_image = block.settings.promo_image
+  assign promo_heading = block.settings.promo_heading
+  assign promo_text = block.settings.promo_text
+  assign promo_link = block.settings.promo_link
+  assign promo_link_label = block.settings.promo_link_label
+-%}
+
+<div class="bt-mega-menu" {{ block.shopify_attributes }} data-mega-menu>
+  <button
+    type="button"
+    class="bt-mega-menu__trigger"
+    aria-expanded="false"
+    aria-haspopup="true"
+    data-mega-trigger
+  >
+    {{ trigger_text }}
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+      <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="bt-mega-menu__panel" data-mega-panel hidden>
+    <div class="bt-mega-menu__inner bt-container">
+      <div class="bt-mega-menu__columns">
+        {%- if menu != blank -%}
+          {%- for link in menu.links -%}
+            <div class="bt-mega-menu__column">
+              <a href="{{ link.url }}" class="bt-mega-menu__heading" {% if link.current %}aria-current="page"{% endif %}>
+                {{ link.title }}
+              </a>
+              {%- if link.links.size > 0 -%}
+                <ul class="bt-mega-menu__links" role="list">
+                  {%- for child in link.links -%}
+                    <li>
+                      <a href="{{ child.url }}" class="bt-mega-menu__link" {% if child.current %}aria-current="page"{% endif %}>
+                        {{ child.title }}
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+      {%- if promo_image != blank -%}
+        <div class="bt-mega-menu__promo">
+          {{ promo_image | image_url: width: 400 | image_tag: loading: 'lazy', widths: '200, 300, 400', alt: promo_heading | default: promo_link_label }}
+          {%- if promo_heading != blank or promo_text != blank -%}
+            <div class="bt-mega-menu__promo-body">
+              {%- if promo_heading != blank -%}
+                <h3 class="bt-mega-menu__promo-heading">{{ promo_heading }}</h3>
+              {%- endif -%}
+              {%- if promo_text != blank -%}
+                <p class="bt-mega-menu__promo-text">{{ promo_text }}</p>
+              {%- endif -%}
+              {%- if promo_link != blank and promo_link_label != blank -%}
+                <a href="{{ promo_link }}" class="bt-btn bt-btn--primary bt-btn--sm">{{ promo_link_label }}</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const mega=document.querySelector('[data-mega-menu]');
+    if(!mega)return;
+    const trigger=mega.querySelector('[data-mega-trigger]');
+    const panel=mega.querySelector('[data-mega-panel]');
+    let open=false;
+    trigger.addEventListener('click',()=>{open=!open;panel.hidden=!open;trigger.setAttribute('aria-expanded',String(open))});
+    trigger.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){open=false;panel.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus()}
+    });
+    document.addEventListener('click',e=>{if(open&&!mega.contains(e.target)){open=false;panel.hidden=true;trigger.setAttribute('aria-expanded','false')}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&open){open=false;panel.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus()}});
+  })();
+</script>
+
+{% stylesheet %}
+  .bt-mega-menu { position: relative; }
+  .bt-mega-menu__trigger {
+    display: flex; align-items: center; gap: 4px;
+    font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text); background: none; border: none; cursor: pointer;
+    padding: var(--bt-space-2xs) 0;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-mega-menu__trigger:hover { color: var(--bt-color-primary); }
+  .bt-mega-menu__panel {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--bt-color-bg);
+    border-top: 1px solid var(--bt-color-border-light);
+    border-bottom: 1px solid var(--bt-color-border-light);
+    box-shadow: var(--bt-shadow-lg);
+    z-index: var(--bt-z-dropdown);
+    padding-block: var(--bt-space-lg);
+  }
+  .bt-mega-menu__inner { display: grid; grid-template-columns: 1fr 280px; gap: var(--bt-space-xl); }
+  .bt-mega-menu__columns { display: flex; gap: var(--bt-space-xl); }
+  .bt-mega-menu__column { min-width: 140px; }
+  .bt-mega-menu__heading { font-family: var(--bt-font-heading); font-size: var(--bt-fs-h4); text-decoration: none; color: var(--bt-color-text); display: block; margin-bottom: var(--bt-space-xs); }
+  .bt-mega-menu__heading:hover { color: var(--bt-color-primary); }
+  .bt-mega-menu__links { list-style: none; display: flex; flex-direction: column; gap: var(--bt-space-3xs); }
+  .bt-mega-menu__link { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); text-decoration: none; transition: color var(--bt-duration-fast); }
+  .bt-mega-menu__link:hover { color: var(--bt-color-primary); }
+  .bt-mega-menu__promo { border-radius: var(--bt-radius-card); overflow: hidden; background: var(--bt-color-surface); }
+  .bt-mega-menu__promo img { width: 100%; height: 160px; object-fit: cover; }
+  .bt-mega-menu__promo-body { padding: var(--bt-space-sm); }
+  .bt-mega-menu__promo-heading { font-family: var(--bt-font-heading); font-size: var(--bt-fs-h4); margin-bottom: var(--bt-space-3xs); }
+  .bt-mega-menu__promo-text { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); margin-bottom: var(--bt-space-xs); }
+  @media (max-width: 989px) {
+    .bt-mega-menu__panel { position: static; box-shadow: none; padding-block: 0; }
+    .bt-mega-menu__inner { grid-template-columns: 1fr; }
+    .bt-mega-menu__columns { flex-direction: column; gap: var(--bt-space-sm); }
+    .bt-mega-menu__promo { display: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.mega_menu.name",
+  "settings": [
+    { "type": "text", "id": "trigger_text", "label": "t:blocks.mega_menu.settings.trigger_text.label", "default": "Shop" },
+    { "type": "link_list", "id": "menu", "label": "t:blocks.mega_menu.settings.menu.label" },
+    { "type": "image_picker", "id": "promo_image", "label": "t:blocks.mega_menu.settings.promo_image.label" },
+    { "type": "text", "id": "promo_heading", "label": "t:blocks.mega_menu.settings.promo_heading.label" },
+    { "type": "text", "id": "promo_text", "label": "t:blocks.mega_menu.settings.promo_text.label" },
+    { "type": "url", "id": "promo_link", "label": "t:blocks.mega_menu.settings.promo_link.label" },
+    { "type": "text", "id": "promo_link_label", "label": "t:blocks.mega_menu.settings.promo_link_label.label", "default": "Shop now" }
+  ],
+  "presets": [{ "name": "t:blocks.mega_menu.name" }]
+}
+{% endschema %}

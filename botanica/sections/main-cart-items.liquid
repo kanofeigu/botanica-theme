@@ -1,0 +1,83 @@
+{% comment %} main-cart-items.liquid — Original cart with free shipping progress. Theme blocks + @app support. Zero Dawn code. {% endcomment %}
+<div class="bt-cart bt-section" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+    <h1 class="bt-h1 bt-text-center">{{ 'sections.cart.title' | t }}</h1>
+    {%- if cart.item_count > 0 -%}
+      {%- if section.settings.show_free_shipping_bar and settings.show_free_shipping_bar -%}
+        {%- liquid
+          assign threshold = section.settings.free_shipping_threshold | times: 100
+          assign remaining = threshold | minus: cart.total_price
+        -%}
+        {%- if remaining > 0 -%}
+          {%- assign remaining_formatted = remaining | money -%}
+          <div class="bt-cart__shipping-bar" role="status">
+            <p class="bt-cart__shipping-msg">{{ 'sections.cart.free_shipping_remaining_html' | t: amount: remaining_formatted }}</p>
+            <div class="bt-cart__shipping-track"><div class="bt-cart__shipping-fill" style="width: {{ cart.total_price | times: 100 | divided_by: threshold }}%"></div></div>
+          </div>
+        {%- else -%}
+          <p class="bt-cart__shipping-msg bt-cart__shipping-msg--reached" role="status">{{ 'sections.cart.free_shipping_reached' | t }}</p>
+        {%- endif -%}
+      {%- endif -%}
+      <form action="{{ routes.cart_url }}" method="post" novalidate class="bt-cart__form">
+        <ul class="bt-cart__items" role="list">
+          {%- for item in cart.items -%}
+            <li class="bt-cart__item" role="listitem">
+              <div class="bt-cart__item-media">{%- if item.image -%}{{ item.image | image_url: width: 200 | image_tag: loading: 'lazy', widths: '100,200', alt: item.title }}{%- endif -%}</div>
+              <div class="bt-cart__item-info">
+                <a href="{{ item.url }}" class="bt-cart__item-title">{{ item.product.title }}</a>
+                {%- if item.variant.title != 'Default Title' -%}<p class="bt-cart__item-variant">{{ item.variant.title }}</p>{%- endif -%}
+                <input type="number" name="updates[]" id="updates_{{ item.key }}" value="{{ item.quantity }}" min="1" class="bt-input bt-cart__qty-input" aria-label="{{ 'products.product.quantity.label' | t }}">
+              </div>
+              <div class="bt-cart__item-price">
+                <span>{{ item.final_line_price | money }}</span>
+                <a href="{{ item.url_to_remove }}" class="bt-cart__item-remove" aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}">{% render 'icon-close' %}</a>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+        <div class="bt-cart__footer">
+          {% content_for "blocks" %}
+          <div class="bt-cart__totals">
+            <p class="bt-cart__subtotal">{{ 'sections.cart.subtotal' | t }}: <strong>{{ cart.total_price | money }}</strong></p>
+            <p class="bt-cart__note bt-fs-body-sm bt-color-text-muted">{{ 'sections.cart.taxes_note' | t }}</p>
+            <button type="submit" name="checkout" class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block">{{ 'sections.cart.checkout' | t }}</button>
+          </div>
+        </div>
+      </form>
+    {%- else -%}
+      <div class="bt-cart__empty bt-text-center">
+        <p>{{ 'sections.cart.empty' | t }}</p>
+        <a href="{{ routes.all_products_collection_url }}" class="bt-btn bt-btn--primary">{{ 'general.continue_shopping' | t }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-cart__shipping-bar { margin-bottom: var(--bt-space-md); text-align: center; }
+  .bt-cart__shipping-msg { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); margin-bottom: var(--bt-space-2xs); }
+  .bt-cart__shipping-msg--reached { color: var(--bt-color-primary); font-weight: var(--bt-fw-semibold); }
+  .bt-cart__shipping-track { width: 100%; max-width: 400px; height: 6px; background: var(--bt-color-border-light); border-radius: var(--bt-radius-pill); margin-inline: auto; overflow: hidden; }
+  .bt-cart__shipping-fill { height: 100%; background: var(--bt-color-primary); border-radius: var(--bt-radius-pill); transition: width var(--bt-duration-base) var(--bt-ease-out); }
+  .bt-cart__items { list-style: none; display: flex; flex-direction: column; gap: var(--bt-space-md); }
+  .bt-cart__item { display: grid; grid-template-columns: 100px 1fr auto; gap: var(--bt-space-sm); align-items: start; padding: var(--bt-space-sm); background: var(--bt-color-surface); border-radius: var(--bt-radius-card); }
+  .bt-cart__item-media { border-radius: var(--bt-radius-sm); overflow: hidden; }
+  .bt-cart__item-title { font-family: var(--bt-font-heading); font-size: var(--bt-fs-h4); text-decoration: none; color: var(--bt-color-text); }
+  .bt-cart__item-variant { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); }
+  .bt-cart__qty-input { width: 80px; padding: 0.4em 0.5em; }
+  .bt-cart__item-price { text-align: right; font-weight: var(--bt-fw-semibold); }
+  .bt-cart__item-remove { display: inline-flex; color: var(--bt-color-text-muted); margin-top: var(--bt-space-2xs); }
+  .bt-cart__footer { margin-top: var(--bt-space-xl); max-width: 480px; margin-left: auto; }
+  .bt-cart__totals { margin-top: var(--bt-space-md); padding-top: var(--bt-space-md); border-top: 2px solid var(--bt-color-border); display: flex; flex-direction: column; gap: var(--bt-space-sm); }
+  .bt-cart__subtotal { display: flex; justify-content: space-between; font-size: var(--bt-fs-h4); font-family: var(--bt-font-heading); }
+  .bt-cart__empty { padding-block: var(--bt-space-2xl); display: flex; flex-direction: column; align-items: center; gap: var(--bt-space-md); }
+  .bt-cart__note { color: var(--bt-color-text-muted); }
+  @media (max-width: 749px) { .bt-cart__item { grid-template-columns: 80px 1fr; } .bt-cart__item-price { grid-column: 1 / -1; text-align: left; } }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_cart_items.name", "blocks": [{ "type": "@theme" }, { "type": "@app" }], "settings": [
+  { "type": "checkbox", "id": "show_free_shipping_bar", "label":"t:sections.main_cart.settings.show_free_shipping_bar.label","default":true },
+  { "type": "text", "id": "free_shipping_threshold", "label":"t:sections.main_cart.settings.free_shipping_threshold.label","default":"50" }
+] }
+{% endschema %}

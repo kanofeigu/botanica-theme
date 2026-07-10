@@ -1,0 +1,23 @@
+{% comment %} main-login.liquid — Customer login page. Original. Zero Dawn code. {% endcomment %}
+<div class="bt-section bt-login" {{ section.shopify_attributes }}>
+  <div class="bt-container" style="max-width: 480px;">
+    <h1 class="bt-h1 bt-text-center">{{ 'customer.login.title' | t }}</h1>
+    {%- form 'customer_login', class: 'bt-login__form bt-stack-md' -%}
+      <div><label for="CustomerEmail" class="bt-label">{{ 'customer.login.email' | t }}</label><input type="email" id="CustomerEmail" name="customer[email]" class="bt-input" required autocomplete="email" autofocus></div>
+      {%- if form.password_needed -%}
+        <div><label for="CustomerPassword" class="bt-label">{{ 'customer.login.password' | t }}</label><input type="password" id="CustomerPassword" name="customer[password]" class="bt-input" required autocomplete="current-password"></div>
+      {%- endif -%}
+      <button type="submit" class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block">{{ 'customer.login.sign_in' | t }}</button>
+      <p class="bt-text-center bt-fs-body-sm"><a href="{{ routes.account_register_url }}">{{ 'customer.login.create_account' | t }}</a></p>
+      {%- if form.errors -%}<p class="bt-form-error bt-text-center" role="alert">{{ form.errors | default_errors }}</p>{%- endif -%}
+    {%- endform -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-login__form { margin-top: var(--bt-space-lg); }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_login.name", "presets": [{ "name": "t:sections.main_login.name" }] }
+{% endschema %}

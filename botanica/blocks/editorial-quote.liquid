@@ -1,0 +1,64 @@
+{% comment %}
+  blocks/editorial-quote.liquid — Editorial pull quote block
+  Terracotta left border, heading font italic, field journal aesthetic.
+  Distinct from field-note (which is simpler): this has optional attribution.
+{% endcomment %}
+{%- liquid
+  assign quote = block.settings.quote
+  assign attribution = block.settings.attribution
+-%}
+{%- if quote != blank -%}
+  <blockquote class="bt-editorial-quote" {{ block.shopify_attributes }}>
+    <p class="bt-editorial-quote__text">{{ quote }}</p>
+    {%- if attribution != blank -%}
+      <cite class="bt-editorial-quote__attr">{{ attribution | escape }}</cite>
+    {%- endif -%}
+  </blockquote>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-editorial-quote {
+    margin: var(--bt-space-md) 0;
+    padding: var(--bt-space-sm) var(--bt-space-md);
+    border-left: 3px solid var(--bt-color-secondary);
+    background: var(--bt-color-secondary-tint);
+    border-radius: 0 var(--bt-radius-sm) var(--bt-radius-sm) 0;
+  }
+  .bt-editorial-quote__text {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h3);
+    font-style: italic;
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text);
+    margin: 0 0 var(--bt-space-2xs);
+    text-wrap: balance;
+  }
+  .bt-editorial-quote__attr {
+    display: block;
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    font-style: normal;
+    color: var(--bt-color-text-muted);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.editorial_quote.name",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:blocks.editorial_quote.settings.quote.label",
+      "default": "This plant has been thriving in the same corner for twelve years — it's the perfect companion for bright, indirect spaces."
+    },
+    {
+      "type": "text",
+      "id": "attribution",
+      "label": "t:blocks.editorial_quote.settings.attribution.label",
+      "default": "Field notes, Botanical Archives"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.editorial_quote.name" }]
+}
+{% endschema %}

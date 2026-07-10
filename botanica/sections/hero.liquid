@@ -1,0 +1,425 @@
+{% comment %}
+  sections/hero.liquid — Multi-layout hero section
+  Layouts: split (text left + image right), stacked (image top + text overlay),
+  full-bleed (full viewport image + scrim + centered text).
+  ★ Design differentiation: asymmetric compositions, specimen labels, paper texture.
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign layout = section.settings.layout | default: 'split'
+  assign image = section.settings.image
+  assign image_mobile = section.settings.image_mobile | default: image
+  assign video = section.settings.video
+  assign poster_image = section.settings.poster_image | default: image
+  assign image_fit = section.settings.image_fit | default: 'cover'
+  assign show_scrim = section.settings.show_scrim | default: false
+  assign scrim_opacity = section.settings.scrim_opacity | default: 40
+  assign heading = section.settings.heading
+  assign text = section.settings.text
+  assign button_label = section.settings.button_label
+  assign button_link = section.settings.button_link
+  assign button_style = section.settings.button_style | default: 'primary'
+  assign eyebrow = section.settings.eyebrow
+  assign min_height = section.settings.min_height | default: 'auto'
+-%}
+<section
+  class="bt-hero bt-hero--{{ layout }}"
+  {{ section.shopify_attributes }}
+  style="--bt-hero-min-height: {% if min_height != 'auto' %}{{ min_height }}vh{% else %}auto{% endif %}; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  {%- if layout == 'full_bleed' or layout == 'stacked' -%}
+    {% render 'botanical-ambience', show_hero_botanical: true %}
+  {%- endif -%}
+  <div class="bt-hero__inner">
+    {%- if video != blank -%}
+      <div class="bt-hero__media{% if image_fit == 'contain' %} bt-hero__media--contain{% endif %}">
+        {{ video | video_tag:
+          image_size: '2000x',
+          autoplay: true,
+          loop: true,
+          muted: true,
+          controls: false,
+          playsinline: true,
+          preload: 'metadata',
+          poster: poster_image | image_url: width: 2000,
+          class: 'bt-hero__vid',
+          loading: 'eager'
+        }}
+        {%- if show_scrim and layout == 'stacked' -%}
+          <div class="bt-hero__scrim" style="--bt-scrim-opacity: {{ scrim_opacity | divided_by: 100.0 }}"></div>
+        {%- endif -%}
+      </div>
+    {%- elsif image != blank -%}
+      {%- assign has_mobile = false -%}
+      {%- if image_mobile != blank and image_mobile != image -%}
+        {%- assign has_mobile = true -%}
+      {%- endif -%}
+      <div
+        class="bt-hero__media{% if image_fit == 'contain' %} bt-hero__media--contain{% endif %}{% if has_mobile %} bt-hero__media--responsive-img{% endif %}"
+        style="{%- if has_mobile -%}--bt-hero-bg-mobile: url('{{ image_mobile | image_url: width: 750 }}'); {%- endif -%}--bt-hero-bg: url('{{ image | image_url: width: 2000 }}');"
+        role="img"
+        aria-label="{{ image.alt | default: heading | escape }}"
+      >
+        {%- if show_scrim and layout == 'stacked' -%}
+          <div class="bt-hero__scrim" style="--bt-scrim-opacity: {{ scrim_opacity | divided_by: 100.0 }}"></div>
+        {%- endif -%}
+      </div>
+    {%- else -%}
+      <div class="bt-hero__media bt-hero__media--placeholder">
+        <div class="bt-hero__placeholder-illustration" aria-hidden="true">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'Botanical illustration' }}
+        </div>
+      </div>
+    {%- endif -%}
+    {%- if show_scrim and layout == 'full_bleed' -%}
+      <div class="bt-hero__scrim" style="--bt-scrim-opacity: {{ scrim_opacity | divided_by: 100.0 }}"></div>
+    {%- endif -%}
+    <div class="bt-hero__content bt-reveal--left">
+      {%- if eyebrow != blank -%}
+        <div class="bt-hero__tag">
+          {% render 'specimen-tag', number: '01', label: 'Field guide', value: eyebrow %}
+        </div>
+      {%- endif -%}
+      {%- if heading != blank -%}
+        <h1 class="bt-hero__heading">{{ heading | escape }}</h1>
+      {%- endif -%}
+      {%- if text != blank -%}
+        <p class="bt-hero__text">{{ text | escape }}</p>
+      {%- endif -%}
+      {%- if button_label != blank -%}
+        <a href="{{ button_link | default: '#' }}" class="bt-btn bt-btn--{{ button_style }} bt-btn--lg">
+          {{ button_label | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+  {%- if section.blocks.size > 0 -%}
+    {% render 'botanical-divider' %}
+    <div class="bt-hero__blocks{% if layout == 'full_bleed' %} bt-hero__blocks--overlay{% endif %}">
+      {% content_for "blocks" %}
+    </div>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .bt-hero {
+    --bt-hero-min-height: auto;
+    position: relative;
+    overflow: hidden;
+    background: var(--bt-color-bg);
+  }
+  /* ── Split layout ── */
+  .bt-hero--split .bt-hero__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    min-height: var(--bt-hero-min-height);
+  }
+  .bt-hero--split .bt-hero__media {
+    order: 1;
+    aspect-ratio: 4 / 5;
+    max-height: 100vh;
+  }
+  .bt-hero--split .bt-hero__content {
+    order: 0;
+    padding: var(--bt-space-xl) clamp(var(--bt-page-gutter), 6vw, 5rem);
+  }
+  /* ── Stacked layout ── */
+  .bt-hero--stacked .bt-hero__inner {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: 0;
+  }
+  .bt-hero--stacked .bt-hero__media {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    max-height: 70vh;
+  }
+  .bt-hero--stacked .bt-hero__content {
+    padding: var(--bt-space-xl) clamp(var(--bt-page-gutter), 8vw, var(--bt-space-2xl));
+    text-align: center;
+  }
+  /* ── Full bleed layout ── */
+  .bt-hero--full_bleed .bt-hero__inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--bt-hero-min-height, 80vh);
+  }
+  .bt-hero--full_bleed .bt-hero__media {
+    position: absolute;
+    inset: 0;
+  }
+  .bt-hero--full_bleed .bt-hero__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: var(--bt-space-xl);
+    max-width: 720px;
+  }
+  .bt-hero--full_bleed .bt-hero__heading,
+  .bt-hero--full_bleed .bt-hero__text,
+  .bt-hero--full_bleed .bt-eyebrow {
+    color: var(--bt-color-primary-contrast, #FFFFFF);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  /* ── Shared ── */
+  .bt-hero__media {
+    position: relative;
+    overflow: hidden;
+    background: var(--bt-color-surface);
+  }
+  /* Hero images use CSS background-image (most reliable cross-browser centering) */
+  .bt-hero__media {
+    background-image: var(--bt-hero-bg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .bt-hero__media--responsive-img {
+    background-image: var(--bt-hero-bg-mobile, var(--bt-hero-bg));
+  }
+  @media (min-width: 750px) {
+    .bt-hero__media--responsive-img {
+      background-image: var(--bt-hero-bg);
+    }
+  }
+  .bt-hero__media--contain {
+    background-size: contain;
+  }
+  .bt-hero__vid {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .bt-hero__media--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bt-color-surface);
+  }
+  .bt-hero__placeholder-illustration {
+    width: 60%;
+    max-width: 400px;
+    opacity: 0.15;
+  }
+  .bt-hero__placeholder-illustration svg {
+    width: 100%;
+    height: auto;
+  }
+  .bt-hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgba(var(--bt-color-text-rgb), var(--bt-scrim-opacity, 0.4)),
+      rgba(var(--bt-color-text-rgb), 0) 60%
+    );
+  }
+  .bt-hero__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h1);
+    font-weight: var(--bt-fw-normal);
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text);
+    margin: 0 0 var(--bt-space-sm);
+    text-wrap: balance;
+    font-variant-numeric: oldstyle-nums;
+  }
+  .bt-hero__text {
+    font-size: var(--bt-fs-body);
+    line-height: var(--bt-lh-body);
+    color: var(--bt-color-text-muted);
+    margin: 0 0 var(--bt-space-md);
+    max-width: 55ch;
+  }
+  .bt-hero--full_bleed .bt-hero__text { margin-inline: auto; }
+  .bt-hero--split .bt-hero__blocks {
+    padding: var(--bt-space-xl) clamp(var(--bt-page-gutter), 6vw, 5rem);
+    border-top: 1px solid var(--bt-color-border-light);
+  }
+  .bt-hero__tag {
+    margin-bottom: var(--bt-space-sm);
+  }
+  .bt-hero__tag .bt-specimen-tag {
+    background: rgba(var(--bt-color-bg-rgb), 0.9);
+    backdrop-filter: blur(4px);
+  }
+  .bt-hero--full_bleed .bt-hero__tag .bt-specimen-tag {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.9);
+  }
+  .bt-hero--full_bleed .bt-hero__tag .bt-specimen-tag__number,
+  .bt-hero--full_bleed .bt-hero__tag .bt-specimen-tag__value {
+    color: var(--bt-color-primary-contrast, #FFFFFF);
+  }
+  .bt-hero--full_bleed .bt-hero__tag .bt-specimen-tag__label {
+    color: rgba(255,255,255,0.7);
+  }
+  /* ── Responsive ── */
+  /* ── Accessibility ── */
+  @media (prefers-reduced-motion: reduce) {
+    .bt-hero__vid {
+      display: none;
+    }
+  }
+  /* ── Responsive ── */
+  @media (max-width: 749px) {
+    .bt-hero--split .bt-hero__inner {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+    }
+    .bt-hero--split .bt-hero__media {
+      order: 0;
+      aspect-ratio: 4 / 5;
+      max-height: 60vh;
+    }
+    .bt-hero--split .bt-hero__content { order: 1; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.hero.name",
+  "tag": "section",
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.hero.settings.layout.label",
+      "options": [
+        { "value": "split", "label": "t:sections.hero.settings.layout.options__1.label" },
+        { "value": "stacked", "label": "t:sections.hero.settings.layout.options__2.label" },
+        { "value": "full_bleed", "label": "t:sections.hero.settings.layout.options__3.label" }
+      ],
+      "default": "split"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.hero.settings.image.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "t:sections.hero.settings.image_mobile.label",
+      "info": "t:sections.hero.settings.image_mobile.info"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:sections.hero.settings.video.label",
+      "info": "t:sections.hero.settings.video.info"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster_image",
+      "label": "t:sections.hero.settings.poster_image.label",
+      "info": "t:sections.hero.settings.poster_image.info"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "t:sections.hero.settings.image_fit.label",
+      "options": [
+        { "value": "cover", "label": "t:sections.hero.settings.image_fit.options__1.label" },
+        { "value": "contain", "label": "t:sections.hero.settings.image_fit.options__2.label" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:sections.hero.settings.eyebrow.label",
+      "default": "Issue 01 — Field guide"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.hero.settings.heading.label",
+      "default": "Bring the outside in"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "t:sections.hero.settings.text.label",
+      "default": "Curated indoor plants selected for their beauty, resilience, and ability to transform any space into a living sanctuary."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:sections.hero.settings.button_label.label",
+      "default": "Explore the collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:sections.hero.settings.button_link.label"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:sections.hero.settings.button_style.label",
+      "options": [
+        { "value": "primary", "label": "t:sections.hero.settings.button_style.options__1.label" },
+        { "value": "outline", "label": "t:sections.hero.settings.button_style.options__2.label" }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scrim",
+      "label": "t:sections.hero.settings.show_scrim.label",
+      "default": true,
+      "info": "t:sections.hero.settings.show_scrim.info"
+    },
+    {
+      "type": "range",
+      "id": "scrim_opacity",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "default": 40,
+      "unit": "%",
+      "label": "t:sections.hero.settings.scrim_opacity.label"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "min": 50,
+      "max": 100,
+      "step": 10,
+      "default": 80,
+      "unit": "vh",
+      "label": "t:sections.hero.settings.min_height.label",
+      "info": "t:sections.hero.settings.min_height.info"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "label": "t:sections.hero.settings.padding_top.label", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "label": "t:sections.hero.settings.padding_bottom.label", "default": 0
+    }
+  ],
+  "presets": [{
+    "name": "t:sections.hero.name"
+  }]
+}
+{% endschema %}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 30" fill="none">
+  <!-- Small generic leaf — oval/teardrop -->
+  <path d="M12 2
+           Q6 2 3 8
+           Q1 14 3 20
+           Q5 26 12 28
+           Q19 26 21 20
+           Q23 14 21 8
+           Q18 2 12 2Z"
+        fill="#8BC480"/>
+  <!-- Center vein -->
+  <line x1="12" y1="3" x2="12" y2="27" stroke="#5A8A50" stroke-width="0.7" opacity="0.4"/>
+  <!-- Lateral veins -->
+  <line x1="12" y1="8" x2="5" y2="6" stroke="#5A8A50" stroke-width="0.5" opacity="0.3"/>
+  <line x1="12" y1="8" x2="19" y2="6" stroke="#5A8A50" stroke-width="0.5" opacity="0.3"/>
+  <line x1="12" y1="13" x2="4" y2="12" stroke="#5A8A50" stroke-width="0.5" opacity="0.3"/>
+  <line x1="12" y1="13" x2="20" y2="12" stroke="#5A8A50" stroke-width="0.5" opacity="0.3"/>
+  <line x1="12" y1="18" x2="5" y2="19" stroke="#5A8A50" stroke-width="0.5" opacity="0.3"/>
+  <line x1="12" y1="18" x2="19" y2="19" stroke="#5A8A50" stroke-width="0.5" opacity="0.3"/>
+  <!-- Stem -->
+  <line x1="12" y1="28" x2="12" y2="30" stroke="#5B8C5A" stroke-width="1" stroke-linecap="round"/>
+</svg>

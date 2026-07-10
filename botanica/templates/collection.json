@@ -1,0 +1,50 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "ambience": {
+      "type": "botanical-ambience",
+      "settings": {
+        "show_leaves": true,
+        "show_spores": true,
+        "show_vines": false,
+        "show_silhouettes": true,
+        "leaf_opacity": 55,
+        "spore_opacity": 45
+      }
+    },
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_image": true,
+        "show_collection_description": true
+      }
+    },
+    "grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "products_per_page": 24,
+        "columns_desktop": 3,
+        "enable_filtering": true,
+        "show_secondary_image": true
+      }
+    },
+    "apps": {
+      "type": "apps",
+      "settings": {}
+    }
+  },
+  "order": [
+    "ambience",
+    "banner",
+    "grid",
+    "apps"
+  ]
+}

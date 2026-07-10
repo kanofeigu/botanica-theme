@@ -1,0 +1,165 @@
+{% comment %}
+  blocks/pickup-availability.liquid — Store pickup availability info
+  Uses Shopify's native pickup_availability endpoint.
+  Shows which store locations have this product available for pickup.
+{% endcomment %}
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign show_when_unavailable = block.settings.show_when_unavailable | default: false
+-%}
+
+<pickup-availability
+  class="bt-pickup"
+  data-root-url="{{ routes.root_url }}"
+  data-variant-id="{{ current_variant.id }}"
+  data-has-only-default-variant="{{ product.has_only_default_variant }}"
+  data-show-when-unavailable="{{ show_when_unavailable }}"
+  {{ block.shopify_attributes }}
+>
+  <template data-pickup-availability-template>
+    {%- comment %} Rendered via JS after fetch {% endcomment -%}
+    <div class="bt-pickup__preview" data-pickup-preview>
+      {%- liquid
+        assign pickup_availability = current_variant.store_availabilities | first
+      -%}
+      {%- if pickup_availability and pickup_availability.available -%}
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="bt-pickup__icon bt-pickup__icon--available">
+          <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <path d="m4.5 8 2.5 2.5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="bt-pickup__info">
+          <p class="bt-pickup__location">{{ pickup_availability.location.name | escape }}</p>
+          <p class="bt-pickup__status bt-pickup__status--available">
+            {{ 'products.product.pickup_availability.pick_up_available' | t }}
+          </p>
+        </div>
+      {%- else -%}
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="bt-pickup__icon bt-pickup__icon--unavailable">
+          <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="bt-pickup__info">
+          <p class="bt-pickup__status bt-pickup__status--unavailable">
+            {{ 'products.product.unavailable' | t }}
+          </p>
+        </div>
+      {%- endif -%}
+      <button type="button" class="bt-pickup__drawer-toggle" aria-haspopup="dialog" data-pickup-toggle>
+        {%- if pickup_availability and pickup_availability.available -%}
+          {{ 'products.product.pickup_availability.view_store_info' | t }}
+        {%- else -%}
+          {{ 'products.product.pickup_availability.check_other_stores' | t }}
+        {%- endif -%}
+      </button>
+    </div>
+
+    <div class="bt-pickup__drawer" hidden data-pickup-drawer role="dialog" aria-modal="true" aria-label="Pickup availability">
+      <div class="bt-pickup__drawer-header">
+        <h3 class="bt-pickup__drawer-title">{{ 'products.product.pickup_availability.title' | t }}</h3>
+        <button type="button" class="bt-pickup__drawer-close" aria-label="{{ 'accessibility.close' | t }}" data-pickup-close>
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M3 3l10 10M13 3l-10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <ul class="bt-pickup__locations" role="list" data-pickup-locations></ul>
+    </div>
+  </template>
+</pickup-availability>
+
+<script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
+
+{% stylesheet %}
+  .bt-pickup {
+    display: block;
+    margin: var(--bt-space-sm) 0;
+  }
+  .bt-pickup__preview {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-pickup__icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .bt-pickup__icon--available { color: var(--bt-color-primary); }
+  .bt-pickup__icon--unavailable { color: var(--bt-color-text-muted); }
+  .bt-pickup__info { flex: 1; }
+  .bt-pickup__location {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text);
+    margin: 0;
+  }
+  .bt-pickup__status {
+    font-size: var(--bt-fs-body-xs);
+    margin: 0;
+  }
+  .bt-pickup__status--available { color: var(--bt-color-primary); }
+  .bt-pickup__status--unavailable { color: var(--bt-color-text-muted); }
+  .bt-pickup__drawer-toggle {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    padding: 0;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+  .bt-pickup__drawer-toggle:hover { color: var(--bt-color-primary); }
+
+  .bt-pickup__drawer {
+    margin-top: var(--bt-space-sm);
+    padding: var(--bt-space-sm);
+    background: var(--bt-color-surface);
+    border-radius: var(--bt-radius-card);
+  }
+  .bt-pickup__drawer[hidden] { display: none; }
+  .bt-pickup__drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--bt-space-sm);
+  }
+  .bt-pickup__drawer-title {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+  }
+  .bt-pickup__drawer-close {
+    width: 32px; height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--bt-color-text-muted);
+  }
+  .bt-pickup__drawer-close:hover { background: var(--bt-color-bg); }
+  .bt-pickup__locations {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-sm);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.pickup_availability.name",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_when_unavailable",
+      "label": "t:blocks.pickup_availability.settings.show_when_unavailable.label",
+      "default": false,
+      "info": "t:blocks.pickup_availability.settings.show_when_unavailable.info"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.pickup_availability.name" }]
+}
+{% endschema %}

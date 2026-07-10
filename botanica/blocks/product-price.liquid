@@ -1,0 +1,61 @@
+{% comment %}
+  blocks/product-price.liquid — Product price with sale/regular + aria-live updates
+{% endcomment %}
+{%- liquid
+  assign target = product | default: section.settings.product
+  if target == blank
+    assign target = all_products.first
+  endif
+  assign variant = target.selected_or_first_available_variant
+-%}
+
+<div class="bt-product-price" {{ block.shopify_attributes }}>
+  <span class="bt-product-price__current" data-current-price>
+    {%- if target.price_varies -%}
+      {{ 'products.product.price.from_price_html' | t: price: variant.price | money }}
+    {%- else -%}
+      {{ variant.price | money }}
+    {%- endif -%}
+  </span>
+  {%- if variant.compare_at_price > variant.price -%}
+    <s class="bt-product-price__compare" data-compare-price>
+      <span class="bt-sr-only">{{ 'products.product.price.regular_price' | t }}: </span>
+      {{ variant.compare_at_price | money }}
+    </s>
+  {%- endif -%}
+  {%- if variant.available and variant.unit_price_measurement -%}
+    <span class="bt-product-price__unit bt-sr-only">
+      {{ 'products.product.price.unit_price' | t }}
+    </span>
+    <span data-unit-price>{{ variant.unit_price | money }}</span>
+  {%- endif -%}
+</div>
+
+<div aria-live="polite" class="bt-sr-only" data-price-live></div>
+
+{% stylesheet %}
+  .bt-product-price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--bt-space-2xs);
+    flex-wrap: wrap;
+  }
+  .bt-product-price__current {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    color: var(--bt-color-text);
+    font-variant-numeric: oldstyle-nums;
+  }
+  .bt-product-price__compare {
+    font-size: var(--bt-fs-body);
+    color: var(--bt-color-text-muted);
+    font-variant-numeric: oldstyle-nums;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.product_price.name",
+  "presets": [{ "name": "t:blocks.product_price.name" }]
+}
+{% endschema %}

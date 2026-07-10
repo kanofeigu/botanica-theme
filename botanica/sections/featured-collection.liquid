@@ -1,0 +1,119 @@
+{% comment %}
+  sections/featured-collection.liquid — Featured collection product grid
+  Displays up to 12 products from a collection. Uses product card snippet.
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign collection = section.settings.collection
+  assign heading = section.settings.heading
+  assign products_to_show = section.settings.products_to_show | default: 4
+  assign columns = section.settings.columns_desktop | default: 3
+-%}
+{%- if collection != blank -%}
+  <section class="bt-section bt-featured-collection bt-dappled-light" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+    <div class="bt-container">
+      {%- if heading != blank -%}
+        <div class="bt-featured-collection__header">
+          <h2 class="bt-featured-collection__heading">{{ heading | escape }}</h2>
+          <a href="{{ collection.url }}" class="bt-featured-collection__view-all bt-btn bt-btn--outline bt-btn--sm">
+            {{ 'collections.general.view_all' | t }}
+          </a>
+        </div>
+      {%- endif -%}
+      <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col">
+        {%- for product in collection.products limit: products_to_show -%}
+          {%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge -%}
+        {%- else -%}
+          {%- for i in (1..4) -%}
+            <div class="bt-card bt-card--placeholder">
+              <div class="bt-card__media">{{ 'product-' | append: i | placeholder_svg_tag: 'bt-card__placeholder' }}</div>
+              <div class="bt-card__body">
+                <h3 class="bt-card__title">{{ 'products.product.title' | t }}</h3>
+                <div class="bt-card__price">{{ 1999 | money }}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-featured-collection__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--bt-space-lg);
+  }
+  .bt-featured-collection__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    margin: 0;
+  }
+  .bt-featured-collection__grid {
+    display: grid;
+    gap: var(--bt-grid-gap);
+  }
+  .bt-featured-collection__grid--2-col { grid-template-columns: repeat(2, 1fr); }
+  .bt-featured-collection__grid--3-col { grid-template-columns: repeat(3, 1fr); }
+  .bt-featured-collection__grid--4-col { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 749px) {
+    .bt-featured-collection__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.featured_collection.name",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.featured_collection.settings.heading.label",
+      "default": "New arrivals"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:sections.featured_collection.settings.collection.label"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "label": "t:sections.featured_collection.settings.products_to_show.label"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "t:sections.featured_collection.settings.columns_desktop.label",
+      "options": [
+        { "value": "2", "label": "t:sections.featured_collection.settings.columns_desktop.options__1.label" },
+        { "value": "3", "label": "t:sections.featured_collection.settings.columns_desktop.options__2.label" },
+        { "value": "4", "label": "t:sections.featured_collection.settings.columns_desktop.options__3.label" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.featured_collection.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.featured_collection.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{ "name": "t:sections.featured_collection.name" }]
+}
+{% endschema %}

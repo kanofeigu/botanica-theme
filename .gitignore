@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Runtime state
+STATE.json
+
+# Temporary files
+*.tmp
+*.log
+check_tmp.json
+check*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sensitive config (if any)
+.env
+.env.local
+
+# Shopify
+shopify.app.toml

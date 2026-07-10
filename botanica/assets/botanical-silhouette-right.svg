@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 600" fill="none">
+  <!-- Tall plant silhouette — right side parallax -->
+  <!-- Main stems -->
+  <path d="M220 580 Q225 500 230 420 Q232 360 235 300 Q240 240 238 180 Q236 120 230 70 Q228 40 225 15"
+        stroke="#4A6B4F" stroke-width="4.5" stroke-linecap="round" opacity="0.12"/>
+  <path d="M170 580 Q165 500 160 430 Q155 370 145 310 Q140 260 135 220 Q130 180 128 150"
+        stroke="#4A6B4F" stroke-width="3" stroke-linecap="round" opacity="0.09"/>
+  <path d="M260 580 Q265 520 270 450 Q272 400 275 350 Q278 300 280 260 Q282 220 280 190"
+        stroke="#4A6B4F" stroke-width="3.5" stroke-linecap="round" opacity="0.08"/>
+
+  <!-- Large Monstera-style leaves on stem 1 -->
+  <g opacity="0.1">
+    <ellipse cx="235" cy="280" rx="55" ry="25" fill="#4A6B4F" transform="rotate(15 235 280)"/>
+    <ellipse cx="238" cy="160" rx="40" ry="18" fill="#4A6B4F" transform="rotate(10 238 160)"/>
+    <ellipse cx="232" cy="70" rx="30" ry="13" fill="#4A6B4F" transform="rotate(5 232 70)"/>
+  </g>
+
+  <!-- Leaves on stem 2 (fiddle-leaf shapes) -->
+  <g opacity="0.08">
+    <ellipse cx="145" cy="350" rx="38" ry="16" fill="#4A6B4F" transform="rotate(-20 145 350)"/>
+    <ellipse cx="140" cy="250" rx="32" ry="14" fill="#4A6B4F" transform="rotate(-15 140 250)"/>
+  </g>
+
+  <!-- Leaves on stem 3 -->
+  <g opacity="0.07">
+    <ellipse cx="275" cy="380" rx="35" ry="15" fill="#4A6B4F" transform="rotate(25 275 380)"/>
+    <ellipse cx="278" cy="280" rx="28" ry="12" fill="#4A6B4F" transform="rotate(20 278 280)"/>
+  </g>
+</svg>

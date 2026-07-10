@@ -1,0 +1,6 @@
+query {
+  productByHandle(handle: "monstera-deliciosa") {
+    title
+    resourcePublicationsV2(first: 3) { nodes { isPublished publication { id name } } }
+  }
+}

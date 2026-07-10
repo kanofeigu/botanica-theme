@@ -1,0 +1,140 @@
+{% comment %}
+  sections/shop-by-care.liquid — Shop by care difficulty (flagship botanical)
+  3 care-card blocks in a responsive grid: Easy / Medium / Expert.
+  Each card shows icon, badge, title, description, light/water meter preview.
+  ★ Refined SVG meters replace old *** pattern. Data all from block settings.
+  All-original. Zero Dawn code.
+{% endcomment %}
+<section class="bt-section bt-shop-by-care" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  <div class="bt-container">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bt-shop-by-care__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.description != blank -%}
+      <p class="bt-shop-by-care__desc">{{ section.settings.description | escape }}</p>
+    {%- endif -%}
+    {% render 'botanical-divider' %}
+    <div class="bt-shop-by-care__grid bt-reveal-stagger">
+      {% content_for "blocks" %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .bt-shop-by-care__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-align: center;
+    margin: 0 0 var(--bt-space-2xs);
+  }
+  .bt-shop-by-care__desc {
+    font-size: var(--bt-fs-body);
+    color: var(--bt-color-text-muted);
+    text-align: center;
+    margin: 0 auto var(--bt-space-lg);
+    max-width: 55ch;
+  }
+  .bt-shop-by-care__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--bt-grid-gap);
+  }
+  /* Staggered entrance via scroll-driven animation */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .bt-shop-by-care__grid > * {
+        animation: bt-reveal-up auto linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 30%;
+        animation-duration: 1ms;
+      }
+      .bt-shop-by-care__grid > *:nth-child(1) { animation-range: entry 0% cover 20%; }
+      .bt-shop-by-care__grid > *:nth-child(2) { animation-range: entry 5% cover 25%; }
+      .bt-shop-by-care__grid > *:nth-child(3) { animation-range: entry 10% cover 30%; }
+    }
+  }
+  @keyframes bt-reveal-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media (max-width: 749px) {
+    .bt-shop-by-care__grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.shop_by_care.name",
+  "tag": "section",
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.shop_by_care.settings.heading.label",
+      "default": "Shop by care level"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:sections.shop_by_care.settings.description.label",
+      "default": "Whether you have a green thumb or are just starting your plant journey, we have the perfect companion for your space."
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.shop_by_care.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.shop_by_care.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{
+    "name": "t:sections.shop_by_care.name",
+    "blocks": [
+      {
+        "type": "care-card",
+        "settings": {
+          "icon": "easy",
+          "badge_text": "Beginner friendly",
+          "title": "Easy care",
+          "description": "Thrives on neglect. Perfect for beginners, busy schedules, and low-light corners.",
+          "light_level": 1,
+          "water_level": 1,
+          "card_tint": "easy"
+        }
+      },
+      {
+        "type": "care-card",
+        "settings": {
+          "icon": "medium",
+          "badge_text": "Some attention",
+          "title": "Moderate",
+          "description": "Needs a bit more light and a consistent watering schedule. Rewards you with stunning growth.",
+          "light_level": 2,
+          "water_level": 2,
+          "card_tint": "medium"
+        }
+      },
+      {
+        "type": "care-card",
+        "settings": {
+          "icon": "expert",
+          "badge_text": "For the dedicated",
+          "title": "Expert",
+          "description": "Rare specimens that require specific conditions. The ultimate reward for passionate collectors.",
+          "light_level": 3,
+          "water_level": 3,
+          "card_tint": "expert"
+        }
+      }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,27 @@
+{% comment %} main-order.liquid — Customer order detail page. Original. {% endcomment %}
+<div class="bt-section bt-order" {{ section.shopify_attributes }}>
+  <div class="bt-container" style="max-width: 720px;">
+    <h1 class="bt-h1">{{ 'customer.order.title' | t: name: order.name }}</h1>
+    <p style="margin-bottom: var(--bt-space-sm); color: var(--bt-color-text-muted);">{{ order.created_at | date: '%B %d, %Y' }} &mdash; {{ order.financial_status_label }}</p>
+    <div class="bt-stack-sm">
+      {%- for line_item in order.line_items -%}
+        <div class="bt-card"><div class="bt-card__body bt-flex bt-justify-between bt-items-center">
+          <div><div class="bt-card__title">{{ line_item.product.title }}</div><p class="bt-card__price">{{ line_item.quantity }}x {{ line_item.final_price | money }}</p></div>
+          <span>{{ line_item.final_line_price | money }}</span>
+        </div></div>
+      {%- endfor -%}
+    </div>
+    <div style="margin-top: var(--bt-space-lg); padding-top: var(--bt-space-md); border-top: 2px solid var(--bt-color-border);">
+      <p class="bt-flex bt-justify-between"><strong>{{ 'customer.order.subtotal' | t }}</strong> {{ order.subtotal_price | money }}</p>
+      <p class="bt-flex bt-justify-between" style="font-size: var(--bt-fs-h4); font-family: var(--bt-font-heading); margin-top: var(--bt-space-xs);"><strong>{{ 'customer.order.total' | t }}</strong> {{ order.total_price | money }}</p>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-order .bt-h1 { margin-bottom: var(--bt-space-2xs); }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_order.name", "presets": [{ "name": "t:sections.main_order.name" }] }
+{% endschema %}

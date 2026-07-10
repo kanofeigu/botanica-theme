@@ -1,0 +1,251 @@
+{% comment %}
+  blocks/variant-picker.liquid — Product variant selector
+  Supports two modes: button (pills) and swatch (image squares).
+  Handles unavailable variants: greyed out, strikethrough, aria-disabled.
+  Emits a <script data-selected-variant> JSON blob that assets/variant-selects.js
+  keeps in sync as the merchant picks options, exposing the live variant to
+  cart.js / sticky-atc.js / quick-view.js without coupling.
+{% endcomment %}
+{%- unless product.has_only_default_variant -%}
+  {%- liquid
+    assign picker_type = block.settings.picker_type | default: 'button'
+    assign current_variant = product.selected_or_first_available_variant
+  -%}
+  <variant-selects
+    data-section="{{ section.id }}"
+    data-url="{{ product.url }}"
+    data-picker-type="{{ picker_type }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign option_index = forloop.index0
+        assign use_swatch = false
+        if picker_type == 'swatch' and option_index == block.settings.swatch_option_index
+          assign use_swatch = true
+        endif
+      -%}
+      <fieldset class="bt-variant-fieldset{% if use_swatch %} bt-variant-fieldset--swatch{% endif %}">
+        <legend class="bt-variant-fieldset__legend">
+          <span class="bt-variant-fieldset__name">{{ option.name }}</span>
+          <span class="bt-variant-fieldset__divider" aria-hidden="true">:</span>
+          <span class="bt-variant-fieldset__value" data-selected-value>{{ option.selected_value }}</span>
+        </legend>
+        <div class="bt-variant-options">
+          {%- for value in option.values -%}
+            {%- liquid
+              assign variant_for_value = product.variants | where: option.name, value | first
+              assign is_unavailable = false
+              if variant_for_value and variant_for_value.available == false
+                assign is_unavailable = true
+              endif
+              assign swatch_image = blank
+              if use_swatch and variant_for_value
+                assign swatch_image = variant_for_value.featured_media | default: variant_for_value.image
+              endif
+            -%}
+            <label
+              class="bt-variant-option{% if option.selected_value == value %} is-selected{% endif %}{% if is_unavailable %} is-unavailable{% endif %}{% if use_swatch %} bt-variant-option--swatch{% endif %}"
+              {% if use_swatch and swatch_image != blank %}
+                style="--bt-swatch-bg: url('{{ swatch_image | image_url: width: 120 }}');"
+              {% endif %}
+            >
+              <input
+                type="radio"
+                name="{{ option.name | escape }}"
+                value="{{ value | escape }}"
+                form="{{ product_form_id }}"
+                {% if option.selected_value == value %}checked{% endif %}
+                {% if is_unavailable %}disabled{% endif %}
+                {% if is_unavailable %}aria-disabled="true"{% endif %}
+              >
+              <span class="bt-variant-option__label">
+                {%- if use_swatch -%}
+                  <span class="bt-variant-option__swatch" aria-hidden="true"></span>
+                  <span class="bt-variant-option__text">{{ value }}</span>
+                {%- else -%}
+                  {{ value }}
+                {%- endif -%}
+              </span>
+              {%- if is_unavailable -%}
+                <span class="bt-variant-option__tooltip" role="tooltip">{{ 'products.product.sold_out' | t }}</span>
+              {%- endif -%}
+            </label>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+    {%- endfor -%}
+
+    <script type="application/json" data-variants>
+      {{ product.variants | json }}
+    </script>
+    <script type="application/json" data-selected-variant>
+      {{ current_variant | json }}
+    </script>
+  </variant-selects>
+{%- endunless -%}
+
+{% stylesheet %}
+  .bt-variant-fieldset {
+    border: none;
+    padding: 0;
+    margin: 0 0 var(--bt-space-sm);
+  }
+  .bt-variant-fieldset__legend {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    margin-bottom: var(--bt-space-2xs);
+    display: flex;
+    gap: 0.35em;
+    align-items: baseline;
+  }
+  .bt-variant-fieldset__value {
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-variant-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bt-space-2xs);
+  }
+
+  /* ── Pill / Button mode ── */
+  .bt-variant-option {
+    position: relative;
+  }
+  .bt-variant-option input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+  }
+  .bt-variant-option:not(.bt-variant-option--swatch) .bt-variant-option__label {
+    display: block;
+    padding: 0.5em 1.25em;
+    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    border-radius: var(--bt-radius-btn);
+    font-size: var(--bt-fs-body-sm);
+    cursor: pointer;
+    transition: all var(--bt-duration-fast);
+    min-width: 44px;
+    text-align: center;
+    background: transparent;
+    color: var(--bt-color-text);
+  }
+  .bt-variant-option:not(.bt-variant-option--swatch) input:checked + .bt-variant-option__label {
+    border-color: var(--bt-color-text);
+    outline: 2px solid var(--bt-color-text);
+    outline-offset: 0.2rem;
+    background: transparent;
+    color: var(--bt-color-text);
+  }
+  .bt-variant-option:not(.bt-variant-option--swatch) input:focus-visible + .bt-variant-option__label {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+
+  /* ── Swatch mode ── */
+  .bt-variant-option--swatch .bt-variant-option__label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: var(--bt-fs-body-xs);
+    text-align: center;
+    min-width: 52px;
+  }
+  .bt-variant-option__swatch {
+    display: block;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--bt-radius-sm);
+    background-image: var(--bt-swatch-bg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--bt-color-surface);
+    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    transition: border-color var(--bt-duration-fast), outline var(--bt-duration-fast);
+  }
+  .bt-variant-option__text {
+    display: block;
+    line-height: 1.2;
+    color: var(--bt-color-text-muted);
+  }
+  .bt-variant-option--swatch input:checked ~ .bt-variant-option__label .bt-variant-option__swatch {
+    outline: 2px solid var(--bt-color-text);
+    outline-offset: 2px;
+    border-color: var(--bt-color-text);
+  }
+  .bt-variant-option--swatch input:focus-visible ~ .bt-variant-option__label .bt-variant-option__swatch {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  @media (max-width: 749px) {
+    .bt-variant-option__swatch { width: 44px; height: 44px; }
+    .bt-variant-option--swatch .bt-variant-option__label { min-width: 44px; }
+  }
+
+  /* ── Unavailable variant (both modes) ── */
+  .bt-variant-option.is-unavailable .bt-variant-option__label {
+    opacity: 0.4;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+  .bt-variant-option.is-unavailable .bt-variant-option__swatch {
+    opacity: 0.4;
+  }
+  .bt-variant-option__tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 2px 8px;
+    font-size: var(--bt-fs-body-xs);
+    background: var(--bt-color-text);
+    color: var(--bt-color-bg);
+    border-radius: var(--bt-radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--bt-duration-fast);
+    z-index: 1;
+  }
+  .bt-variant-option.is-unavailable:hover .bt-variant-option__tooltip {
+    opacity: 1;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.variant_picker.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "picker_type",
+      "label": "t:blocks.variant_picker.settings.picker_type.label",
+      "options": [
+        { "value": "button", "label": "t:blocks.variant_picker.settings.picker_type.options__1.label" },
+        { "value": "swatch", "label": "t:blocks.variant_picker.settings.picker_type.options__2.label" }
+      ],
+      "default": "button"
+    },
+    {
+      "type": "select",
+      "id": "swatch_option_index",
+      "label": "t:blocks.variant_picker.settings.swatch_option_index.label",
+      "info": "t:blocks.variant_picker.settings.swatch_option_index.info",
+      "options": [
+        { "value": "0", "label": "t:blocks.variant_picker.settings.swatch_option_index.options__1.label" },
+        { "value": "1", "label": "t:blocks.variant_picker.settings.swatch_option_index.options__2.label" },
+        { "value": "2", "label": "t:blocks.variant_picker.settings.swatch_option_index.options__3.label" }
+      ],
+      "default": "1"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.variant_picker.name" }]
+}
+{% endschema %}

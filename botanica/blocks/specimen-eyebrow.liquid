@@ -1,0 +1,42 @@
+{% comment %}
+  blocks/specimen-eyebrow.liquid — Specimen label / Latin name eyebrow
+  Small label above product title, editorial botanical style.
+  Can bind to product.vendor or use custom text from block settings.
+{% endcomment %}
+{%- liquid
+  assign source = block.settings.source | default: 'vendor'
+  assign eyebrow_text = block.settings.text
+
+  if source == 'vendor' and product.vendor != blank
+    assign eyebrow_text = product.vendor
+  endif
+-%}
+{%- if eyebrow_text != blank -%}
+  <p class="bt-eyebrow" {{ block.shopify_attributes }}>{{ eyebrow_text | escape }}</p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:blocks.specimen_eyebrow.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "source",
+      "label": "t:blocks.specimen_eyebrow.settings.source.label",
+      "options": [
+        { "value": "vendor", "label": "t:blocks.specimen_eyebrow.settings.source.options__1.label" },
+        { "value": "custom", "label": "t:blocks.specimen_eyebrow.settings.source.options__2.label" }
+      ],
+      "default": "vendor"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:blocks.specimen_eyebrow.settings.text.label",
+      "default": "Monstera deliciosa",
+      "info": "t:blocks.specimen_eyebrow.settings.text.info"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.specimen_eyebrow.name" }]
+}
+{% endschema %}

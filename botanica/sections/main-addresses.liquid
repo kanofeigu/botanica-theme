@@ -1,0 +1,23 @@
+{% comment %} main-addresses.liquid — Customer addresses page. Original. {% endcomment %}
+<div class="bt-section bt-addresses" {{ section.shopify_attributes }}>
+  <div class="bt-container" style="max-width: 720px;">
+    <h1 class="bt-h1">{{ 'customer.addresses.title' | t }}</h1>
+    <a href="{{ routes.account_url }}" style="color: var(--bt-color-primary); font-size: var(--bt-fs-body-sm);">&larr; {{ 'customer.account.return' | t }}</a>
+    <div style="margin-top: var(--bt-space-lg);" class="bt-grid bt-grid--2">
+      {%- for address in customer.addresses -%}
+        <div class="bt-card"><div class="bt-card__body">
+          <h3 class="bt-card__title">{{ address.first_name }} {{ address.last_name }}</h3>
+          <p class="bt-card__price">{{ address | format_address }}</p>
+        </div></div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-addresses .bt-h1 { margin-bottom: var(--bt-space-xs); }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_addresses.name", "presets": [{ "name": "t:sections.main_addresses.name" }] }
+{% endschema %}

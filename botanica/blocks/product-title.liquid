@@ -1,0 +1,26 @@
+{% comment %}
+  blocks/product-title.liquid — Product title (H1 on PDP)
+{% endcomment %}
+<h1 class="bt-product-title" {{ block.shopify_attributes }}>
+  {{ product.title | escape }}
+</h1>
+
+{% stylesheet %}
+  .bt-product-title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h1);
+    font-weight: 400;
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text);
+    margin: 0;
+    text-wrap: balance;
+    font-variant-numeric: oldstyle-nums;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.product_title.name",
+  "presets": [{ "name": "t:blocks.product_title.name" }]
+}
+{% endschema %}

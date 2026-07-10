@@ -1,0 +1,24 @@
+mutation {
+  productCreate(
+    input: {
+      title: "Test Plant - Golden Pothos"
+      handle: "test-golden-pothos"
+      vendor: "Botanica"
+      productType: "Hanging Plant"
+      tags: ["care-easy", "light-low", "hanging-plant", "beginner"]
+      status: ACTIVE
+    }
+    variants: [{
+      price: 24.00
+      compareAtPrice: 30.00
+      sku: "TEST-GPO-01"
+      inventoryPolicy: CONTINUE
+      options: ["6 inch Hanging"]
+      requiresShipping: true
+      taxable: true
+    }]
+  ) {
+    product { id title onlineStoreUrl }
+    userErrors { field message }
+  }
+}

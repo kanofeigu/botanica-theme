@@ -1,0 +1,28 @@
+{
+  "name": "Footer group",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "column_count": "3"
+      },
+      "blocks": {
+        "brand": {
+          "type": "brand",
+          "settings": { "tagline": "Plants for real interiors" }
+        },
+        "links": {
+          "type": "links",
+          "settings": { "title": "Shop", "menu": "main-menu" }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": { "title": "Care guide", "text": "Weekly plant care, delivered free.", "placeholder": "your@email.com", "button_label": "Subscribe" }
+        }
+      },
+      "block_order": ["brand", "links", "newsletter"]
+    }
+  },
+  "order": ["footer"]
+}

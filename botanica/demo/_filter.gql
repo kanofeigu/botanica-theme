@@ -1,0 +1,13 @@
+query {
+  shop {
+    metafieldDefinitions(first: 20, namespace: "shopify", ownerType: COLLECTION) {
+      nodes { key namespace }
+    }
+  }
+  collections(first: 1, query: "title:All Plants") {
+    nodes {
+      title
+      filterSettings { icon active enabled }
+    }
+  }
+}

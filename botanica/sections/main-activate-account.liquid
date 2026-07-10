@@ -1,0 +1,20 @@
+{% comment %} main-activate-account.liquid — Activate customer account. Original. {% endcomment %}
+<div class="bt-section bt-activate-account" {{ section.shopify_attributes }}>
+  <div class="bt-container" style="max-width: 480px;">
+    <h1 class="bt-h1 bt-text-center">{{ 'customer.activate_account.title' | t }}</h1>
+    {%- form 'activate_customer_password', class: 'bt-stack-md' -%}
+      <div><label for="CustomerPassword" class="bt-label">{{ 'customer.activate_account.password' | t }}</label><input type="password" id="CustomerPassword" name="customer[password]" class="bt-input" required autocomplete="new-password"></div>
+      <div><label for="CustomerPasswordConfirmation" class="bt-label">{{ 'customer.activate_account.password_confirm' | t }}</label><input type="password" id="CustomerPasswordConfirmation" name="customer[password_confirmation]" class="bt-input" required></div>
+      <button type="submit" class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block">{{ 'customer.activate_account.submit' | t }}</button>
+      {%- if form.errors -%}<p class="bt-form-error bt-text-center" role="alert">{{ form.errors | default_errors }}</p>{%- endif -%}
+    {%- endform -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .bt-activate-account form { margin-top: var(--bt-space-lg); }
+{% endstylesheet %}
+
+{% schema %}
+{ "name": "t:sections.main_activate_account.name", "presets": [{ "name": "t:sections.main_activate_account.name" }] }
+{% endschema %}

@@ -1,0 +1,146 @@
+{% comment %}
+  sections/image-with-text.liquid — Image + text section
+  Configurable layout (image left/right), aspect ratio, content via blocks.
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign image = section.settings.image
+  assign layout = section.settings.layout | default: 'image_left'
+  assign aspect = section.settings.image_aspect | default: '4-5'
+  assign parts = aspect | split: '-'
+  assign aspect_style = parts[0] | append: ' / ' | append: parts[1]
+-%}
+<section
+    class="bt-section bt-image-text"
+    {{ section.shopify_attributes }}
+    style="--bt-iwt-padding-top: {{ section.settings.padding_top }}px; --bt-iwt-padding-bottom: {{ section.settings.padding_bottom }}px; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
+  >
+  <div class="bt-container">
+    <div class="bt-image-text__grid bt-image-text__grid--{{ layout }}">
+      <div class="bt-image-text__media" style="--bt-media-aspect: {{ aspect_style }}">
+        {%- if image != blank -%}
+          {{ image | image_url: width: 800 | image_tag:
+            loading: 'lazy',
+            widths: '400, 600, 800, 1000',
+            sizes: '(min-width: 990px) 50vw, 100vw',
+            alt: image.alt
+          }}
+        {%- else -%}
+          <div class="bt-image-text__placeholder" style="aspect-ratio: {{ aspect_style }}">
+            {{ 'image' | placeholder_svg_tag }}
+          </div>
+        {%- endif -%}
+      </div>
+      <div class="bt-image-text__content">
+        {% content_for "blocks" %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .bt-image-text__grid {
+    display: grid;
+    gap: var(--bt-space-xl);
+    align-items: center;
+  }
+  .bt-image-text__grid--image_left { grid-template-columns: 1fr 1fr; }
+  .bt-image-text__grid--image_right { grid-template-columns: 1fr 1fr; }
+  .bt-image-text__grid--image_right .bt-image-text__media { order: 1; }
+  .bt-image-text__grid--image_right .bt-image-text__content { order: 0; }
+  .bt-image-text__grid--text_first { grid-template-columns: 1fr 1fr; }
+  .bt-image-text__grid--text_first .bt-image-text__media { order: 1; }
+  .bt-image-text__grid--text_first .bt-image-text__content { order: 0; }
+  .bt-image-text__media {
+    border-radius: var(--bt-radius-card);
+    overflow: hidden;
+    background: var(--bt-color-surface);
+  }
+  .bt-image-text__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: var(--bt-media-aspect, 4 / 5);
+  }
+  .bt-image-text__placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--bt-color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bt-image-text__placeholder svg { width: 100%; height: 100%; }
+  .bt-image-text__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-sm);
+    padding: var(--bt-space-md);
+  }
+  @media (max-width: 749px) {
+    .bt-image-text__grid {
+      grid-template-columns: 1fr;
+    }
+    .bt-image-text__grid--image_right .bt-image-text__media { order: 0; }
+    .bt-image-text__content { padding: var(--bt-space-md) 0; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.image_with_text.name",
+  "tag": "section",
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.image_with_text.settings.image.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.image_with_text.settings.layout.label",
+      "options": [
+        { "value": "image_left", "label": "t:sections.image_with_text.settings.layout.options__1.label" },
+        { "value": "image_right", "label": "t:sections.image_with_text.settings.layout.options__2.label" },
+        { "value": "text_first", "label": "t:sections.image_with_text.settings.layout.options__3.label" }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect",
+      "label": "t:sections.image_with_text.settings.image_aspect.label",
+      "options": [
+        { "value": "1-1", "label": "t:sections.image_with_text.settings.image_aspect.options__1.label" },
+        { "value": "4-5", "label": "t:sections.image_with_text.settings.image_aspect.options__2.label" },
+        { "value": "3-4", "label": "t:sections.image_with_text.settings.image_aspect.options__3.label" },
+        { "value": "3-2", "label": "t:sections.image_with_text.settings.image_aspect.options__4.label" }
+      ],
+      "default": "4-5"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.image_with_text.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.image_with_text.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{
+    "name": "t:sections.image_with_text.name",
+    "blocks": [
+      { "type": "eyebrow" },
+      { "type": "heading" },
+      { "type": "text" },
+      { "type": "button-group" }
+    ]
+  }]
+}
+{% endschema %}

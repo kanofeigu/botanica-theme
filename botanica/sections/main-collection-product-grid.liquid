@@ -1,0 +1,1095 @@
+{% comment %}
+  main-collection-product-grid.liquid — Sidebar-first filter experience.
+  Single source of truth: Shopify native `collection.filters` (supports
+  price_range / boolean / list). No duplicate top chip bar. Sort is a
+  custom popover dropdown with animation. Price filter is a dual-thumb
+  range slider (no number spiners). Sidebar groups animate open/close.
+  Zero Dawn code.
+{% endcomment %}
+
+{%- liquid
+  assign products_per_page = section.settings.products_per_page | default: 12
+  assign columns_desktop = section.settings.columns_desktop | default: 3
+  assign enable_sorting = section.settings.enable_sorting | default: true
+  assign enable_filtering = section.settings.enable_filtering | default: true
+
+  assign has_modern_filters = false
+  if collection.filters.size > 0
+    assign has_modern_filters = true
+  endif
+
+  assign has_active_filters = false
+  for filter in collection.filters
+    if filter.active_values.size > 0
+      assign has_active_filters = true
+    endif
+    if filter.type == 'price_range'
+      if filter.min_value.value > 0 or filter.max_value.value < filter.range_max
+        assign has_active_filters = true
+      endif
+    endif
+  endfor
+
+  assign active_filter_count = 0
+  for filter in collection.filters
+    assign active_filter_count = active_filter_count | plus: filter.active_values.size
+  endfor
+-%}
+
+<div class="bt-collection-grid bt-section" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+
+    {% comment %} ══════════════ TOOLBAR: count + sort (mobile filter trigger) ══════════════ {% endcomment %}
+    <div class="bt-collection-grid__toolbar">
+      <div class="bt-collection-grid__count">
+        <span>{{ 'collections.collection.product_count' | t: count: collection.products_count }}</span>
+        {%- if has_active_filters -%}
+          <span class="bt-collection-grid__filtered-badge">{{ active_filter_count }} {{ 'collections.filters.active' | t }}</span>
+        {%- endif -%}
+      </div>
+
+      <div class="bt-collection-grid__toolbar-actions">
+        {%- if enable_filtering and has_modern_filters -%}
+          <button type="button" class="bt-collection-grid__filter-trigger bt-btn bt-btn--outline bt-btn--sm" data-filter-toggle aria-label="{{ 'collections.filters.title' | t }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+            <span>{{ 'collections.filters.title' | t }}</span>
+            {%- if has_active_filters -%}<span class="bt-collection-grid__filter-count">{{ active_filter_count }}</span>{%- endif -%}
+          </button>
+        {%- endif -%}
+
+        {%- if enable_sorting -%}
+          <div class="bt-sort" data-sort>
+            <button type="button" class="bt-sort__button bt-interactive" data-sort-button aria-haspopup="listbox" aria-expanded="false" aria-label="{{ 'collections.sorting.title' | t }}">
+              <span class="bt-sort__label">
+                <span class="bt-sort__label-prefix">{{ 'collections.sorting.title' | t }}:</span>
+                <span class="bt-sort__label-value" data-sort-current>
+                  {%- liquid
+                    assign current_sort = collection.sort_by | default: collection.default_sort_by
+                    assign current_sort_name = current_sort
+                    for opt in collection.sort_options
+                      if opt.value == current_sort
+                        assign current_sort_name = opt.name
+                      endif
+                    endfor
+                  -%}
+                  {{ current_sort_name }}
+                </span>
+              </span>
+              <svg class="bt-sort__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="bt-sort__menu" data-sort-menu role="listbox" aria-label="{{ 'collections.sorting.title' | t }}" hidden>
+              {%- for option in collection.sort_options -%}
+                <a href="#" class="bt-sort__option{% if option.value == current_sort %} is-selected{% endif %}" role="option" {% if option.value == current_sort %}aria-selected="true"{% endif %} data-sort-option data-sort-value="{{ option.value }}">
+                  <span>{{ option.name }}</span>
+                  <svg class="bt-sort__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                </a>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {% comment %} ══════════════ MAIN LAYOUT ══════════════ {% endcomment %}
+    <div class="bt-collection-grid__layout">
+      {% comment %} Sidebar — single source of truth for filters {% endcomment %}
+      {%- if enable_filtering and has_modern_filters -%}
+        <aside class="bt-collection-grid__sidebar" aria-label="{{ 'accessibility.filter' | t }}" data-sidebar>
+          <div class="bt-collection-grid__sidebar-header">
+            <h2 class="bt-collection-grid__sidebar-title">{{ 'collections.filters.title' | t }}</h2>
+            {%- if has_active_filters -%}
+              <a href="{{ collection.url }}?sort_by={{ collection.sort_by | default: collection.default_sort_by }}" class="bt-collection-grid__sidebar-clear bt-interactive bt-press">
+                {{ 'collections.filters.clear_all' | t }}
+              </a>
+            {%- endif -%}
+          </div>
+
+          {%- for filter in collection.filters -%}
+            <details class="bt-filter-group" {% if filter.active_values.size > 0 or filter.type == 'price_range' and has_active_filters %}open{% endif %} data-filter-group>
+              <summary class="bt-filter-group__summary bt-interactive">
+                <span>{{ filter.label }}</span>
+                <span class="bt-filter-group__summary-right">
+                  {%- if filter.active_values.size > 0 -%}<span class="bt-filter-group__badge">{{ filter.active_values.size }}</span>{%- endif -%}
+                  <svg class="bt-filter-group__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </summary>
+              <div class="bt-filter-group__content" data-filter-content>
+                <div class="bt-filter-group__values">
+                  {%- case filter.type -%}
+                    {%- when 'boolean' or 'list' -%}
+                      {%- for value in filter.values -%}
+                        <label class="bt-filter-checkbox bt-interactive{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                          <input
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                            data-url-to-add="{{ value.url_to_add | escape }}"
+                            data-url-to-remove="{{ value.url_to_remove | escape }}"
+                          >
+                          <span class="bt-filter-checkbox__indicator">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                          </span>
+                          <span class="bt-filter-checkbox__label">{{ value.label }}</span>
+                          <span class="bt-filter-checkbox__count">{{ value.count }}</span>
+                        </label>
+                      {%- endfor -%}
+                    {%- when 'price_range' -%}
+                      {%- liquid
+                        assign range_max_val = filter.range_max | divided_by: 100.0
+                        assign cur_min = filter.min_value.value | divided_by: 100.0
+                        assign cur_max = filter.max_value.value | divided_by: 100.0
+                        assign current_key = ''
+                        assign current_label = 'collections.filters.price_any' | t
+                        if cur_min > 0 or cur_max < range_max_val
+                          assign current_key = cur_min | round | append: '-' | append: cur_max | round
+                        endif
+                        assign base_url = filter.url_to_remove | default: collection.url | split: '?' | first
+                        assign sort_param = collection.sort_by | default: collection.default_sort_by
+
+                        # Build the option list up front so we can compute the current label.
+                        # Tiers tuned to the $20-$58 product range: < $25, $25-$50, > $50.
+                        # NOTE: money filters expect CENTS, so multiply by 100.
+                        assign price_options = ''
+                        assign steps = '25,50' | split: ','
+                        assign prev = 0
+                        for step in steps
+                          assign step_n = step | plus: 0
+                          assign key = prev | append: '-' | append: step_n
+                          assign step_cents = step_n | times: 100
+                          if prev == 0
+                            assign lbl = 'collections.filters.price_under_html' | t: amount: step_cents | money
+                          else
+                            assign prev_cents = prev | times: 100
+                            assign lo_formatted = prev_cents | money
+                            assign hi_formatted = step_cents | money
+                            assign lbl = 'collections.filters.price_between_html' | t: lo: lo_formatted, hi: hi_formatted
+                          endif
+                          assign url = base_url | append: '?filter.v.price.gte=' | append: prev | append: '&filter.v.price.lte=' | append: step_n
+                          if sort_param != blank
+                            assign url = url | append: '&sort_by=' | append: sort_param
+                          endif
+                          assign price_options = price_options | append: key | append: '~~' | append: lbl | append: '~~' | append: url | append: '|||'
+                          if current_key == key
+                            assign current_label = lbl
+                          endif
+                          assign prev = step_n
+                        endfor
+                        assign over_key = prev | append: '-' | append: range_max_val | round
+                        assign over_cents = prev | times: 100
+                        assign over_lbl = 'collections.filters.price_over_html' | t: amount: over_cents | money
+                        assign over_url = base_url | append: '?filter.v.price.gte=' | append: prev | append: '&filter.v.price.lte=' | append: range_max_val | round
+                        if sort_param != blank
+                          assign over_url = over_url | append: '&sort_by=' | append: sort_param
+                        endif
+                        assign price_options = price_options | append: over_key | append: '~~' | append: over_lbl | append: '~~' | append: over_url
+                        if current_key == over_key
+                          assign current_label = over_lbl
+                        endif
+                        assign opt_list = price_options | split: '|||'
+                      -%}
+                      <div class="bt-price-popover bt-sort" data-price-popover>
+                        <button type="button" class="bt-sort__button bt-interactive" data-price-button aria-haspopup="listbox" aria-expanded="false" aria-label="{{ 'collections.filters.price_label' | t }}">
+                          <span class="bt-sort__label">
+                            <span class="bt-sort__label-prefix">{{ 'collections.filters.price_label' | t }}:</span>
+                            <span class="bt-sort__label-value" data-price-current>{{ current_label }}</span>
+                          </span>
+                          <svg class="bt-sort__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="bt-sort__menu" data-price-menu role="listbox" aria-label="{{ 'collections.filters.price_label' | t }}" hidden>
+                          <a href="{{ base_url }}{% if sort_param != blank %}?sort_by={{ sort_param }}{% endif %}" class="bt-sort__option{% if current_key == blank %} is-selected{% endif %}" role="option" {% if current_key == blank %}aria-selected="true"{% endif %} data-price-option data-price-label="{{ 'collections.filters.price_any' | t }}">
+                            <span>{{ 'collections.filters.price_any' | t }}</span>
+                            <svg class="bt-sort__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                          </a>
+                          {%- for opt in opt_list -%}
+                            {%- liquid
+                              assign parts = opt | split: '~~'
+              assign opt_key = parts[0]
+              assign opt_label = parts[1]
+              assign opt_url = parts[2]
+              assign is_sel = false
+              if current_key == opt_key
+                assign is_sel = true
+              endif
+                            -%}
+                            <a href="{{ opt_url }}" class="bt-sort__option{% if is_sel %} is-selected{% endif %}" role="option" {% if is_sel %}aria-selected="true"{% endif %} data-price-option data-price-label="{{ opt_label | escape }}">
+                              <span>{{ opt_label }}</span>
+                              <svg class="bt-sort__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                            </a>
+                          {%- endfor -%}
+                        </div>
+                      </div>
+                  {%- endcase -%}
+                </div>
+              </div>
+            </details>
+          {%- endfor -%}
+
+          {% content_for "blocks" %}
+        </aside>
+      {%- endif -%}
+
+      {% comment %} Product grid {% endcomment %}
+      <div class="bt-collection-grid__main">
+        {%- paginate collection.products by products_per_page -%}
+          {%- if collection.products.size > 0 -%}
+            <div class="bt-grid bt-grid--{{ columns_desktop }}">
+              {%- for product in collection.products -%}
+                {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
+              {%- endfor -%}
+            </div>
+          {%- else -%}
+            <div class="bt-collection-grid__empty">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--bt-color-border-medium)" stroke-width="1" aria-hidden="true"><path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12Z" opacity="0.4"/><circle cx="8" cy="9" r="1" fill="var(--bt-color-border-medium)"/><circle cx="16" cy="9" r="1" fill="var(--bt-color-border-medium)"/><path d="M8 14c.8 1.2 2.4 2 4 2s3.2-.8 4-2" stroke="var(--bt-color-border-medium)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <p class="bt-collection-grid__empty-text">{{ 'collections.general.no_matches' | t }}</p>
+              <a href="{{ collection.url }}" class="bt-btn bt-btn--outline bt-interactive bt-press">{{ 'collections.filters.clear_all' | t }}</a>
+            </div>
+          {%- endif -%}
+
+          {%- if paginate.pages > 1 -%}
+            <div class="bt-collection-grid__pagination">{% render 'pagination', paginate: paginate %}</div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% javascript %}
+  (function () {
+    /* ════════════════════════════════════════════
+       AJAX SILENT REFRESH — fade-out, swap, fade-up reveal.
+       No full page reload, no screen flash.
+       ════════════════════════════════════════════ */
+    var ajaxing = false;
+
+    function ajaxNavigate(url, pushState) {
+      if (ajaxing) return;
+      ajaxing = true;
+      var grid = document.querySelector('.bt-collection-grid');
+      if (!grid) { window.location.href = url; return; }
+      /* Close any open popover + remove orphaned portal menus from body
+         before swapping DOM (otherwise they'd reference stale nodes). */
+      document.querySelectorAll('.bt-sort__menu.is-open').forEach(function (m) {
+        m.classList.remove('is-open');
+        m.hidden = true;
+        m.style.position = ''; m.style.zIndex = '';
+        m.style.left = ''; m.style.top = ''; m.style.width = '';
+      });
+      document.querySelectorAll('[aria-expanded="true"]').forEach(function (b) {
+        b.setAttribute('aria-expanded', 'false');
+      });
+      /* fade out the grid content (not the whole grid, to avoid layout jump) */
+      grid.classList.add('bt-ajax-out');
+      document.body.classList.add('bt-ajax-loading');
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+        .then(function (html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var newGrid = doc.querySelector('.bt-collection-grid');
+          var oldGrid = document.querySelector('.bt-collection-grid');
+          if (newGrid && oldGrid) {
+            /* swap innerHTML, then animate in */
+            oldGrid.innerHTML = newGrid.innerHTML;
+            if (pushState !== false) {
+              history.pushState({ btAjax: true, url: url }, '', url);
+            }
+            /* remove fade-out, trigger fade-up reveal */
+            oldGrid.classList.remove('bt-ajax-out');
+            oldGrid.classList.add('bt-ajax-in');
+            /* re-init interactive components on new DOM */
+            initAll();
+            /* scroll to top of grid if user had scrolled past it */
+            var rect = oldGrid.getBoundingClientRect();
+            if (rect.top < 0) {
+              oldGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            /* clean up reveal class after animation */
+            setTimeout(function () { oldGrid.classList.remove('bt-ajax-in'); }, 420);
+          }
+        })
+        .catch(function () { window.location.href = url; })
+        .then(function () { ajaxing = false; document.body.classList.remove('bt-ajax-loading'); });
+    }
+
+    function urlWithSort(sortVal) {
+      var url = new URL(window.location.href);
+      url.searchParams.set('sort_by', sortVal);
+      url.searchParams.delete('page');
+      return url.toString();
+    }
+
+    /* ════════════════════════════════════════════
+       POPOVER (sort + price) — portal to body
+       ════════════════════════════════════════════ */
+    function setupPopover(root, btnSel, menuSel, opts) {
+      var btn = root.querySelector(btnSel);
+      var menu = root.querySelector(menuSel);
+      if (!btn || !menu) return;
+      var open = false;
+      var originalParent = menu.parentNode;
+      var originalNextSibling = menu.nextSibling;
+      opts = opts || {};
+      var currentEl = opts.currentSel ? root.querySelector(opts.currentSel) : null;
+      var optionSel = opts.optionSel || '[data-sort-option]';
+      var labelAttr = opts.labelAttr || null;
+
+      function position() {
+        var r = btn.getBoundingClientRect();
+        var menuWidth = menu.offsetWidth;
+        var left = r.left;
+        if (left + menuWidth > window.innerWidth - 8) left = window.innerWidth - menuWidth - 8;
+        if (left < 8) left = 8;
+        menu.style.left = left + 'px';
+        menu.style.top = (r.bottom + 6) + 'px';
+      }
+      function show() {
+        open = true;
+        if (opts.matchWidth) menu.style.width = btn.offsetWidth + 'px';
+        document.body.appendChild(menu);
+        menu.hidden = false;
+        menu.style.position = 'fixed';
+        menu.style.zIndex = '1000';
+        void menu.offsetHeight;
+        menu.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+        position();
+      }
+      function hide() {
+        open = false;
+        menu.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        setTimeout(function () {
+          if (open) return;
+          menu.hidden = true;
+          menu.style.position = ''; menu.style.zIndex = '';
+          menu.style.left = ''; menu.style.top = ''; menu.style.width = '';
+          if (originalNextSibling && originalNextSibling.parentNode === originalParent) {
+            originalParent.insertBefore(menu, originalNextSibling);
+          } else { originalParent.appendChild(menu); }
+        }, 220);
+      }
+
+      btn.addEventListener('click', function (e) { e.stopPropagation(); if (open) hide(); else show(); });
+      document.addEventListener('click', function (e) { if (open && !root.contains(e.target) && !menu.contains(e.target)) hide(); });
+      document.addEventListener('keydown', function (e) { if (open && e.key === 'Escape') { hide(); btn.focus(); } });
+      window.addEventListener('scroll', function () { if (open) position(); }, true);
+      window.addEventListener('resize', function () { if (open) position(); });
+
+      root.querySelectorAll(optionSel).forEach(function (opt) {
+        opt.addEventListener('mouseenter', function () {
+          if (!currentEl) return;
+          if (labelAttr) { var lbl = opt.getAttribute(labelAttr); if (lbl) currentEl.textContent = lbl; }
+          else { var txt = opt.querySelector('span'); if (txt) currentEl.textContent = txt.textContent; }
+        });
+        /* Sort options: AJAX navigate preserving query params */
+        var sortVal = opt.getAttribute('data-sort-value');
+        if (sortVal !== null) {
+          opt.addEventListener('click', function (e) {
+            e.preventDefault();
+            hide();
+            ajaxNavigate(urlWithSort(sortVal));
+          });
+        }
+        /* Price options: AJAX navigate via the option's href.
+           Price popover portals to body so the link is outside
+           .bt-collection-grid — the global click delegation won't
+           catch it, so we handle it here. */
+        if (opt.hasAttribute('data-price-option')) {
+          opt.addEventListener('click', function (e) {
+            var href = opt.getAttribute('href');
+            if (!href || href === '#') return;
+            e.preventDefault();
+            hide();
+            ajaxNavigate(href);
+          });
+        }
+      });
+      root.addEventListener('mouseleave', function () {
+        if (!currentEl) return;
+        var selOpt = root.querySelector(optionSel + '.is-selected');
+        if (selOpt) {
+          if (labelAttr) { currentEl.textContent = selOpt.getAttribute(labelAttr) || currentEl.textContent; }
+          else { var sp = selOpt.querySelector('span'); if (sp) currentEl.textContent = sp.textContent; }
+        }
+      });
+    }
+
+    function initPopovers() {
+      /* Clean up any orphaned portal menus left on body from previous AJAX swap */
+      document.querySelectorAll('body > .bt-sort__menu').forEach(function (m) {
+        /* only remove if its original parent is gone (stale) */
+        if (!m.closest('.bt-collection-grid') && !m.closest('[data-sort]') && !m.closest('[data-price-popover]')) {
+          m.remove();
+        }
+      });
+      document.querySelectorAll('[data-sort]').forEach(function (root) {
+        if (root._btPopoverInit) return; root._btPopoverInit = true;
+        setupPopover(root, '[data-sort-button]', '[data-sort-menu]', {
+          currentSel: '[data-sort-current]', optionSel: '[data-sort-option]'
+        });
+      });
+      document.querySelectorAll('[data-price-popover]').forEach(function (root) {
+        if (root._btPopoverInit) return; root._btPopoverInit = true;
+        setupPopover(root, '[data-price-button]', '[data-price-menu]', {
+          currentSel: '[data-price-current]', optionSel: '[data-price-option]',
+          labelAttr: 'data-price-label', matchWidth: true
+        });
+      });
+    }
+
+    /* ════════════════════════════════════════════
+       SIDEBAR DETAILS — height animation
+       ════════════════════════════════════════════ */
+    function initDetails() {
+      document.querySelectorAll('[data-filter-group]').forEach(function (details) {
+        if (details._btDetailsInit) return; details._btDetailsInit = true;
+        var content = details.querySelector('[data-filter-content]');
+        if (!content) return;
+        var summary = details.querySelector('summary');
+        summary.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (details.open) {
+            content.style.height = content.scrollHeight + 'px';
+            void content.offsetHeight;
+            content.style.height = '0px'; content.style.opacity = '0';
+            setTimeout(function () { details.removeAttribute('open'); content.style.height = ''; content.style.opacity = ''; }, 220);
+          } else {
+            details.setAttribute('open', '');
+            content.style.height = '0px'; content.style.opacity = '0';
+            void content.offsetHeight;
+            content.style.height = content.scrollHeight + 'px'; content.style.opacity = '1';
+            setTimeout(function () { content.style.height = ''; }, 220);
+          }
+        });
+      });
+    }
+
+    /* ════════════════════════════════════════════
+       AJAX NAVIGATION DELEGATION
+       Intercept clicks on links + checkbox changes
+       inside the collection grid → ajaxNavigate.
+       ════════════════════════════════════════════ */
+    function initAjaxDelegation() {
+      if (window._btAjaxDelegation) return; window._btAjaxDelegation = true;
+
+      document.addEventListener('click', function (e) {
+        var link = e.target.closest('a[href]');
+        if (!link) return;
+        if (!link.closest('.bt-collection-grid')) return;
+        var href = link.getAttribute('href');
+        if (!href || href === '#' || href.charAt(0) === '#') return;
+        if (link.target === '_blank' || link.hasAttribute('download')) return;
+        /* skip sort options (handled by their own click handler) */
+        if (link.hasAttribute('data-sort-value')) return;
+        /* skip price options (handled by popover click handler) */
+        if (link.hasAttribute('data-price-option')) return;
+        /* skip product links — navigate normally to PDP */
+        if (href.indexOf('/products/') !== -1) return;
+        e.preventDefault();
+        ajaxNavigate(href);
+      });
+
+      document.addEventListener('change', function (e) {
+        var input = e.target;
+        if (input.tagName !== 'INPUT' || input.type !== 'checkbox') return;
+        if (!input.closest('.bt-collection-grid')) return;
+        var url = input.checked ? input.getAttribute('data-url-to-add') : input.getAttribute('data-url-to-remove');
+        if (!url) return;
+        ajaxNavigate(url);
+      });
+
+      window.addEventListener('popstate', function (e) {
+        ajaxNavigate(window.location.href, false);
+      });
+    }
+
+    /* ════════════════════════════════════════════
+       MOBILE SIDEBAR
+       ════════════════════════════════════════════ */
+    function initMobileSidebar() {
+      var filterToggle = document.querySelector('[data-filter-toggle]');
+      var sidebar = document.querySelector('[data-sidebar]');
+      if (!filterToggle || !sidebar) return;
+      if (filterToggle._btMobileInit) return; filterToggle._btMobileInit = true;
+      filterToggle.addEventListener('click', function () {
+        sidebar.classList.toggle('is-open');
+        document.body.classList.toggle('bt-filter-open');
+      });
+      document.addEventListener('click', function (e) {
+        if (document.body.classList.contains('bt-filter-open') && !sidebar.contains(e.target) && !filterToggle.contains(e.target)) {
+          sidebar.classList.remove('is-open');
+          document.body.classList.remove('bt-filter-open');
+        }
+      });
+    }
+
+    function initAll() {
+      initPopovers();
+      initDetails();
+      initMobileSidebar();
+    }
+
+    initAll();
+    initAjaxDelegation();
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  /* ════════════════════════════════════════════
+     TOOLBAR
+     ════════════════════════════════════════════ */
+  .bt-collection-grid__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-space-md);
+    margin-bottom: var(--bt-space-md);
+    padding-bottom: var(--bt-space-sm);
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-collection-grid__count {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-collection-grid__filtered-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 8px;
+    background: var(--bt-color-primary-tint);
+    color: var(--bt-color-primary);
+    border-radius: var(--bt-radius-pill);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+  }
+  .bt-collection-grid__toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-sm);
+  }
+  .bt-collection-grid__filter-trigger {
+    display: none;
+  }
+  .bt-collection-grid__filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+    border-radius: var(--bt-radius-pill);
+    font-size: 0.65rem;
+    font-weight: var(--bt-fw-bold);
+  }
+
+  /* ════════════════════════════════════════════
+     SORT — custom popover dropdown
+     ════════════════════════════════════════════ */
+  .bt-sort { position: relative; }
+  .bt-sort__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    padding: 0.5em 0.9em;
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text);
+    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-pill);
+    cursor: pointer;
+    transition: all var(--bt-duration-fast) var(--bt-ease-out);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .bt-sort__button:hover {
+    border-color: var(--bt-color-primary);
+    color: var(--bt-color-primary);
+  }
+  .bt-sort__button:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: 2px;
+  }
+  .bt-sort__button[aria-expanded="true"] {
+    border-color: var(--bt-color-primary);
+    color: var(--bt-color-primary);
+  }
+  .bt-sort__label { display: inline-flex; align-items: baseline; gap: 0.35em; }
+  .bt-sort__label-prefix {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: var(--bt-fw-medium);
+  }
+  .bt-sort__label-value {
+    font-weight: var(--bt-fw-semibold);
+  }
+  .bt-sort__chevron {
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+  .bt-sort__button[aria-expanded="true"] .bt-sort__chevron {
+    transform: rotate(180deg);
+  }
+
+  .bt-sort__menu {
+    /* Positioning handled by JS (portal to body + fixed coords) */
+    z-index: 1000;
+    min-width: 200px;
+    padding: 4px;
+    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-color-border-light);
+    border-radius: var(--bt-radius-md);
+    box-shadow: 0 8px 28px rgba(var(--bt-color-text-rgb), 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    /* hidden state (before .is-open) */
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top center;
+    pointer-events: none;
+    transition: opacity 160ms var(--bt-ease-out), transform 160ms var(--bt-ease-out);
+  }
+  .bt-sort__menu.is-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  .bt-sort__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-space-2xs);
+    padding: 0.55em 0.75em;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text);
+    text-decoration: none;
+    border-radius: var(--bt-radius-sm);
+    transition: background var(--bt-duration-fast), color var(--bt-duration-fast);
+  }
+  .bt-sort__option:hover {
+    background: var(--bt-color-primary-tint);
+    color: var(--bt-color-primary);
+  }
+  .bt-sort__option:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: -2px;
+  }
+  .bt-sort__check {
+    opacity: 0;
+    color: var(--bt-color-primary);
+    flex-shrink: 0;
+    transition: opacity var(--bt-duration-fast);
+  }
+  .bt-sort__option.is-selected {
+    background: var(--bt-color-primary-tint);
+    color: var(--bt-color-primary);
+    font-weight: var(--bt-fw-semibold);
+  }
+  .bt-sort__option.is-selected .bt-sort__check {
+    opacity: 1;
+  }
+
+  /* ════════════════════════════════════════════
+     LAYOUT
+     ════════════════════════════════════════════ */
+  .bt-collection-grid__layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: var(--bt-space-xl);
+    align-items: start;
+    overflow-x: clip; /* prevent any horizontal scrollbar from child overflow */
+  }
+  .bt-collection-grid__main { min-width: 0; }
+
+  /* ════════════════════════════════════════════
+     SIDEBAR
+     ════════════════════════════════════════════ */
+  .bt-collection-grid__sidebar {
+    position: sticky;
+    top: calc(var(--bt-space-md) + 80px);
+    /* No max-height/overflow — let popover menus overflow freely,
+       and avoid a horizontal scrollbar inside the sidebar. */
+    padding-right: 2px;
+  }
+  .bt-collection-grid__sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--bt-space-sm);
+    padding-bottom: var(--bt-space-xs);
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-collection-grid__sidebar-title {
+    margin: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body);
+    font-weight: var(--bt-fw-normal);
+  }
+  .bt-collection-grid__sidebar-clear {
+    font-size: 0.7rem;
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bt-color-text-muted);
+    text-decoration: none;
+    padding: 2px 8px;
+    border-radius: var(--bt-radius-pill);
+    transition: all var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-collection-grid__sidebar-clear:hover {
+    color: var(--bt-color-secondary);
+    background: var(--bt-color-secondary-tint);
+  }
+
+  /* ── Filter group (animated details) ── */
+  .bt-filter-group {
+    border-bottom: 1px solid var(--bt-color-border-light);
+    padding-block: var(--bt-space-xs);
+  }
+  .bt-filter-group__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    list-style: none;
+    user-select: none;
+    padding-block: 4px;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-filter-group__summary:hover { color: var(--bt-color-primary); }
+  .bt-filter-group__summary::-webkit-details-marker { display: none; }
+  .bt-filter-group__summary::-moz-list-marker { display: none; }
+  .bt-filter-group__summary-right {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-filter-group__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+    border-radius: var(--bt-radius-pill);
+    font-size: 0.65rem;
+    font-weight: var(--bt-fw-bold);
+  }
+  .bt-filter-group__chevron {
+    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+  details[open] > .bt-filter-group__summary .bt-filter-group__chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Animated content wrapper */
+  .bt-filter-group__content {
+    overflow: hidden;
+    transition: height 220ms var(--bt-ease-out), opacity 200ms var(--bt-ease-out);
+  }
+  details:not([open]) .bt-filter-group__content {
+    height: 0;
+    opacity: 0;
+  }
+  details[open] .bt-filter-group__content {
+    opacity: 1;
+  }
+
+  .bt-filter-group__values {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: var(--bt-space-xs);
+    padding-bottom: var(--bt-space-3xs);
+  }
+
+  /* ── Filter checkbox ── */
+  .bt-filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    cursor: pointer;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text);
+    padding: 3px 0;
+    user-select: none;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-filter-checkbox:hover { color: var(--bt-color-primary); }
+  .bt-filter-checkbox.is-disabled { cursor: not-allowed; opacity: 0.45; }
+  .bt-filter-checkbox.is-disabled:hover { color: var(--bt-color-text); }
+  .bt-filter-checkbox input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+  }
+  .bt-filter-checkbox__indicator {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--bt-color-border-medium);
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: var(--bt-color-bg);
+    transition: all var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-filter-checkbox:hover .bt-filter-checkbox__indicator {
+    border-color: var(--bt-color-primary);
+  }
+  .bt-filter-checkbox__indicator svg {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity var(--bt-duration-fast), transform var(--bt-duration-base) var(--bt-ease-out);
+    color: var(--bt-color-primary-contrast);
+  }
+  .bt-filter-checkbox input:checked + .bt-filter-checkbox__indicator {
+    background: var(--bt-color-primary);
+    border-color: var(--bt-color-primary);
+  }
+  .bt-filter-checkbox input:checked + .bt-filter-checkbox__indicator svg {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .bt-filter-checkbox input:focus-visible + .bt-filter-checkbox__indicator {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: 2px;
+  }
+  .bt-filter-checkbox__label { flex: 1; }
+  .bt-filter-checkbox__count {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    flex-shrink: 0;
+    font-variant-numeric: oldstyle-nums;
+  }
+
+  /* Price popover reuses .bt-sort__* classes — align with sibling
+     filter group values (same padding-top, full-width button). */
+  .bt-price-popover { display: block; }
+  .bt-price-popover .bt-sort__button {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: var(--bt-space-xs);
+  }
+  /* menu width set by JS to match button — no min-width override needed */
+
+  /* ════════════════════════════════════════════
+     EMPTY STATE
+     ════════════════════════════════════════════ */
+  .bt-collection-grid__empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--bt-space-md);
+    padding-block: var(--bt-space-3xl);
+    text-align: center;
+    animation: bt-reveal-fade var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-collection-grid__empty-text {
+    color: var(--bt-color-text-muted);
+    font-size: var(--bt-fs-body);
+  }
+
+  /* ════════════════════════════════════════════
+     PAGINATION
+     ════════════════════════════════════════════ */
+  .bt-collection-grid__pagination {
+    margin-top: var(--bt-space-xl);
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ════════════════════════════════════════════
+     RESPONSIVE
+     ════════════════════════════════════════════ */
+  @media (max-width: 989px) {
+    .bt-collection-grid__layout {
+      grid-template-columns: 1fr;
+    }
+    .bt-collection-grid__sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      max-height: none;
+      width: min(340px, 88vw);
+      height: 100vh;
+      z-index: 100;
+      background: var(--bt-color-bg);
+      padding: var(--bt-space-lg) var(--bt-space-md) var(--bt-space-md);
+      transform: translateX(-100%);
+      transition: transform var(--bt-duration-base) var(--bt-ease-out);
+      overflow-y: auto;
+      overflow-x: hidden;
+      box-shadow: 0 0 40px rgba(var(--bt-color-text-rgb), 0.2);
+    }
+    .bt-collection-grid__sidebar.is-open {
+      transform: translateX(0);
+    }
+    .bt-collection-grid__filter-trigger {
+      display: inline-flex;
+    }
+    body.bt-filter-open::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(var(--bt-color-text-rgb), 0.4);
+      z-index: 99;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .bt-collection-grid__toolbar {
+      flex-wrap: wrap;
+      gap: var(--bt-space-xs);
+    }
+    .bt-collection-grid__toolbar-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+    /* sort menu positioning handled by JS portal on all viewports */
+  }
+
+  /* Reduced motion: disable animations */
+  /* ════════════════════════════════════════════
+     AJAX TRANSITIONS — fade-out, then fade-up reveal.
+     No screen flash: the grid stays in place, only its
+     content cross-fades + lifts slightly on arrival.
+     ════════════════════════════════════════════ */
+  .bt-collection-grid { position: relative; }
+  .bt-collection-grid__main { position: relative; }
+
+  /* Fade out: content dims + blurs slightly while loading */
+  .bt-collection-grid.bt-ajax-out .bt-collection-grid__main {
+    opacity: 0.35;
+    filter: blur(1px);
+    transition: opacity 180ms var(--bt-ease-out), filter 180ms var(--bt-ease-out);
+    pointer-events: none;
+  }
+  /* Spinner centered on the main grid area */
+  body.bt-ajax-loading .bt-collection-grid__main::after {
+    content: '';
+    position: absolute;
+    top: 40%; left: 50%;
+    width: 32px; height: 32px;
+    margin: -16px 0 0 -16px;
+    border: 3px solid var(--bt-color-border-light);
+    border-top-color: var(--bt-color-primary);
+    border-radius: 50%;
+    animation: bt-ajax-spin 0.7s linear infinite;
+    z-index: 5;
+  }
+  @keyframes bt-ajax-spin { to { transform: rotate(360deg); } }
+
+  /* Fade-up reveal: new content fades in + lifts 8px */
+  .bt-collection-grid.bt-ajax-in .bt-collection-grid__main {
+    animation: bt-ajax-reveal 380ms var(--bt-ease-out) both;
+  }
+  @keyframes bt-ajax-reveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* Stagger product cards for a graceful cascade feel */
+  .bt-collection-grid.bt-ajax-in .bt-grid > * {
+    animation: bt-ajax-card 380ms var(--bt-ease-out) both;
+  }
+  @keyframes bt-ajax-card {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(1) { animation-delay: 0ms; }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(2) { animation-delay: 40ms; }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(3) { animation-delay: 80ms; }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(4) { animation-delay: 120ms; }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(5) { animation-delay: 160ms; }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(6) { animation-delay: 200ms; }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(7) { animation-delay: 240ms; }
+  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(8) { animation-delay: 280ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bt-sort__menu,
+    .bt-filter-group__content,
+    .bt-filter-group__chevron,
+    .bt-sort__chevron,
+    .bt-collection-grid__sidebar {
+      transition: none !important;
+    }
+    .bt-collection-grid__empty { animation: none; }
+    body.bt-ajax-loading .bt-collection-grid__main::after { animation: none; }
+    .bt-collection-grid.bt-ajax-in .bt-collection-grid__main,
+    .bt-collection-grid.bt-ajax-in .bt-grid > * { animation: none !important; }
+    .bt-collection-grid.bt-ajax-out .bt-collection-grid__main { filter: none; transition: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_collection_product_grid.name",
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 12,
+      "label": "t:sections.main_collection_product_grid.settings.products_per_page.label"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "label": "t:sections.main_collection_product_grid.settings.columns_desktop.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "t:sections.main_collection_product_grid.settings.enable_filtering.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "t:sections.main_collection_product_grid.settings.enable_sorting.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "t:sections.main_collection_product_grid.settings.show_secondary_image.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:sections.main_collection_product_grid.settings.show_vendor.label",
+      "default": false
+    }
+  ],
+  "presets": [{ "name": "t:sections.main_collection_product_grid.name" }]
+}
+{% endschema %}

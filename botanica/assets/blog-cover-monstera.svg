@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A6B4F"/>
+      <stop offset="100%" stop-color="#2E4733"/>
+    </linearGradient>
+    <linearGradient id="overlay1" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#1a1a1a" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg1)"/>
+  <!-- Monstera leaf shape -->
+  <g transform="translate(400,240)" fill="#4A6B4F" stroke="#5B8B5F" stroke-width="1.5">
+    <ellipse cx="-80" cy="-60" rx="45" ry="70" transform="rotate(-30 -80 -60)" opacity="0.9"/>
+    <ellipse cx="40" cy="-80" rx="50" ry="80" transform="rotate(10 40 -80)" opacity="0.85"/>
+    <ellipse cx="-30" cy="20" rx="40" ry="65" transform="rotate(20 -30 20)" opacity="0.8"/>
+    <ellipse cx="60" cy="10" rx="45" ry="55" transform="rotate(-15 60 10)" opacity="0.7"/>
+  </g>
+  <!-- Fenestration holes -->
+  <circle cx="350" cy="180" r="8" fill="#2E4733" opacity="0.6"/>
+  <circle cx="420" cy="160" r="10" fill="#2E4733" opacity="0.5"/>
+  <circle cx="390" cy="220" r="6" fill="#2E4733" opacity="0.7"/>
+  <circle cx="440" cy="200" r="7" fill="#2E4733" opacity="0.5"/>
+  <!-- Stem -->
+  <path d="M400 300 Q390 350 380 400 Q375 430 385 460" stroke="#3A573F" stroke-width="3" fill="none"/>
+  <!-- Overlay gradient -->
+  <rect width="800" height="500" fill="url(#overlay1)"/>
+  <!-- Text -->
+  <text x="60" y="410" fill="#F5F1E8" font-family="Georgia,serif" font-size="28" font-weight="bold">The secret life of</text>
+  <text x="60" y="445" fill="#C97D5A" font-family="Georgia,serif" font-size="36" font-weight="bold">Chlorophyll</text>
+  <!-- Decorative line -->
+  <line x1="60" y1="460" x2="200" y2="460" stroke="#C97D5A" stroke-width="2" opacity="0.8"/>
+</svg>

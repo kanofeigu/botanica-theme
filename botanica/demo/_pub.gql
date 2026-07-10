@@ -1,0 +1,6 @@
+mutation {
+  themePublish(id: "gid://shopify/OnlineStoreTheme/153130598591") {
+    theme { id name role }
+    userErrors { field message }
+  }
+}

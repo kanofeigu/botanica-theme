@@ -1,0 +1,11 @@
+query {
+  themes(first: 10) {
+    nodes {
+      id
+      name
+      role
+      themeStoreId
+      processing
+    }
+  }
+}

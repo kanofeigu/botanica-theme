@@ -1,0 +1,10 @@
+query {
+  productByHandle(handle: "monstera-deliciosa") {
+    title
+    status
+    publishedOnCurrentChannel
+    resourcePublicationsV2(first: 3) {
+      nodes { isPublished publication { id name hasOnlineStoreChannel } }
+    }
+  }
+}

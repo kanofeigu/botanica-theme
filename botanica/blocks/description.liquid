@@ -1,0 +1,22 @@
+{% comment %}
+  blocks/description.liquid — Product description block
+{% endcomment %}
+<div class="bt-product-description rte" {{ block.shopify_attributes }}>
+  {{ product.description }}
+</div>
+
+{% stylesheet %}
+  .bt-product-description {
+    color: var(--bt-color-text, #2E2A24);
+    line-height: 1.7;
+  }
+  .bt-product-description p { margin: 0 0 1em; }
+  .bt-product-description p:last-child { margin-bottom: 0; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.description.name",
+  "presets": [{ "name": "t:blocks.description.name" }]
+}
+{% endschema %}

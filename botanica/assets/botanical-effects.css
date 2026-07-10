@@ -1,0 +1,816 @@
+/* ───────────────────────────────────────────
+   Botanica v3 — Botanical Scroll Effects
+   ★ Competitive differentiator — plant-themed
+     scroll-driven animations that make the
+     theme feel ALIVE.
+   All CSS-native. Zero JS for visual effects.
+   ⚠ All effects guarded: prefers-reduced-motion.
+   ⚠ Feature-detect fallback: unsupported browsers
+     see static decorative elements.
+   ─────────────────────────────────────────── */
+
+/* ════════════════════════════════════════════
+   1. GROWING VINE — SIDE DECORATION
+   Vine draws itself as user scrolls down.
+   Position on left/right edges of sections.
+   Uses stroke-dashoffset driven by scroll().
+   ════════════════════════════════════════════ */
+
+.bt-vine {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.bt-vine--left {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  transform: translateX(-30px);
+}
+
+.bt-vine--right {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  transform: translateX(30px);
+}
+
+.bt-vine__svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.15;
+}
+
+/* Vine growth animation — stem draws in as you scroll */
+@supports (animation-timeline: scroll()) {
+  .bt-vine--grow .bt-vine__stem {
+    animation: bt-vine-draw linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0% 40%;
+  }
+
+  @keyframes bt-vine-draw {
+    from { stroke-dashoffset: var(--bt-vine-length, 800); }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  /* Leaves appear after stem passes */
+  .bt-vine--grow .bt-vine__leaf {
+    animation: bt-vine-leaf-appear linear both;
+    animation-timeline: scroll(root);
+    animation-range: 15% 30%;
+  }
+
+  @keyframes bt-vine-leaf-appear {
+    from { opacity: 0; transform: scale(0.3); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Tendril unfurls last */
+  .bt-vine--grow .bt-vine__tendril {
+    animation: bt-vine-tendril linear both;
+    animation-timeline: scroll(root);
+    animation-range: 25% 40%;
+  }
+
+  @keyframes bt-vine-tendril {
+    from { stroke-dashoffset: 50; }
+    to   { stroke-dashoffset: 0; }
+  }
+}
+
+/* ════════════════════════════════════════════
+   2. FALLING LEAVES — SCROLL-DRIVEN CASCADE
+   Leaves fall from top as user scrolls, each
+   at a different speed. Creates mesmerizing
+   botanical atmosphere.
+   ════════════════════════════════════════════ */
+
+.bt-falling-leaves {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Individual leaf — positioned, sized, and timed differently */
+.bt-leaf {
+  position: absolute;
+  top: -60px;
+  width: var(--bt-leaf-size, 30px);
+  height: auto;
+  opacity: 0;
+  will-change: transform;
+}
+
+/* Leaf 1 — Monstera, left side, slow */
+.bt-leaf--1 {
+  left: 8%;
+  --bt-leaf-size: 36px;
+}
+
+/* Leaf 2 — Fiddle, mid-right, medium */
+.bt-leaf--2 {
+  left: 25%;
+  --bt-leaf-size: 30px;
+}
+
+/* Leaf 3 — Small, center-right, fast */
+.bt-leaf--3 {
+  left: 48%;
+  --bt-leaf-size: 22px;
+}
+
+/* Leaf 4 — Monstera, right edge, very slow */
+.bt-leaf--4 {
+  left: 72%;
+  --bt-leaf-size: 34px;
+}
+
+/* Leaf 5 — Fiddle, far left, medium */
+.bt-leaf--5 {
+  left: 15%;
+  --bt-leaf-size: 28px;
+}
+
+/* Leaf 6 — Small, near right, fast */
+.bt-leaf--6 {
+  left: 62%;
+  --bt-leaf-size: 20px;
+}
+
+/* Leaf 7 — Monstera, center, slow */
+.bt-leaf--7 {
+  left: 38%;
+  --bt-leaf-size: 32px;
+}
+
+/* Leaf 8 — Small, far right, medium */
+.bt-leaf--8 {
+  left: 85%;
+  --bt-leaf-size: 24px;
+}
+
+@supports (animation-timeline: scroll()) {
+  /* Each leaf has its own animation phase — they cascade */
+  .bt-leaf--1 {
+    animation: bt-leaf-fall-slow linear both;
+    animation-timeline: scroll(root);
+    animation-range: 5% 60%;
+  }
+  .bt-leaf--2 {
+    animation: bt-leaf-fall-medium linear both;
+    animation-timeline: scroll(root);
+    animation-range: 12% 55%;
+  }
+  .bt-leaf--3 {
+    animation: bt-leaf-fall-fast linear both;
+    animation-timeline: scroll(root);
+    animation-range: 8% 50%;
+  }
+  .bt-leaf--4 {
+    animation: bt-leaf-fall-slow linear both;
+    animation-timeline: scroll(root);
+    animation-range: 18% 65%;
+  }
+  .bt-leaf--5 {
+    animation: bt-leaf-fall-medium linear both;
+    animation-timeline: scroll(root);
+    animation-range: 3% 48%;
+  }
+  .bt-leaf--6 {
+    animation: bt-leaf-fall-fast linear both;
+    animation-timeline: scroll(root);
+    animation-range: 15% 52%;
+  }
+  .bt-leaf--7 {
+    animation: bt-leaf-fall-slow linear both;
+    animation-timeline: scroll(root);
+    animation-range: 10% 58%;
+  }
+  .bt-leaf--8 {
+    animation: bt-leaf-fall-medium linear both;
+    animation-timeline: scroll(root);
+    animation-range: 20% 62%;
+  }
+
+  /* Fall + sway + rotate — each leaf has unique path */
+  @keyframes bt-leaf-fall-slow {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    5%   { opacity: var(--bt-leaf-opacity, 0.7); }
+    20%  { transform: translateY(20vh) translateX(-15px) rotate(60deg); opacity: var(--bt-leaf-opacity, 0.7); }
+    40%  { transform: translateY(45vh) translateX(10px) rotate(140deg); opacity: calc(var(--bt-leaf-opacity, 0.7) * 0.85); }
+    60%  { transform: translateY(70vh) translateX(-20px) rotate(220deg); opacity: calc(var(--bt-leaf-opacity, 0.7) * 0.55); }
+    80%  { transform: translateY(90vh) translateX(5px) rotate(300deg); opacity: calc(var(--bt-leaf-opacity, 0.7) * 0.28); }
+    100% { transform: translateY(105vh) translateX(-10px) rotate(380deg); opacity: 0; }
+  }
+
+  @keyframes bt-leaf-fall-medium {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    5%   { opacity: var(--bt-leaf-opacity, 0.65); }
+    25%  { transform: translateY(30vh) translateX(20px) rotate(90deg); opacity: var(--bt-leaf-opacity, 0.65); }
+    50%  { transform: translateY(60vh) translateX(-15px) rotate(180deg); opacity: calc(var(--bt-leaf-opacity, 0.65) * 0.75); }
+    75%  { transform: translateY(85vh) translateX(10px) rotate(270deg); opacity: calc(var(--bt-leaf-opacity, 0.65) * 0.45); }
+    100% { transform: translateY(105vh) translateX(-5px) rotate(360deg); opacity: 0; }
+  }
+
+  @keyframes bt-leaf-fall-fast {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    4%   { opacity: var(--bt-leaf-opacity, 0.6); }
+    30%  { transform: translateY(40vh) translateX(-25px) rotate(120deg); opacity: var(--bt-leaf-opacity, 0.6); }
+    60%  { transform: translateY(75vh) translateX(15px) rotate(240deg); opacity: calc(var(--bt-leaf-opacity, 0.6) * 0.65); }
+    100% { transform: translateY(105vh) translateX(-15px) rotate(360deg); opacity: 0; }
+  }
+}
+
+/* ════════════════════════════════════════════
+   3. PARALLAX BOTANICAL SILHOUETTES
+   Background plant silhouettes on section edges
+   that move slower than scroll — greenhouse depth.
+   ════════════════════════════════════════════ */
+
+.bt-bg-botanical {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bt-bg-botanical--left {
+  left: 0;
+  width: clamp(150px, 20vw, 300px);
+}
+
+.bt-bg-botanical--right {
+  right: 0;
+  width: clamp(150px, 20vw, 300px);
+}
+
+.bt-bg-botanical__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.08;
+}
+
+@supports (animation-timeline: scroll()) {
+  .bt-bg-botanical--parallax .bt-bg-botanical__img {
+    animation: bt-bg-drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: cover 0% cover 100%;
+  }
+
+  /* Background plants move at 1/5 the scroll speed */
+  @keyframes bt-bg-drift {
+    from { transform: translateY(-40px); }
+    to   { transform: translateY(40px); }
+  }
+
+  .bt-bg-botanical--left.bt-bg-botanical--parallax .bt-bg-botanical__img {
+    animation-name: bt-bg-drift-left;
+  }
+
+  @keyframes bt-bg-drift-left {
+    from { transform: translateY(-40px) translateX(-20px); }
+    to   { transform: translateY(40px) translateX(20px); }
+  }
+}
+
+/* ════════════════════════════════════════════
+   4. SCROLL-DRIVEN COLOR SHIFT
+   Subtle background warmth shift — like light
+   filtering through leaves as you scroll.
+   ════════════════════════════════════════════ */
+
+@supports (animation-timeline: scroll()) {
+  .bt-color-shift {
+    animation: bt-color-warm linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0% 100%;
+  }
+
+  /* Warm tint builds gradually — like afternoon light */
+  @keyframes bt-color-warm {
+    0%   {
+      background-color: var(--bt-color-bg);
+    }
+    50%  {
+      background-color: color-mix(in srgb, var(--bt-color-bg) 95%, var(--bt-color-secondary) 5%);
+    }
+    100% {
+      background-color: color-mix(in srgb, var(--bt-color-bg) 90%, var(--bt-color-secondary) 10%);
+    }
+  }
+
+  /* Alternating sections get slightly different tints */
+  .bt-color-shift--cool {
+    animation-name: bt-color-cool;
+  }
+
+  @keyframes bt-color-cool {
+    0%   {
+      background-color: color-mix(in srgb, var(--bt-color-bg) 95%, var(--bt-color-primary) 5%);
+    }
+    50%  {
+      background-color: var(--bt-color-bg);
+    }
+    100% {
+      background-color: color-mix(in srgb, var(--bt-color-bg) 97%, var(--bt-color-secondary) 3%);
+    }
+  }
+}
+
+/* ════════════════════════════════════════════
+   5. DAPPLED LIGHT PATTERN
+   CSS-generated light-through-leaves pattern
+   that shifts subtly as user scrolls.
+   ════════════════════════════════════════════ */
+
+.bt-dappled-light {
+  position: relative;
+}
+
+.bt-dappled-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+  background:
+    radial-gradient(ellipse 80px 120px at 15% 20%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 60px 100px at 35% 60%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 90px 130px at 55% 30%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 70px 110px at 75% 55%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 50px 80px at 20% 75%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 140px at 65% 80%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 60px 90px at 85% 15%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 75px 100px at 45% 45%, rgba(var(--bt-color-bg-rgb), 0.5) 0%, transparent 70%);
+}
+
+@supports (animation-timeline: scroll()) {
+  .bt-dappled-light::before {
+    animation: bt-dappled-shift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0% 100%;
+  }
+
+  @keyframes bt-dappled-shift {
+    0%   { transform: translate(0, 0) scale(1); opacity: 0.03; }
+    50%  { transform: translate(-15px, -10px) scale(1.05); opacity: 0.05; }
+    100% { transform: translate(5px, -20px) scale(1.02); opacity: 0.04; }
+  }
+}
+
+/* ════════════════════════════════════════════
+   6. SPECIMEN CARD REVEAL
+   Cards start with a botanical-sketch overlay
+   that fades on scroll to reveal the real product.
+   Brand-defining "field guide" aesthetic.
+   ════════════════════════════════════════════ */
+
+.bt-specimen-reveal {
+  position: relative;
+}
+
+/* Sketch overlay — line-drawing effect */
+.bt-specimen-reveal__sketch {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    /* Cross-hatch pattern simulating botanical sketch */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(var(--bt-color-text-rgb), 0.03) 1px,
+      rgba(var(--bt-color-text-rgb), 0.03) 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 1px,
+      rgba(var(--bt-color-text-rgb), 0.02) 1px,
+      rgba(var(--bt-color-text-rgb), 0.02) 2px
+    );
+  border: 1px solid rgba(var(--bt-color-text-rgb), 0.1);
+  border-radius: inherit;
+}
+
+@supports (animation-timeline: view()) {
+  .bt-specimen-reveal__sketch {
+    animation: bt-sketch-fade linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
+
+  @keyframes bt-sketch-fade {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+}
+
+/* ════════════════════════════════════════════
+   7. HERO BOTANICAL FLOAT
+   Decorative botanical illustration in hero
+   subtly shifts as user scrolls past.
+   ════════════════════════════════════════════ */
+
+.bt-hero-botanical {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Position variants */
+.bt-hero-botanical--full {
+  inset: 0;
+}
+
+.bt-hero-botanical--bottom-right {
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  height: 60%;
+}
+
+.bt-hero-botanical--top-left {
+  left: 0;
+  top: 0;
+  width: 40%;
+  height: 50%;
+}
+
+.bt-hero-botanical__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.06;
+}
+
+@supports (animation-timeline: scroll()) {
+  .bt-hero-botanical--float .bt-hero-botanical__img {
+    animation: bt-hero-botanical-drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0% 30%;
+  }
+
+  @keyframes bt-hero-botanical-drift {
+    from {
+      transform: translateY(0) rotate(0deg) scale(1);
+      opacity: 0.06;
+    }
+    to {
+      transform: translateY(40px) rotate(3deg) scale(1.05);
+      opacity: 0.03;
+    }
+  }
+}
+
+/* ════════════════════════════════════════════
+   8. SPORE / POLLEN PARTICLES
+   Tiny floating dots that drift at different
+   speeds — like pollen in a greenhouse breeze.
+   ════════════════════════════════════════════ */
+
+.bt-spores {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bt-spore {
+  position: absolute;
+  width: var(--bt-spore-size, 4px);
+  height: var(--bt-spore-size, 4px);
+  border-radius: 50%;
+  background: rgba(var(--bt-color-text-rgb), 0.06);
+  opacity: 0;
+}
+
+/* Scattered spore positions */
+.bt-spore--1  { top: 15%; left: 10%; --bt-spore-size: 5px; }
+.bt-spore--2  { top: 30%; left: 25%; --bt-spore-size: 3px; }
+.bt-spore--3  { top: 45%; left: 40%; --bt-spore-size: 6px; }
+.bt-spore--4  { top: 20%; left: 55%; --bt-spore-size: 4px; }
+.bt-spore--5  { top: 55%; left: 70%; --bt-spore-size: 3.5px; }
+.bt-spore--6  { top: 35%; left: 85%; --bt-spore-size: 5px; }
+.bt-spore--7  { top: 65%; left: 15%; --bt-spore-size: 4.5px; }
+.bt-spore--8  { top: 10%; left: 68%; --bt-spore-size: 3px; }
+.bt-spore--9  { top: 50%; left: 32%; --bt-spore-size: 5px; }
+.bt-spore--10 { top: 75%; left: 50%; --bt-spore-size: 4px; }
+.bt-spore--11 { top: 40%; left: 78%; --bt-spore-size: 3.5px; }
+.bt-spore--12 { top: 70%; left: 92%; --bt-spore-size: 5px; }
+
+@supports (animation-timeline: scroll()) {
+  .bt-spore--1  { animation: bt-spore-drift-1 linear both; animation-timeline: scroll(root); animation-range: 0% 100%; }
+  .bt-spore--2  { animation: bt-spore-drift-2 linear both; animation-timeline: scroll(root); animation-range: 5% 100%; }
+  .bt-spore--3  { animation: bt-spore-drift-3 linear both; animation-timeline: scroll(root); animation-range: 10% 100%; }
+  .bt-spore--4  { animation: bt-spore-drift-1 linear both; animation-timeline: scroll(root); animation-range: 3% 100%; }
+  .bt-spore--5  { animation: bt-spore-drift-2 linear both; animation-timeline: scroll(root); animation-range: 8% 100%; }
+  .bt-spore--6  { animation: bt-spore-drift-3 linear both; animation-timeline: scroll(root); animation-range: 15% 100%; }
+  .bt-spore--7  { animation: bt-spore-drift-2 linear both; animation-timeline: scroll(root); animation-range: 20% 100%; }
+  .bt-spore--8  { animation: bt-spore-drift-1 linear both; animation-timeline: scroll(root); animation-range: 2% 100%; }
+  .bt-spore--9  { animation: bt-spore-drift-3 linear both; animation-timeline: scroll(root); animation-range: 12% 100%; }
+  .bt-spore--10 { animation: bt-spore-drift-1 linear both; animation-timeline: scroll(root); animation-range: 7% 100%; }
+  .bt-spore--11 { animation: bt-spore-drift-2 linear both; animation-timeline: scroll(root); animation-range: 18% 100%; }
+  .bt-spore--12 { animation: bt-spore-drift-3 linear both; animation-timeline: scroll(root); animation-range: 25% 100%; }
+
+  @keyframes bt-spore-drift-1 {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    10%  { opacity: var(--bt-spore-opacity, 0.8); }
+    30%  { transform: translate(40px, -30px); opacity: calc(var(--bt-spore-opacity, 0.8) * 0.75); }
+    60%  { transform: translate(80px, -60px); opacity: calc(var(--bt-spore-opacity, 0.8) * 0.5); }
+    100% { transform: translate(120px, -100px); opacity: 0; }
+  }
+
+  @keyframes bt-spore-drift-2 {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    10%  { opacity: var(--bt-spore-opacity, 0.7); }
+    30%  { transform: translate(-30px, -40px); opacity: calc(var(--bt-spore-opacity, 0.7) * 0.7); }
+    60%  { transform: translate(-60px, -80px); opacity: calc(var(--bt-spore-opacity, 0.7) * 0.4); }
+    100% { transform: translate(-100px, -120px); opacity: 0; }
+  }
+
+  @keyframes bt-spore-drift-3 {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    10%  { opacity: var(--bt-spore-opacity, 0.75); }
+    30%  { transform: translate(20px, -50px); opacity: calc(var(--bt-spore-opacity, 0.75) * 0.7); }
+    60%  { transform: translate(-20px, -90px); opacity: calc(var(--bt-spore-opacity, 0.75) * 0.4); }
+    100% { transform: translate(10px, -130px); opacity: 0; }
+  }
+}
+
+/* ════════════════════════════════════════════
+   9. LEAF GROWTH ON SECTION ENTER
+   Individual decorative leaves that scale up
+   from 0 on view() entry — like a plant
+   sprouting as you reach each section.
+   ════════════════════════════════════════════ */
+
+.bt-sprout {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0);
+}
+
+@supports (animation-timeline: view()) {
+  .bt-sprout {
+    animation: bt-sprout-grow var(--bt-duration-slow) var(--bt-ease-spring) both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 80%;
+  }
+
+  @keyframes bt-sprout-grow {
+    from {
+      opacity: 0;
+      transform: scale(0) rotate(-20deg);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+}
+
+/* ════════════════════════════════════════════
+   10. SCROLLING HORIZONTAL PLANT GALLERY
+   Section variant: plants scroll horizontally
+   as user scrolls vertically (scroll-snap).
+   ════════════════════════════════════════════ */
+
+.bt-plant-scroll {
+  display: flex;
+  gap: var(--bt-space-md);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: var(--bt-space-md) 0;
+  /* Hide scrollbar — clean look */
+  scrollbar-width: none;
+}
+
+.bt-plant-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.bt-plant-scroll > * {
+  flex: 0 0 clamp(280px, 40vw, 400px);
+  scroll-snap-align: start;
+}
+
+@supports (animation-timeline: scroll()) {
+  /* Auto-scroll the gallery as user scrolls the page */
+  .bt-plant-scroll--auto {
+    animation: bt-plant-scroll-drive linear both;
+    animation-timeline: scroll(root);
+    animation-range: contain 0% contain 100%;
+    overflow-x: hidden; /* JS-free auto-scroll */
+  }
+
+  @keyframes bt-plant-scroll-drive {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-1 * (var(--bt-scroll-distance, 100%)))); }
+  }
+}
+
+/* ════════════════════════════════════════════
+   11. WATER DROP RIPPLES
+   Decorative water drops that create subtle
+   ripple animations — watering can metaphor.
+   ════════════════════════════════════════════ */
+
+.bt-water-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--bt-color-primary-rgb), 0.15);
+  pointer-events: none;
+}
+
+@supports (animation-timeline: view()) {
+  .bt-water-ripple--animate {
+    animation: bt-ripple-expand linear both;
+    animation-timeline: view();
+    animation-range: entry -20% entry 100%;
+    transform-origin: center;
+  }
+
+  @keyframes bt-ripple-expand {
+    from { transform: scale(0); opacity: 0.5; }
+    to   { transform: scale(1); opacity: 0; }
+  }
+}
+
+/* ════════════════════════════════════════════
+   12. SOIL / TERRAIN TEXTURE (static decorative)
+   Static gradient at section bottom simulating
+   soil cross-section.
+   ════════════════════════════════════════════ */
+
+.bt-soil-strip {
+  position: relative;
+  height: 40px;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(var(--bt-color-text-rgb), 0.03) 50%,
+      rgba(var(--bt-color-text-rgb), 0.06) 100%
+    );
+}
+
+.bt-soil-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60px 8px at 10% 70%, rgba(var(--bt-color-text-rgb), 0.06), transparent),
+    radial-gradient(ellipse 40px 6px at 30% 60%, rgba(var(--bt-color-text-rgb), 0.04), transparent),
+    radial-gradient(ellipse 50px 7px at 55% 75%, rgba(var(--bt-color-text-rgb), 0.05), transparent),
+    radial-gradient(ellipse 35px 5px at 75% 65%, rgba(var(--bt-color-text-rgb), 0.04), transparent),
+    radial-gradient(ellipse 45px 7px at 90% 70%, rgba(var(--bt-color-text-rgb), 0.05), transparent);
+}
+
+/* ════════════════════════════════════════════
+   REDUCED MOTION — KILL ALL EFFECTS
+   ════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-vine--grow .bt-vine__stem,
+  .bt-vine--grow .bt-vine__leaf,
+  .bt-vine--grow .bt-vine__tendril,
+  .bt-leaf,
+  .bt-bg-botanical--parallax .bt-bg-botanical__img,
+  .bt-color-shift,
+  .bt-color-shift--cool,
+  .bt-dappled-light::before,
+  .bt-specimen-reveal__sketch,
+  .bt-hero-botanical--float .bt-hero-botanical__img,
+  .bt-spore,
+  .bt-sprout,
+  .bt-plant-scroll--auto,
+  .bt-water-ripple--animate {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .bt-falling-leaves,
+  .bt-spores {
+    display: none;
+  }
+
+  .bt-vine--grow .bt-vine__stem {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .bt-vine--grow .bt-vine__leaf {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+
+  .bt-plant-scroll {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ════════════════════════════════════════════
+   FEATURE DETECT — UNSUPPORTED BROWSERS
+   Static fallback: effects gracefully degrade.
+   ════════════════════════════════════════════ */
+
+@supports not (animation-timeline: scroll()) {
+  /* Hide animated elements that would be broken */
+  .bt-falling-leaves,
+  .bt-spores {
+    display: none;
+  }
+
+  /* Show static versions */
+  .bt-vine--grow .bt-vine__stem {
+    stroke-dashoffset: 0;
+  }
+
+  .bt-vine--grow .bt-vine__leaf {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  .bt-specimen-reveal__sketch {
+    opacity: 0.15;
+  }
+
+  .bt-color-shift,
+  .bt-color-shift--cool {
+    animation: none !important;
+  }
+
+  .bt-sprout {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Static parallax — still looks good */
+  .bt-bg-botanical--parallax .bt-bg-botanical__img {
+    transform: translateY(-20px);
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  .bt-sprout {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ════════════════════════════════════════════ */
+
+@media (max-width: 749px) {
+  /* Reduce effect intensity on mobile */
+  .bt-vine--left  { width: 60px; transform: translateX(-20px); }
+  .bt-vine--right { width: 60px; transform: translateX(20px); }
+
+  .bt-bg-botanical--left  { width: 80px; }
+  .bt-bg-botanical--right { width: 80px; }
+
+  /* Fewer leaves on mobile */
+  .bt-leaf--5,
+  .bt-leaf--7,
+  .bt-leaf--8 { display: none; }
+
+  /* Slower spore count */
+  .bt-spore--5,
+  .bt-spore--7,
+  .bt-spore--9,
+  .bt-spore--11,
+  .bt-spore--12 { display: none; }
+}
+
+/* ════════════════════════════════════════════
+   PRINT STYLES
+   ════════════════════════════════════════════ */
+
+@media print {
+  .bt-vine,
+  .bt-falling-leaves,
+  .bt-bg-botanical,
+  .bt-spores,
+  .bt-dappled-light::before,
+  .bt-hero-botanical,
+  .bt-water-ripple,
+  .bt-soil-strip { display: none !important; }
+}

@@ -1,0 +1,248 @@
+{% comment %}
+  sections/slideshow.liquid — Content slideshow using scroll-snap
+  ★ CSS-native: scroll-snap for basic behavior, no JS required.
+  Keyboard navigable, screen reader accessible.
+  Pause controls via @supports (CSS scroll-driven carousel buttons Chrome only).
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign heading = section.settings.heading
+  assign slide_count = 0
+  for block in section.blocks
+    if block.type == 'slide'
+      assign slide_count = slide_count | plus: 1
+    endif
+  endfor
+-%}
+{%- if slide_count > 0 -%}
+  <section class="bt-section bt-slideshow" {{ section.shopify_attributes }}>
+    <div class="bt-container">
+      {%- if heading != blank -%}
+        <h2 class="bt-slideshow__heading">{{ heading | escape }}</h2>
+      {%- endif -%}
+      <div class="bt-slideshow__track" tabindex="0" role="region" aria-label="{{ 'accessibility.slideshow' | t }}" aria-roledescription="{{ 'accessibility.carousel' | t }}">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'slide' -%}
+            <div
+              class="bt-slideshow__slide"
+              id="Slide-{{ section.id }}-{{ forloop.index }}"
+              {{ block.shopify_attributes }}
+              role="group"
+              aria-roledescription="{{ 'accessibility.slide' | t }}"
+              aria-label="{{ 'accessibility.slide_n' | t: number: forloop.index }}"
+            >
+              {%- if block.settings.image != blank -%}
+                <div class="bt-slideshow__media">
+                  {%- liquid
+                    if forloop.first
+                      assign slide_loading = 'eager'
+                      assign slide_fetch = 'high'
+                    else
+                      assign slide_loading = 'lazy'
+                      assign slide_fetch = 'auto'
+                    endif
+                  -%}
+                  {{ block.settings.image | image_url: width: 1200 | image_tag:
+                    loading: slide_loading,
+                    fetchpriority: slide_fetch,
+                    widths: '400, 600, 800, 1000, 1200',
+                    sizes: '100vw',
+                    alt: block.settings.image.alt | default: block.settings.title
+                  }}
+                </div>
+              {%- endif -%}
+              <div class="bt-slideshow__content">
+                {%- if block.settings.eyebrow != blank -%}
+                  <p class="bt-eyebrow">{{ block.settings.eyebrow | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.title != blank -%}
+                  <h3 class="bt-slideshow__title">{{ block.settings.title | escape }}</h3>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <p class="bt-slideshow__text">{{ block.settings.text | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.link_label != blank -%}
+                  <a href="{{ block.settings.link | default: '#' }}" class="bt-btn bt-btn--primary">
+                    {{ block.settings.link_label | escape }}
+                  </a>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {%- if slide_count > 1 -%}
+        <div class="bt-slideshow__nav" aria-hidden="true">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'slide' -%}
+              <a href="#Slide-{{ section.id }}-{{ forloop.index }}" class="bt-slideshow__dot" aria-label="{{ 'accessibility.slide_n' | t: number: forloop.index }}"></a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-slideshow__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-align: center;
+    margin: 0 0 var(--bt-space-lg);
+  }
+  .bt-slideshow__track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--bt-space-sm);
+    padding-bottom: var(--bt-space-sm);
+    border-radius: var(--bt-radius-card);
+  }
+  .bt-slideshow__track::-webkit-scrollbar { height: 6px; }
+  .bt-slideshow__track::-webkit-scrollbar-thumb { background: var(--bt-color-border-light); border-radius: 999px; }
+  .bt-slideshow__track:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  .bt-slideshow__slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    position: relative;
+    border-radius: var(--bt-radius-card);
+    overflow: hidden;
+    background: var(--bt-color-surface);
+    aspect-ratio: 3 / 2;
+  }
+  .bt-slideshow__media {
+    position: absolute;
+    inset: 0;
+  }
+  .bt-slideshow__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bt-slideshow__content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--bt-space-xl) var(--bt-space-md) var(--bt-space-md);
+    background: linear-gradient(to top, rgba(var(--bt-color-text-rgb), 0.5), transparent);
+    color: var(--bt-color-primary-contrast, #FFFFFF);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .bt-slideshow__content .bt-eyebrow { color: rgba(255,255,255,0.9); margin-bottom: var(--bt-space-3xs); }
+  .bt-slideshow__title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h3);
+    font-weight: var(--bt-fw-normal);
+    margin: 0 0 var(--bt-space-3xs);
+  }
+  .bt-slideshow__text {
+    font-size: var(--bt-fs-body-sm);
+    margin: 0 0 var(--bt-space-sm);
+    opacity: 0.9;
+  }
+  .bt-slideshow__nav {
+    display: flex;
+    justify-content: center;
+    gap: var(--bt-space-2xs);
+    margin-top: var(--bt-space-md);
+  }
+  .bt-slideshow__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bt-color-border-light);
+    transition: background var(--bt-duration-fast);
+  }
+  .bt-slideshow__dot:hover { background: var(--bt-color-primary); }
+  @media (max-width: 749px) {
+    .bt-slideshow__slide { aspect-ratio: 4 / 3; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.slideshow.name",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "t:sections.slideshow.blocks.slide.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.slideshow.blocks.slide.settings.image.label"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "t:sections.slideshow.blocks.slide.settings.eyebrow.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.slideshow.blocks.slide.settings.title.label",
+          "default": "Slide heading"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "t:sections.slideshow.blocks.slide.settings.text.label"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "t:sections.slideshow.blocks.slide.settings.link_label.label",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.slideshow.blocks.slide.settings.link.label"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.slideshow.settings.heading.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.slideshow.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.slideshow.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{
+    "name": "t:sections.slideshow.name",
+    "blocks": [
+      {
+        "type": "slide",
+        "settings": { "title": "New arrivals", "text": "Discover our latest botanical additions." }
+      },
+      {
+        "type": "slide",
+        "settings": { "title": "Care collection", "text": "Everything you need to help your plants thrive." }
+      }
+    ]
+  }]
+}
+{% endschema %}

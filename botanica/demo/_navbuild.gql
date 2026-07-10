@@ -1,0 +1,52 @@
+mutation {
+  item1: menuItemCreate(
+    menuId: "gid://shopify/Menu/242607915199"
+    title: "Shop Plants"
+    url: "/collections/all-plants"
+    type: HTTP
+    items: [
+      { title: "All Plants", url: "/collections/all-plants", type: HTTP },
+      { title: "Easy Care", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=care-easy", type: HTTP },
+      { title: "Pet Friendly", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=pet-safe", type: HTTP },
+      { title: "Air Purifying", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=air-purifying", type: HTTP },
+      { title: "Rare Plants", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=rare", type: HTTP }
+    ]
+  ) { menuItem { id } userErrors { field message } }
+  
+  item2: menuItemCreate(
+    menuId: "gid://shopify/Menu/242607915199"
+    title: "Shop by Size"
+    url: "#"
+    type: HTTP
+    items: [
+      { title: "Mini (15-25cm)", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=size-mini", type: HTTP },
+      { title: "Desk (30-50cm)", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=size-desk", type: HTTP },
+      { title: "Floor (60-90cm)", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=size-floor", type: HTTP },
+      { title: "Statement (100cm+)", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=size-statement", type: HTTP }
+    ]
+  ) { menuItem { id } userErrors { field message } }
+
+  item3: menuItemCreate(
+    menuId: "gid://shopify/Menu/242607915199"
+    title: "Gifts & Bundles"
+    url: "#"
+    type: HTTP
+    items: [
+      { title: "Gift Ready Plants", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=beginner", type: HTTP },
+      { title: "Beginner Starter Kit", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=beginner", type: HTTP },
+      { title: "Collector's Choice", url: "/collections/all-plants?filter.v.availability=1&filter.v.tags=rare", type: HTTP }
+    ]
+  ) { menuItem { id } userErrors { field message } }
+
+  item4: menuItemCreate(
+    menuId: "gid://shopify/Menu/242607915199"
+    title: "Plant Care"
+    url: "/blogs/plant-care-journal-1"
+    type: HTTP
+    items: [
+      { title: "Care Journal", url: "/blogs/plant-care-journal-1", type: HTTP },
+      { title: "Find Your Size", url: "/pages/size-guide", type: HTTP },
+      { title: "Care FAQ", url: "/pages/faq", type: HTTP }
+    ]
+  ) { menuItem { id } userErrors { field message } }
+}

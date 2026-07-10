@@ -1,0 +1,14 @@
+query {
+  productByHandle(handle: "monstera-deliciosa") {
+    title
+    status
+    publishedOnCurrentChannel
+    publishedOnPublication(channelId: "gid://shopify/Publication/155576992063")
+    resourcePublicationsV2(first: 3) {
+      nodes {
+        isPublished
+        publication { id name }
+      }
+    }
+  }
+}

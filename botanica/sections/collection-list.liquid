@@ -1,0 +1,168 @@
+{% comment %}
+  sections/collection-list.liquid — Collection list grid
+  Merchants select up to 12 collections. Renders as 2-4 column grid with images.
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign heading = section.settings.heading
+  assign columns = section.settings.columns_desktop | default: 3
+  assign collections_per_page = section.settings.collections_per_page | default: 6
+  assign show_count = section.settings.show_product_count | default: false
+-%}
+{%- if section.settings.collections != blank -%}
+  <section class="bt-section bt-collection-list" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+    <div class="bt-container">
+      {%- if heading != blank -%}
+        <h2 class="bt-collection-list__heading">{{ heading | escape }}</h2>
+      {%- endif -%}
+      <div class="bt-collection-list__grid bt-collection-list__grid--{{ columns }}-col">
+        {%- for collection in section.settings.collections limit: collections_per_page -%}
+          <div class="bt-collection-card">
+            <a href="{{ collection.url }}" class="bt-collection-card__link" aria-label="{{ collection.title }}">
+              <div class="bt-collection-card__media">
+                {%- if collection.featured_image -%}
+                  {{ collection.featured_image | image_url: width: 600 | image_tag:
+                    loading: 'lazy',
+                    widths: '300, 400, 500, 600',
+                    sizes: '(min-width: 990px) 33vw, 50vw',
+                    alt: collection.title
+                  }}
+                {%- else -%}
+                  {{ 'collection-1' | placeholder_svg_tag: 'bt-collection-card__placeholder' }}
+                {%- endif -%}
+              </div>
+              <div class="bt-collection-card__body">
+                <h3 class="bt-collection-card__title">{{ collection.title }}</h3>
+                {%- if show_count and collection.all_products_count > 0 -%}
+                  <span class="bt-collection-card__count">
+                    {{ 'collections.collection.product_count' | t: count: collection.all_products_count }}
+                  </span>
+                {%- endif -%}
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-collection-list__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-align: center;
+    margin: 0 0 var(--bt-space-lg);
+  }
+  .bt-collection-list__grid {
+    display: grid;
+    gap: var(--bt-grid-gap);
+  }
+  .bt-collection-list__grid--2-col { grid-template-columns: repeat(2, 1fr); }
+  .bt-collection-list__grid--3-col { grid-template-columns: repeat(3, 1fr); }
+  .bt-collection-list__grid--4-col { grid-template-columns: repeat(4, 1fr); }
+  .bt-collection-card { border-radius: var(--bt-radius-card); overflow: hidden; }
+  .bt-collection-card__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .bt-collection-card__media {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--bt-color-surface);
+    border-radius: var(--bt-radius-card);
+  }
+  .bt-collection-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-collection-card:hover .bt-collection-card__media img {
+    transform: scale(1.05);
+  }
+  .bt-collection-card__body {
+    padding: var(--bt-space-sm) 0;
+    text-align: center;
+  }
+  .bt-collection-card__title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    margin: 0;
+  }
+  .bt-collection-card__count {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-collection-card__placeholder { width: 100%; height: 100%; background: var(--bt-color-surface); }
+  @media (max-width: 749px) {
+    .bt-collection-list__grid--3-col, .bt-collection-list__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 479px) {
+    .bt-collection-list__grid { grid-template-columns: 1fr; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.collection_list.name",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.collection_list.settings.heading.label",
+      "default": "Shop by category"
+    },
+    {
+      "type": "collection_list",
+      "id": "collections",
+      "label": "t:sections.collection_list.settings.collections.label"
+    },
+    {
+      "type": "range",
+      "id": "collections_per_page",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 6,
+      "label": "t:sections.collection_list.settings.collections_per_page.label"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "t:sections.collection_list.settings.columns_desktop.label",
+      "options": [
+        { "value": "2", "label": "t:sections.collection_list.settings.columns_desktop.options__1.label" },
+        { "value": "3", "label": "t:sections.collection_list.settings.columns_desktop.options__2.label" },
+        { "value": "4", "label": "t:sections.collection_list.settings.columns_desktop.options__3.label" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "t:sections.collection_list.settings.show_product_count.label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.collection_list.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.collection_list.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{ "name": "t:sections.collection_list.name" }]
+}
+{% endschema %}

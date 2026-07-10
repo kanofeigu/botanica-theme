@@ -1,0 +1,1188 @@
+{% comment %} header.liquid — Botanica v3. Clean mega menu, Patch Plants inspired. Zero Dawn code. {% endcomment %}
+
+{%- liquid
+  assign main_menu = linklists[section.settings.menu]
+  assign sticky = section.settings.sticky_header
+  assign logo_width = settings.logo_width | default: 100
+  assign logo_width_2x = logo_width | times: 2
+-%}
+
+<header class="bt-header{% if sticky %} bt-header--sticky{% endif %}" role="banner" {{ section.shopify_attributes }}>
+  <div class="bt-header__bar bt-container">
+
+    {% comment %} Logo {% endcomment %}
+    <a href="{{ routes.root_url }}" class="bt-header__logo" aria-label="{{ shop.name }}">
+      {%- if settings.logo != blank -%}
+        {{ settings.logo | image_url: width: logo_width_2x | image_tag: alt: shop.name, width: logo_width, loading: 'eager', fetchpriority: 'high' }}
+      {%- else -%}
+        <span class="bt-header__logo-text bt-h4">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    {% comment %} Desktop navigation {% endcomment %}
+    <nav class="bt-header__nav" aria-label="{{ 'accessibility.main_navigation' | t }}">
+      <ul class="bt-header__links">
+        {%- for link in main_menu.links -%}
+          <li class="bt-header__item{% if link.links.size > 0 %} bt-header__item--has-mega{% endif %}">
+            <a
+              href="{{ link.url }}"
+              class="bt-header__link bt-interactive{% if link.current or link.child_current %} bt-header__link--active{% endif %}"
+              {% if link.current %}aria-current="page"{% endif %}
+              {% if link.links.size > 0 %}aria-expanded="false" aria-haspopup="true" data-mega-trigger{% endif %}
+            >
+              {{- link.title -}}
+              {%- if link.links.size > 0 -%}
+                <svg class="bt-header__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              {%- endif -%}
+            </a>
+
+            {%- if link.links.size > 0 -%}
+              {%- assign mega_id = link.title | handleize -%}
+              <div class="bt-mega" data-mega-panel="{{ mega_id }}" hidden>
+                <div class="bt-mega__inner bt-container">
+                  {% comment %} Column 1: parent category sidebar {% endcomment %}
+                  <div class="bt-mega__sidebar">
+                    <p class="bt-mega__title">{{ link.title }}</p>
+                    <ul class="bt-mega__nav">
+                      {%- assign first_flyout = '' -%}
+                      {%- for child in link.links -%}
+                        {%- assign child_id = mega_id | append: '-' | append: forloop.index -%}
+                        {%- if child.links.size > 0 and first_flyout == '' -%}
+                          {%- assign first_flyout = child_id -%}
+                        {%- endif -%}
+                        <li>
+                          <a
+                            href="{% if child.links.size > 0 and child.url == '#' %}#{% else %}{{ child.url }}{% endif %}"
+                            class="bt-mega__item bt-interactive{% if child.links.size > 0 %} bt-mega__item--has-flyout{% endif %}{% if child.current %} bt-mega__item--active{% endif %}"
+                            {% if child.current %}aria-current="page"{% endif %}
+                            {% if child.links.size > 0 %}data-flyout="{{ child_id }}" role="button" aria-expanded="false"{% endif %}
+                          >
+                            {{- child.title -}}
+                            {%- if child.links.size > 0 -%}
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                            {%- endif -%}
+                          </a>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+
+                  {% comment %} Column 2: flyout sub-menu panels {% endcomment %}
+                  <div class="bt-mega__flyout">
+                    {%- for child in link.links -%}
+                      {%- if child.links.size > 0 -%}
+                        {%- assign child_id = mega_id | append: '-' | append: forloop.index -%}
+                        <div class="bt-mega__flyout-panel" data-flyout-panel="{{ child_id }}"{% if child_id != first_flyout %} hidden{% endif %}>
+                          <p class="bt-mega__flyout-label">{{ child.title }}</p>
+                          <ul class="bt-mega__flyout-list">
+                            {%- for grandchild in child.links -%}
+                              <li>
+                                <a href="{{ grandchild.url }}" class="bt-mega__flyout-link bt-interactive" {% if grandchild.current %}aria-current="page"{% endif %}>
+                                  {{- grandchild.title -}}
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        </div>
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {% comment %} Empty state: shown when no flyout group is active {% endcomment %}
+                    <div class="bt-mega__flyout-placeholder" data-flyout-placeholder{% unless first_flyout != '' %} data-flyout-default{% endunless %} hidden>
+                      {%- if first_flyout != '' -%}
+                        <p class="bt-mega__flyout-label">{{ 'sections.header.mega.browse_label' | t }}</p>
+                        <p class="bt-mega__flyout-hint">{{ 'sections.header.mega.hover_hint' | t }}</p>
+                      {%- else -%}
+                        <p class="bt-mega__flyout-label">{{ link.title }}</p>
+                        <p class="bt-mega__flyout-hint">{{ 'sections.header.mega.choose_hint' | t }}</p>
+                      {%- endif -%}
+                    </div>
+                  </div>
+
+                  {%- comment %} Column 3: promo blocks or fallback product images {% endcomment %}
+                  {%- liquid
+                    assign show_blocks = false
+                    for block in section.blocks
+                      if block.settings.menu_item == link.title
+                        assign show_blocks = true
+                      endif
+                    endfor
+                  -%}
+                  {%- if show_blocks -%}
+                  <div class="bt-mega__promo-col">
+                    {%- for block in section.blocks -%}
+                      {%- if block.settings.menu_item == link.title -%}
+                        {%- case block.type -%}
+                          {%- when 'mega-promo' -%}
+                            {%- liquid
+                              assign _promo_fid = ''
+                              if block.settings.flyout_item != blank
+                                for _child in link.links
+                                  if _child.title == block.settings.flyout_item
+                                    assign _promo_fid = mega_id | append: '-' | append: forloop.index
+                                    break
+                                  endif
+                                endfor
+                              endif
+                            -%}
+                            <div class="bt-mega__promo{% if _promo_fid != '' %} bt-mega__promo--hidden{% endif %}"{% if _promo_fid != '' %} data-promo-for="{{ _promo_fid }}"{% endif %} {{ block.shopify_attributes }}>
+                              {%- if block.settings.promo_image != blank -%}
+                                <a href="{{ block.settings.promo_link | default: '#' }}" class="bt-mega__promo-media">
+                                  {{ block.settings.promo_image | image_url: width: 500 | image_tag: loading: 'lazy', widths: '300,400,500', alt: block.settings.promo_heading | escape }}
+                                </a>
+                              {%- endif -%}
+                              {%- if block.settings.promo_heading != blank -%}
+                                <p class="bt-mega__promo-title">{{ block.settings.promo_heading }}</p>
+                              {%- endif -%}
+                              {%- if block.settings.promo_text != blank -%}
+                                <p class="bt-mega__promo-text">{{ block.settings.promo_text }}</p>
+                              {%- endif -%}
+                              {%- if block.settings.promo_link != blank and block.settings.promo_label != blank -%}
+                                <a href="{{ block.settings.promo_link }}" class="bt-btn bt-btn--outline bt-btn--sm bt-interactive bt-press">{{ block.settings.promo_label }}</a>
+                              {%- endif -%}
+                            </div>
+                          {%- when 'mega-links' -%}
+                            <div class="bt-mega__links-block" {{ block.shopify_attributes }}>
+                              <p class="bt-mega__promo-title">{{ block.settings.heading }}</p>
+                              <ul class="bt-mega__link-list">
+                                {%- for i in (1..5) -%}
+                                  {%- capture link_text -%}link_text_{{ i }}{%- endcapture -%}
+                                  {%- capture link_url -%}link_url_{{ i }}{%- endcapture -%}
+                                  {%- assign lt = block.settings[link_text] -%}
+                                  {%- assign lu = block.settings[link_url] -%}
+                                  {%- if lt != blank and lu != blank -%}
+                                    <li><a href="{{ lu }}" class="bt-mega__flyout-link bt-interactive">{{ lt }}</a></li>
+                                  {%- endif -%}
+                                {%- endfor -%}
+                              </ul>
+                            </div>
+                          {%- when 'mega-collections' -%}
+                            {%- assign collection_list = linklists[block.settings.collection_menu] -%}
+                            <div class="bt-mega__links-block" {{ block.shopify_attributes }}>
+                              <p class="bt-mega__promo-title">{{ block.settings.heading }}</p>
+                              <ul class="bt-mega__link-list">
+                                {%- if collection_list.links.size > 0 -%}
+                                  {%- for col_link in collection_list.links -%}
+                                    <li><a href="{{ col_link.url }}" class="bt-mega__flyout-link bt-interactive">{{ col_link.title }}</a></li>
+                                  {%- endfor -%}
+                                {%- endif -%}
+                                {%- if block.settings.view_all_url != blank and block.settings.view_all_text != blank -%}
+                                  <li class="bt-mega__link-list-divider" aria-hidden="true"></li>
+                                  <li><a href="{{ block.settings.view_all_url }}" class="bt-mega__flyout-link bt-mega__flyout-link--view-all bt-interactive">{{ block.settings.view_all_text }}</a></li>
+                                {%- endif -%}
+                              </ul>
+                            </div>
+                        {%- endcase -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </div>
+                  {%- else -%}
+                  {%- comment %} Fallback: dynamic promo images that switch per flyout category {% endcomment %}
+                  <div class="bt-mega__promo-col">
+                    {%- assign flyout_idx = 0 -%}
+                    {%- for child in link.links -%}
+                      {%- if child.links.size > 0 -%}
+                        {%- assign child_id = mega_id | append: '-' | append: forloop.index -%}
+                        {%- assign flyout_idx = flyout_idx | plus: 1 -%}
+                        {%- comment %} Pick different image per category group {% endcomment %}
+                        {%- if flyout_idx == 1 -%}
+                          {%- assign promo_title = child.title -%}
+                          {%- assign promo_text = 'sections.header.mega.promo_fresh_html' | t -%}
+                        {%- elsif flyout_idx == 2 -%}
+                          {%- assign promo_title = child.title -%}
+                          {%- assign promo_text = 'sections.header.mega.promo_hardy_html' | t -%}
+                        {%- elsif flyout_idx == 3 -%}
+                          {%- assign promo_title = child.title -%}
+                          {%- assign promo_text = 'sections.header.mega.promo_spot_html' | t -%}
+                        {%- else -%}
+                          {%- assign promo_title = child.title -%}
+                          {%- assign promo_text = 'sections.header.mega.promo_pet_html' | t -%}
+                        {%- endif -%}
+                        <div class="bt-mega__promo{% if child_id != first_flyout %} bt-mega__promo--hidden{% endif %}" data-promo-for="{{ child_id }}">
+                          <a href="{{ routes.all_products_collection_url }}" class="bt-mega__promo-media">
+                            {{ 'collection-1' | placeholder_svg_tag: 'Plant collection' }}
+                          </a>
+                          <p class="bt-mega__promo-title">{{ promo_title }}</p>
+                          <p class="bt-mega__promo-text">{{ promo_text }}</p>
+                          <a href="{{ routes.all_products_collection_url }}" class="bt-btn bt-btn--outline bt-btn--sm bt-interactive bt-press">{{ 'sections.header.mega.shop_now_label' | t: label: promo_title }}</a>
+                        </div>
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {% comment %} Default promo (shown when no flyout is active) {% endcomment %}
+                    {%- liquid
+                      if first_flyout != ''
+                        assign default_hidden = true
+                      else
+                        assign default_hidden = false
+                      endif
+                      assign link_handle = link.title | handleize
+                      if link_handle == 'gifts'
+                        assign def_title = 'sections.header.mega.gift_title' | t
+                        assign def_text = 'sections.header.mega.gift_text_html' | t
+                        assign def_btn = 'sections.header.mega.gift_btn' | t
+                      else
+                        assign def_title = 'sections.header.mega.best_sellers_title' | t
+                        assign def_text = 'sections.header.mega.best_sellers_text_html' | t
+                        assign def_btn = 'sections.header.mega.best_sellers_btn' | t
+                      endif
+                    -%}
+                    <div class="bt-mega__promo{% if default_hidden %} bt-mega__promo--hidden{% endif %}" data-promo-default>
+                      <a href="{{ routes.all_products_collection_url }}" class="bt-mega__promo-media">
+                        {{ 'lifestyle-1' | placeholder_svg_tag: 'Botanical lifestyle' }}
+                      </a>
+                      <p class="bt-mega__promo-title">{{ def_title }}</p>
+                      <p class="bt-mega__promo-text">{{ def_text }}</p>
+                      <a href="{{ routes.all_products_collection_url }}" class="bt-btn bt-btn--outline bt-btn--sm bt-interactive bt-press">{{ def_btn }}</a>
+                    </div>
+                  </div>
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    {% comment %} Actions: search, cart, mobile toggle {% endcomment %}
+    <div class="bt-header__actions">
+      <a href="{{ routes.search_url }}" class="bt-header__icon-btn bt-interactive" aria-label="{{ 'general.search.search' | t }}">
+        {% render 'icon-search' %}
+      </a>
+
+      <a href="{{ routes.cart_url }}" class="bt-header__icon-btn bt-interactive bt-header__cart" aria-label="{{ 'sections.cart.title' | t }}">
+        {% render 'icon-cart' %}
+        {%- if cart.item_count > 0 -%}
+          <span class="bt-header__cart-dot" aria-hidden="true">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+
+      <button type="button" class="bt-header__icon-btn bt-interactive bt-header__hamburger" aria-label="{{ 'accessibility.menu' | t }}" aria-expanded="false" data-mobile-toggle>
+        {% render 'icon-hamburger' %}
+      </button>
+    </div>
+  </div>
+
+  {% comment %} Mobile drawer {% endcomment %}
+  <div class="bt-header__drawer" data-mobile-drawer hidden>
+    <div class="bt-header__drawer-panel">
+      <div class="bt-header__drawer-top">
+        <span class="bt-eyebrow">{{ 'accessibility.menu' | t }}</span>
+        <button type="button" class="bt-header__icon-btn bt-interactive" aria-label="{{ 'accessibility.close' | t }}" data-mobile-close>
+          {% render 'icon-close' %}
+        </button>
+      </div>
+
+      <form action="{{ routes.search_url }}" method="get" role="search" class="bt-header__drawer-search">
+        <input type="search" name="q" class="bt-input" placeholder="{{ 'general.search.placeholder' | t }}" aria-label="{{ 'general.search.search' | t }}" required>
+        <input type="hidden" name="type" value="product">
+      </form>
+
+      <nav aria-label="{{ 'accessibility.mobile_navigation' | t }}">
+        <ul class="bt-header__drawer-links">
+          {%- for link in main_menu.links -%}
+            <li>
+              {%- if link.links.size > 0 -%}
+                <details class="bt-header__drawer-group">
+                  <summary class="bt-header__drawer-summary bt-interactive">
+                    {{- link.title -}}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                  </summary>
+                  <ul class="bt-header__drawer-sublist">
+                    {%- for child in link.links -%}
+                      <li>
+                        {%- if child.links.size > 0 -%}
+                          <details class="bt-header__drawer-subgroup">
+                            <summary class="bt-header__drawer-link bt-header__drawer-summary bt-interactive">
+                              {{- child.title -}}
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                            </summary>
+                            <ul class="bt-header__drawer-sublist bt-header__drawer-sublist--nested">
+                              {%- for grandchild in child.links -%}
+                                <li><a href="{{ grandchild.url }}" class="bt-header__drawer-link bt-interactive" {% if grandchild.current %}aria-current="page"{% endif %}>{{ grandchild.title }}</a></li>
+                              {%- endfor -%}
+                            </ul>
+                          </details>
+                        {%- else -%}
+                          <a href="{{ child.url }}" class="bt-header__drawer-link bt-interactive" {% if child.current %}aria-current="page"{% endif %}>{{ child.title }}</a>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </details>
+              {%- else -%}
+                <a href="{{ link.url }}" class="bt-header__drawer-link bt-header__drawer-link--top bt-interactive" {% if link.current %}aria-current="page"{% endif %}>{{ link.title }}</a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<script>
+(function() {
+  var header = document.querySelector('.bt-header');
+  if (!header) return;
+
+  /* ================================================================
+     DESKTOP MEGA MENU + FLYOUT
+     ================================================================ */
+
+  var triggers = header.querySelectorAll('[data-mega-trigger]');
+  var activePanel = null;
+  var activeTrigger = null;
+  var closeTimer = 0;
+
+  function openPanel(trigger, panel) {
+    clearTimeout(closeTimer);
+    if (activePanel && activePanel !== panel) {
+      closePanel(activePanel);
+      if (activeTrigger) activeTrigger.setAttribute('aria-expanded', 'false');
+    }
+    panel.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+    panel.offsetHeight; // force reflow
+    panel.classList.add('bt-mega--open');
+    activePanel = panel;
+    activeTrigger = trigger;
+
+    // Pre-select first flyout item in this panel, or show default placeholder
+    var firstFlyout = panel.querySelector('[data-flyout]');
+    if (firstFlyout) {
+      activateFlyout(panel, firstFlyout);
+    } else {
+      var defaultPlaceholder = panel.querySelector('[data-flyout-default]');
+      if (defaultPlaceholder) defaultPlaceholder.hidden = false;
+      switchPromo(panel, null);
+    }
+  }
+
+  function closePanel(panel) {
+    panel.classList.remove('bt-mega--open');
+    setTimeout(function() {
+      if (!panel.classList.contains('bt-mega--open')) panel.hidden = true;
+    }, 200);
+  }
+
+  function closeAll() {
+    clearTimeout(closeTimer);
+    if (activePanel) {
+      closePanel(activePanel);
+      activePanel = null;
+    }
+    if (activeTrigger) {
+      activeTrigger.setAttribute('aria-expanded', 'false');
+      activeTrigger = null;
+    }
+  }
+
+  function scheduleClose() {
+    closeTimer = setTimeout(closeAll, 150);
+  }
+
+  /* ── Flyout: hover sidebar item → show its sub-panel + matching promo image ── */
+  function switchPromo(panel, targetId) {
+    // Hide all promo panels, then show matching one
+    panel.querySelectorAll('[data-promo-for]').forEach(function(p) { p.classList.add('bt-mega__promo--hidden'); });
+    var defaultPromo = panel.querySelector('[data-promo-default]');
+    if (targetId) {
+      var match = panel.querySelector('[data-promo-for="' + targetId + '"]');
+      if (match) match.classList.remove('bt-mega__promo--hidden');
+      if (defaultPromo) defaultPromo.classList.add('bt-mega__promo--hidden');
+    } else {
+      if (defaultPromo) defaultPromo.classList.remove('bt-mega__promo--hidden');
+    }
+  }
+
+  function activateFlyout(panel, trigger) {
+    panel.querySelectorAll('[data-flyout]').forEach(function(t) {
+      t.classList.remove('bt-mega__item--flyout-open');
+      t.setAttribute('aria-expanded', 'false');
+    });
+    panel.querySelectorAll('[data-flyout-panel]').forEach(function(p) { p.hidden = true; });
+
+    trigger.classList.add('bt-mega__item--flyout-open');
+    trigger.setAttribute('aria-expanded', 'true');
+    var targetId = trigger.getAttribute('data-flyout');
+    var targetPanel = panel.querySelector('[data-flyout-panel="' + targetId + '"]');
+    if (targetPanel) targetPanel.hidden = false;
+
+    switchPromo(panel, targetId);
+
+    var placeholder = panel.querySelector('[data-flyout-placeholder]');
+    if (placeholder) placeholder.hidden = true;
+  }
+
+  function deactivateFlyout(panel) {
+    panel.querySelectorAll('[data-flyout]').forEach(function(t) {
+      t.classList.remove('bt-mega__item--flyout-open');
+      t.setAttribute('aria-expanded', 'false');
+    });
+    panel.querySelectorAll('[data-flyout-panel]').forEach(function(p) { p.hidden = true; });
+    switchPromo(panel, null);
+    var placeholder = panel.querySelector('[data-flyout-placeholder]');
+    if (placeholder) placeholder.hidden = false;
+  }
+
+  // Attach mega menu triggers
+  triggers.forEach(function(trigger) {
+    var item = trigger.closest('.bt-header__item');
+    if (!item) return;
+    var panel = item.querySelector('[data-mega-panel]');
+    if (!panel) return;
+
+    // Open/close mega panel
+    item.addEventListener('mouseenter', function() { openPanel(trigger, panel); });
+    item.addEventListener('mouseleave', scheduleClose);
+
+    trigger.addEventListener('focus', function() { openPanel(trigger, panel); });
+    item.addEventListener('focusout', function(e) {
+      if (!item.contains(e.relatedTarget)) scheduleClose();
+    });
+
+    item.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { closeAll(); trigger.focus(); }
+    });
+
+    // Flyout hover — attach to sidebar items inside this panel
+    panel.addEventListener('mouseover', function(e) {
+      var flyoutTrigger = e.target.closest('[data-flyout]');
+      if (!flyoutTrigger) {
+        // Hovering a leaf item (no children) → deactivate all flyouts
+        var sidebarItem = e.target.closest('.bt-mega__item');
+        if (sidebarItem && !sidebarItem.hasAttribute('data-flyout')) {
+          deactivateFlyout(panel);
+        }
+        return;
+      }
+      activateFlyout(panel, flyoutTrigger);
+    });
+  });
+
+  // Click outside header → close
+  document.addEventListener('click', function(e) {
+    if (!header.contains(e.target) && activePanel) closeAll();
+  });
+
+  /* ================================================================
+     MOBILE DRAWER
+     ================================================================ */
+
+  var mobileToggle = header.querySelector('[data-mobile-toggle]');
+  var mobileDrawer = header.querySelector('[data-mobile-drawer]');
+  var mobileClose = header.querySelector('[data-mobile-close]');
+
+  if (mobileToggle && mobileDrawer) {
+    function openMobile() {
+      mobileDrawer.hidden = false;
+      mobileToggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      var firstInput = mobileDrawer.querySelector('input');
+      if (firstInput) setTimeout(function() { firstInput.focus(); }, 100);
+    }
+
+    function closeMobile() {
+      mobileDrawer.hidden = true;
+      mobileToggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      mobileToggle.focus();
+    }
+
+    mobileToggle.addEventListener('click', function() {
+      mobileDrawer.hidden ? openMobile() : closeMobile();
+    });
+
+    if (mobileClose) mobileClose.addEventListener('click', closeMobile);
+
+    mobileDrawer.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeMobile();
+    });
+
+    mobileDrawer.addEventListener('click', function(e) {
+      if (e.target === mobileDrawer) closeMobile();
+    });
+  }
+})();
+</script>
+
+{% stylesheet %}
+  /* ============================================================
+     HEADER — Botanica v3
+     Clean mega menu. Patch Plants inspired. Zero Dawn code.
+     ============================================================ */
+
+  /* ── Header shell ── */
+  .bt-header {
+    position: relative;
+    background: var(--bt-color-bg);
+    border-bottom: 1px solid var(--bt-color-border-light);
+    z-index: var(--bt-z-sticky); /* 20 */
+  }
+  .bt-header--sticky {
+    position: sticky;
+    top: 0;
+  }
+
+  /* ── Header bar (logo + nav + actions row) ── */
+  .bt-header__bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    min-height: 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ── Logo ── */
+  .bt-header__logo {
+    flex-shrink: 0;
+    text-decoration: none;
+    color: var(--bt-color-text);
+    display: flex;
+    align-items: center;
+    justify-self: start;
+  }
+  .bt-header__logo img {
+    max-height: 44px;
+    width: auto;
+  }
+  .bt-header__logo-text {
+    margin: 0;
+    white-space: nowrap;
+    font-weight: var(--bt-fw-bold);
+    font-size: var(--bt-fs-h4);
+  }
+
+  /* ── Desktop nav ── */
+  .bt-header__nav {
+    display: none;
+    justify-self: center;
+  }
+  .bt-header__links {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .bt-header__item {
+    position: static; /* so mega panel positions vs .bt-header */
+  }
+  .bt-header__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: var(--bt-space-2xs) var(--bt-space-sm);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    text-decoration: none;
+    border-radius: var(--bt-radius-sm);
+    white-space: nowrap;
+    transition: color var(--bt-duration-fast), background var(--bt-duration-fast);
+    cursor: pointer;
+  }
+  .bt-header__link:hover,
+  .bt-header__link:focus-visible,
+  .bt-header__link--active {
+    color: var(--bt-color-primary);
+  }
+  .bt-header__link:hover {
+    background: var(--bt-color-primary-tint);
+  }
+  .bt-header__link:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  .bt-header__chevron {
+    flex-shrink: 0;
+    opacity: 0.45;
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-header__item--has-mega:hover .bt-header__chevron,
+  .bt-header__link:focus-visible .bt-header__chevron {
+    transform: rotate(180deg);
+  }
+
+  /* ============================================================
+     MEGA PANEL
+     Full viewport width, bg matches header. Flyout interaction.
+     ============================================================ */
+
+  .bt-mega {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bt-color-bg);
+    border-bottom: 1px solid var(--bt-color-border-light);
+    box-shadow: var(--bt-shadow-lg);
+    z-index: 1;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity var(--bt-duration-fast) var(--bt-ease-out),
+                transform var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-mega--open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  [hidden] { display: none !important; }
+
+  /* ── Grid: 3-col with promo, 2-col without ── */
+  .bt-mega__inner {
+    display: grid;
+    grid-template-columns: 220px 1fr 300px;
+    gap: 0;
+    max-width: var(--bt-max-width);
+    min-height: 260px;
+  }
+  .bt-mega__inner--no-promo {
+    grid-template-columns: 220px 1fr;
+  }
+
+  /* ── Column 1: sidebar ── */
+  .bt-mega__sidebar {
+    padding: var(--bt-space-lg) var(--bt-space-md);
+    border-right: 1px solid var(--bt-color-border-light);
+  }
+  .bt-mega__title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 var(--bt-space-sm);
+    padding: 0 var(--bt-space-sm);
+  }
+  .bt-mega__nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* Sidebar menu item */
+  .bt-mega__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bt-space-xs) var(--bt-space-sm);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text);
+    text-decoration: none;
+    border-radius: var(--bt-radius-sm);
+    transition: background var(--bt-duration-fast), color var(--bt-duration-fast);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .bt-mega__item:hover,
+  .bt-mega__item:focus-visible,
+  .bt-mega__item--active {
+    color: var(--bt-color-primary);
+    background: var(--bt-color-primary-tint);
+  }
+  .bt-mega__item:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  .bt-mega__item--has-flyout svg {
+    opacity: 0.35;
+    transition: opacity var(--bt-duration-fast), transform var(--bt-duration-fast);
+    flex-shrink: 0;
+  }
+  .bt-mega__item--has-flyout:hover svg,
+  .bt-mega__item--flyout-open svg {
+    opacity: 0.7;
+    transform: translateX(2px);
+  }
+
+  /* ── Column 2: flyout panel ── */
+  .bt-mega__flyout {
+    padding: var(--bt-space-lg) var(--bt-space-xl);
+    position: relative;
+  }
+  .bt-mega__flyout-panel {
+    animation: bt-flyout-fade var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  @keyframes bt-flyout-fade {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .bt-mega__flyout-label {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 var(--bt-space-sm);
+  }
+  .bt-mega__flyout-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .bt-mega__flyout-link {
+    display: block;
+    padding: var(--bt-space-2xs) var(--bt-space-sm);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text);
+    text-decoration: none;
+    border-radius: var(--bt-radius-sm);
+    transition: background var(--bt-duration-fast), color var(--bt-duration-fast);
+  }
+  .bt-mega__flyout-link:hover,
+  .bt-mega__flyout-link:focus-visible {
+    color: var(--bt-color-primary);
+    background: var(--bt-color-primary-tint);
+  }
+  .bt-mega__flyout-link:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  .bt-mega__flyout-hint {
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    margin: var(--bt-space-xs) 0 0;
+  }
+
+  /* ── Column 3: promo ── */
+  .bt-mega__promo-col {
+    padding: var(--bt-space-lg);
+    border-left: 1px solid var(--bt-color-border-light);
+  }
+  .bt-mega__promo {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    animation: bt-flyout-fade var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-mega__promo--hidden {
+    display: none;
+  }
+  .bt-mega__promo-media {
+    display: block;
+    border-radius: var(--bt-radius-md);
+    overflow: hidden;
+    margin-bottom: var(--bt-space-sm);
+    aspect-ratio: 3 / 4;
+    background: var(--bt-color-surface-hover);
+  }
+  .bt-mega__promo-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--bt-duration-slow) var(--bt-ease-out);
+  }
+  .bt-mega__promo-media:hover img {
+    transform: scale(1.05);
+  }
+  .bt-mega__promo-title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    margin: 0 0 var(--bt-space-2xs);
+  }
+  .bt-mega__promo-text {
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    margin: 0 0 var(--bt-space-sm);
+    line-height: var(--bt-lh-body);
+  }
+  .bt-mega__links-block {
+    height: 100%;
+  }
+  .bt-mega__link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* ============================================================
+     ACTIONS (search, cart, hamburger)
+     ============================================================ */
+  .bt-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-3xs);
+    justify-self: end;
+  }
+  .bt-header__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--bt-color-text);
+    border-radius: var(--bt-radius-sm);
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+    transition: background var(--bt-duration-fast), color var(--bt-duration-fast);
+  }
+  .bt-header__icon-btn:hover,
+  .bt-header__icon-btn:focus-visible {
+    background: var(--bt-color-surface-hover);
+    color: var(--bt-color-primary);
+  }
+  .bt-header__icon-btn:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+
+  /* Cart count dot */
+  .bt-header__cart {
+    position: relative;
+  }
+  .bt-header__cart-dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+    font-family: var(--bt-font-body);
+    font-size: 10px;
+    font-weight: var(--bt-fw-bold);
+    line-height: 18px;
+    text-align: center;
+    border-radius: var(--bt-radius-pill);
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     MOBILE DRAWER
+     ============================================================ */
+  .bt-header__drawer {
+    position: fixed;
+    inset: 0;
+    z-index: var(--bt-z-modal);
+    background: rgba(var(--bt-color-text-rgb), 0.35);
+  }
+  .bt-header__drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(380px, 85vw);
+    background: var(--bt-color-bg);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    animation: bt-drawer-slide var(--bt-duration-base) var(--bt-ease-out);
+  }
+  @keyframes bt-drawer-slide {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bt-header__drawer-panel {
+      animation: none;
+    }
+  }
+
+  .bt-header__drawer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bt-space-sm) var(--bt-space-md);
+    border-bottom: 1px solid var(--bt-color-border-light);
+    flex-shrink: 0;
+  }
+  .bt-header__drawer-top .bt-eyebrow {
+    margin: 0;
+  }
+
+  .bt-header__drawer-search {
+    padding: var(--bt-space-sm) var(--bt-space-md);
+    flex-shrink: 0;
+  }
+  .bt-header__drawer-search .bt-input {
+    width: 100%;
+  }
+
+  .bt-header__drawer-links {
+    list-style: none;
+    margin: 0;
+    padding: var(--bt-space-sm) 0;
+    flex: 1;
+  }
+  .bt-header__drawer-link {
+    display: block;
+    padding: var(--bt-space-xs) var(--bt-space-md);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body);
+    color: var(--bt-color-text);
+    text-decoration: none;
+    transition: background var(--bt-duration-fast), color var(--bt-duration-fast);
+  }
+  .bt-header__drawer-link:hover,
+  .bt-header__drawer-link:focus-visible {
+    background: var(--bt-color-surface-hover);
+    color: var(--bt-color-primary);
+  }
+  .bt-header__drawer-link:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: -2px;
+  }
+  .bt-header__drawer-link--top {
+    font-weight: var(--bt-fw-semibold);
+  }
+
+  /* Accordion groups (details/summary) */
+  .bt-header__drawer-group {
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-header__drawer-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bt-space-xs) var(--bt-space-md);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .bt-header__drawer-summary::-webkit-details-marker {
+    display: none;
+  }
+  .bt-header__drawer-summary svg {
+    flex-shrink: 0;
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-header__drawer-group[open] > .bt-header__drawer-summary svg {
+    transform: rotate(180deg);
+  }
+  .bt-header__drawer-sublist {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--bt-space-xs);
+  }
+  .bt-header__drawer-sublist .bt-header__drawer-link {
+    padding-left: var(--bt-space-xl);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text-muted);
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+
+  /* Mobile: hide desktop nav & mega, show hamburger */
+  @media (max-width: 989px) {
+    .bt-header__nav,
+    .bt-mega {
+      display: none !important;
+    }
+  }
+
+  /* Desktop: show nav, hide hamburger */
+  @media (min-width: 990px) {
+    .bt-header__nav {
+      display: flex;
+    }
+    .bt-header__hamburger {
+      display: none;
+    }
+  }
+
+  /* Mega grid adjusts naturally: 220px sidebar + 1fr flyout + 300px promo.
+     When no promo column, the 300px track collapses. */
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "class": "section-header",
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "mega-collections",
+      "name": "t:sections.header.blocks.mega_collections.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "t:sections.header.blocks.mega_collections.settings.menu_item.label",
+          "info": "t:sections.header.blocks.mega_collections.settings.menu_item.info"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.header.blocks.mega_collections.settings.heading.label"
+        },
+        {
+          "type": "link_list",
+          "id": "collection_menu",
+          "label": "t:sections.header.blocks.mega_collections.settings.collection_menu.label"
+        },
+        {
+          "type": "url",
+          "id": "view_all_url",
+          "label": "t:sections.header.blocks.mega_collections.settings.view_all_url.label"
+        },
+        {
+          "type": "text",
+          "id": "view_all_text",
+          "label": "t:sections.header.blocks.mega_collections.settings.view_all_text.label",
+          "default": "View all"
+        }
+      ]
+    },
+    {
+      "type": "mega-promo",
+      "name": "t:sections.header.blocks.mega_promo.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "t:sections.header.blocks.mega_promo.settings.menu_item.label",
+          "info": "t:sections.header.blocks.mega_promo.settings.menu_item.info"
+        },
+        {
+          "type": "text",
+          "id": "flyout_item",
+          "label": "t:sections.header.blocks.mega_promo.settings.flyout_item.label",
+          "info": "t:sections.header.blocks.mega_promo.settings.flyout_item.info"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image",
+          "label": "t:sections.header.blocks.mega_promo.settings.promo_image.label"
+        },
+        {
+          "type": "text",
+          "id": "promo_heading",
+          "label": "t:sections.header.blocks.mega_promo.settings.promo_heading.label"
+        },
+        {
+          "type": "textarea",
+          "id": "promo_text",
+          "label": "t:sections.header.blocks.mega_promo.settings.promo_text.label"
+        },
+        {
+          "type": "url",
+          "id": "promo_link",
+          "label": "t:sections.header.blocks.mega_promo.settings.promo_link.label"
+        },
+        {
+          "type": "text",
+          "id": "promo_label",
+          "label": "t:sections.header.blocks.mega_promo.settings.promo_label.label",
+          "default": "Shop now"
+        }
+      ]
+    },
+    {
+      "type": "mega-links",
+      "name": "t:sections.header.blocks.mega_links.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "t:sections.header.blocks.mega_links.settings.menu_item.label",
+          "info": "t:sections.header.blocks.mega_links.settings.menu_item.info"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.header.blocks.mega_links.settings.heading.label"
+        },
+        {
+          "type": "text",
+          "id": "link_text_1",
+          "label": "t:sections.header.blocks.mega_links.settings.link_text_1.label"
+        },
+        {
+          "type": "url",
+          "id": "link_url_1",
+          "label": "t:sections.header.blocks.mega_links.settings.link_url_1.label"
+        },
+        {
+          "type": "text",
+          "id": "link_text_2",
+          "label": "t:sections.header.blocks.mega_links.settings.link_text_2.label"
+        },
+        {
+          "type": "url",
+          "id": "link_url_2",
+          "label": "t:sections.header.blocks.mega_links.settings.link_url_2.label"
+        },
+        {
+          "type": "text",
+          "id": "link_text_3",
+          "label": "t:sections.header.blocks.mega_links.settings.link_text_3.label"
+        },
+        {
+          "type": "url",
+          "id": "link_url_3",
+          "label": "t:sections.header.blocks.mega_links.settings.link_url_3.label"
+        },
+        {
+          "type": "text",
+          "id": "link_text_4",
+          "label": "t:sections.header.blocks.mega_links.settings.link_text_4.label"
+        },
+        {
+          "type": "url",
+          "id": "link_url_4",
+          "label": "t:sections.header.blocks.mega_links.settings.link_url_4.label"
+        },
+        {
+          "type": "text",
+          "id": "link_text_5",
+          "label": "t:sections.header.blocks.mega_links.settings.link_text_5.label"
+        },
+        {
+          "type": "url",
+          "id": "link_url_5",
+          "label": "t:sections.header.blocks.mega_links.settings.link_url_5.label"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:sections.header.settings.menu.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "t:sections.header.settings.sticky.label",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

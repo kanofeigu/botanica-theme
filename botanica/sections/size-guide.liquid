@@ -1,0 +1,121 @@
+{% comment %}
+  sections/size-guide.liquid — Plant size guide (flagship botanical)
+  4 size-card blocks in a responsive row: Mini/Desk/Floor/Statement.
+  Image-based visualization per card. cm/inch toggle via block setting.
+  All-original. Zero Dawn code.
+{% endcomment %}
+<section class="bt-section bt-size-guide" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  <div class="bt-container">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bt-size-guide__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.description != blank -%}
+      <p class="bt-size-guide__desc">{{ section.settings.description | escape }}</p>
+    {%- endif -%}
+    <div class="bt-size-guide__grid bt-reveal-stagger">
+      {% content_for "blocks" %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .bt-size-guide__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-align: center;
+    margin: 0 0 var(--bt-space-2xs);
+  }
+  .bt-size-guide__desc {
+    font-size: var(--bt-fs-body);
+    color: var(--bt-color-text-muted);
+    text-align: center;
+    margin: 0 auto var(--bt-space-lg);
+    max-width: 55ch;
+  }
+  .bt-size-guide__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--bt-grid-gap);
+    align-items: stretch;
+  }
+  @media (max-width: 749px) {
+    .bt-size-guide__grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.size_guide.name",
+  "tag": "section",
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.size_guide.settings.heading.label",
+      "default": "Find your size"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:sections.size_guide.settings.description.label",
+      "default": "From windowsill companions to living room centerpieces — every plant has its place."
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.size_guide.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.size_guide.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{
+    "name": "t:sections.size_guide.name",
+    "blocks": [
+      {
+        "type": "size-card",
+        "settings": {
+          "title": "Mini",
+          "height_cm": 15,
+          "pot_cm": 8,
+          "description": "Palm-sized. Desks, nightstands, and tiny corners"
+        }
+      },
+      {
+        "type": "size-card",
+        "settings": {
+          "title": "Desk",
+          "height_cm": 35,
+          "pot_cm": 14,
+          "description": "Windowsills, bookshelves, and side tables"
+        }
+      },
+      {
+        "type": "size-card",
+        "settings": {
+          "title": "Floor",
+          "height_cm": 75,
+          "pot_cm": 22,
+          "description": "Next to sofas, armchairs, and consoles"
+        }
+      },
+      {
+        "type": "size-card",
+        "settings": {
+          "title": "Statement",
+          "height_cm": 130,
+          "pot_cm": 36,
+          "description": "Room corners, entryways, and double-height spaces"
+        }
+      }
+    ]
+  }]
+}
+{% endschema %}

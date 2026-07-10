@@ -1,0 +1,157 @@
+{% comment %}
+  sections/botanical-ambience.liquid
+  ★ Ambient botanical atmosphere section.
+  Drop anywhere in a template to add scroll-driven
+  botanical effects. Lightweight — all CSS-native.
+  Merchants control which effects are active.
+  All-original. Zero Dawn code.
+{% endcomment %}
+
+{%- liquid
+  assign show_leaves = section.settings.show_leaves
+  assign show_spores = section.settings.show_spores
+  assign show_vines = section.settings.show_vines
+  assign show_silhouettes = section.settings.show_silhouettes
+  assign show_color_shift = section.settings.show_color_shift
+  assign show_dappled = section.settings.show_dappled
+  assign show_soil_strip = section.settings.show_soil_strip
+  assign show_hero_botanical = section.settings.show_hero_botanical
+  assign leaf_opacity = section.settings.leaf_opacity | divided_by: 100.0
+  assign spore_opacity = section.settings.spore_opacity | divided_by: 100.0
+-%}
+
+{%- if show_leaves or show_spores or show_vines or show_silhouettes or show_color_shift or show_dappled or show_soil_strip or show_hero_botanical -%}
+  <div
+    class="bt-ambience
+      {% if show_dappled %}bt-dappled-light{% endif %}"
+    {{ section.shopify_attributes }}
+    style="--bt-leaf-opacity: {{ leaf_opacity }}; --bt-spore-opacity: {{ spore_opacity }};"
+  >
+    {%- if show_color_shift -%}
+      <div class="bt-color-shift" aria-hidden="true"></div>
+    {%- endif -%}
+
+    {% render 'botanical-ambience',
+      show_leaves: show_leaves,
+      show_spores: show_spores,
+      show_vines: show_vines,
+      show_silhouettes: show_silhouettes,
+      show_hero_botanical: show_hero_botanical
+    %}
+
+    {%- if show_soil_strip -%}
+      <div class="bt-soil-strip" aria-hidden="true"></div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-ambience {
+    position: relative;
+    z-index: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.botanical_ambience.name",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.botanical_ambience.settings.header_effects"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_leaves",
+      "label": "t:sections.botanical_ambience.settings.show_leaves.label",
+      "info": "t:sections.botanical_ambience.settings.show_leaves.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_spores",
+      "label": "t:sections.botanical_ambience.settings.show_spores.label",
+      "info": "t:sections.botanical_ambience.settings.show_spores.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vines",
+      "label": "t:sections.botanical_ambience.settings.show_vines.label",
+      "info": "t:sections.botanical_ambience.settings.show_vines.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_silhouettes",
+      "label": "t:sections.botanical_ambience.settings.show_silhouettes.label",
+      "info": "t:sections.botanical_ambience.settings.show_silhouettes.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_color_shift",
+      "label": "t:sections.botanical_ambience.settings.show_color_shift.label",
+      "info": "t:sections.botanical_ambience.settings.show_color_shift.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dappled",
+      "label": "t:sections.botanical_ambience.settings.show_dappled.label",
+      "info": "t:sections.botanical_ambience.settings.show_dappled.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_soil_strip",
+      "label": "t:sections.botanical_ambience.settings.show_soil_strip.label",
+      "info": "t:sections.botanical_ambience.settings.show_soil_strip.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hero_botanical",
+      "label": "t:sections.botanical_ambience.settings.show_hero_botanical.label",
+      "info": "t:sections.botanical_ambience.settings.show_hero_botanical.info",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:sections.botanical_ambience.settings.header_intensity"
+    },
+    {
+      "type": "range",
+      "id": "leaf_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "t:sections.botanical_ambience.settings.leaf_opacity.label",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "spore_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "t:sections.botanical_ambience.settings.spore_opacity.label",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.botanical_ambience.name",
+      "settings": {
+        "show_leaves": true,
+        "show_spores": true,
+        "show_silhouettes": true,
+        "show_vines": false
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,109 @@
+{% comment %}
+  snippets/botanical-ambience.liquid
+  ★ Ambient botanical effects — falling leaves, floating spores,
+    parallax silhouettes. Drop this into any page for instant
+    "living greenhouse" atmosphere.
+  Parameters:
+    show_leaves (bool) — falling leaf cascade
+    show_spores (bool) — floating pollen particles
+    show_vines (bool) — growing vine decorations
+    show_silhouettes (bool) — parallax plant silhouettes
+    show_hero_botanical (bool) — hero decorative illustration
+    color_shift (bool) — scroll-driven background warmth shift
+{% endcomment %}
+
+{%- liquid
+  assign show_leaves = show_leaves | default: false
+  assign show_spores = show_spores | default: false
+  assign show_vines = show_vines | default: false
+  assign show_silhouettes = show_silhouettes | default: false
+  assign show_hero_botanical = show_hero_botanical | default: false
+  assign color_shift = color_shift | default: false
+-%}
+
+{%- if show_leaves -%}
+  <div class="bt-falling-leaves" aria-hidden="true">
+    <div class="bt-leaf bt-leaf--1">
+      <img src="{{ 'leaf-monstera.svg' | asset_url }}" alt="" width="36" height="48" class="bt-leaf__img" loading="lazy">
+    </div>
+    <div class="bt-leaf bt-leaf--2">
+      <img src="{{ 'leaf-fiddle.svg' | asset_url }}" alt="" width="30" height="40" class="bt-leaf__img" loading="lazy">
+    </div>
+    <div class="bt-leaf bt-leaf--3">
+      <img src="{{ 'leaf-small.svg' | asset_url }}" alt="" width="22" height="30" class="bt-leaf__img" loading="lazy">
+    </div>
+    <div class="bt-leaf bt-leaf--4">
+      <img src="{{ 'leaf-monstera.svg' | asset_url }}" alt="" width="34" height="46" class="bt-leaf__img" loading="lazy">
+    </div>
+    <div class="bt-leaf bt-leaf--5">
+      <img src="{{ 'leaf-fiddle.svg' | asset_url }}" alt="" width="28" height="38" class="bt-leaf__img" loading="lazy">
+    </div>
+    <div class="bt-leaf bt-leaf--6">
+      <img src="{{ 'leaf-small.svg' | asset_url }}" alt="" width="20" height="28" class="bt-leaf__img" loading="lazy">
+    </div>
+    <div class="bt-leaf bt-leaf--7">
+      <img src="{{ 'leaf-monstera.svg' | asset_url }}" alt="" width="32" height="44" class="bt-leaf__img" loading="lazy">
+    </div>
+    <div class="bt-leaf bt-leaf--8">
+      <img src="{{ 'leaf-small.svg' | asset_url }}" alt="" width="24" height="32" class="bt-leaf__img" loading="lazy">
+    </div>
+  </div>
+{%- endif -%}
+
+{%- if show_spores -%}
+  <div class="bt-spores" aria-hidden="true">
+    <div class="bt-spore bt-spore--1"></div>
+    <div class="bt-spore bt-spore--2"></div>
+    <div class="bt-spore bt-spore--3"></div>
+    <div class="bt-spore bt-spore--4"></div>
+    <div class="bt-spore bt-spore--5"></div>
+    <div class="bt-spore bt-spore--6"></div>
+    <div class="bt-spore bt-spore--7"></div>
+    <div class="bt-spore bt-spore--8"></div>
+    <div class="bt-spore bt-spore--9"></div>
+    <div class="bt-spore bt-spore--10"></div>
+    <div class="bt-spore bt-spore--11"></div>
+    <div class="bt-spore bt-spore--12"></div>
+  </div>
+{%- endif -%}
+
+{%- if show_vines -%}
+  <div class="bt-vine bt-vine--left bt-vine--grow" aria-hidden="true">
+    <svg class="bt-vine__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 600" fill="none" aria-hidden="true" style="color: var(--bt-color-primary)">
+      <path class="bt-vine__stem" d="M100 580 Q95 520 85 480 Q70 420 90 370 Q110 320 80 270 Q55 220 70 170 Q85 120 75 70 Q65 30 50 10" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="800" stroke-dashoffset="800"/>
+      <path class="bt-vine__stem" d="M90 370 Q60 350 30 330 Q10 318 5 305" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="200" stroke-dashoffset="200"/>
+      <path class="bt-vine__stem" d="M80 270 Q115 245 145 230 Q165 220 175 210" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="200" stroke-dashoffset="200"/>
+      <path class="bt-vine__stem" d="M70 170 Q45 155 20 145" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" stroke-dasharray="150" stroke-dashoffset="150"/>
+      <path class="bt-vine__stem" d="M75 70 Q95 52 115 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" stroke-dasharray="150" stroke-dashoffset="150"/>
+      <g class="bt-vine__leaf"><path d="M30 320 Q18 312 12 298 Q20 292 30 300 Q36 292 42 298 Q48 306 44 314 Q40 318 30 320Z" fill="currentColor" opacity="0.6" transform="translate(0,10)"/></g>
+      <g class="bt-vine__leaf"><path d="M165 200 Q155 188 151 176 Q157 166 165 174 Q173 166 179 176 Q175 188 165 200Z" fill="currentColor" opacity="0.6" transform="translate(0,8)"/></g>
+      <g class="bt-vine__leaf"><path d="M82 480 Q72 470 68 458 Q75 452 82 462 Q87 454 92 460 Q96 468 92 475 Q89 479 82 480Z" fill="currentColor" opacity="0.6"/></g>
+      <path class="bt-vine__tendril" d="M50 10 Q40 5 38 0 Q36 -5 42 -3 Q48 0 46 -6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" stroke-dasharray="50" stroke-dashoffset="50"/>
+    </svg>
+  </div>
+  <div class="bt-vine bt-vine--right bt-vine--grow" aria-hidden="true">
+    <svg class="bt-vine__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 600" fill="none" aria-hidden="true" style="transform: scaleX(-1); color: var(--bt-color-primary)">
+      <path class="bt-vine__stem" d="M100 580 Q95 520 85 480 Q70 420 90 370 Q110 320 80 270 Q55 220 70 170 Q85 120 75 70 Q65 30 50 10" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="800" stroke-dashoffset="800"/>
+      <path class="bt-vine__stem" d="M90 370 Q60 350 30 330 Q10 318 5 305" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="200" stroke-dashoffset="200"/>
+      <path class="bt-vine__stem" d="M80 270 Q115 245 145 230 Q165 220 175 210" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="200" stroke-dashoffset="200"/>
+      <g class="bt-vine__leaf"><path d="M30 320 Q18 312 12 298 Q20 292 30 300 Q36 292 42 298 Q48 306 44 314 Q40 318 30 320Z" fill="currentColor" opacity="0.6" transform="translate(0,10)"/></g>
+      <g class="bt-vine__leaf"><path d="M165 200 Q155 188 151 176 Q157 166 165 174 Q173 166 179 176 Q175 188 165 200Z" fill="currentColor" opacity="0.6" transform="translate(0,8)"/></g>
+      <path class="bt-vine__tendril" d="M50 10 Q40 5 38 0 Q36 -5 42 -3 Q48 0 46 -6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" stroke-dasharray="50" stroke-dashoffset="50"/>
+    </svg>
+  </div>
+{%- endif -%}
+
+{%- if show_silhouettes -%}
+  <div class="bt-bg-botanical bt-bg-botanical--left bt-bg-botanical--parallax" aria-hidden="true">
+    <img src="{{ 'botanical-silhouette-left.svg' | asset_url }}" alt="" width="300" height="600" class="bt-bg-botanical__img" loading="lazy">
+  </div>
+  <div class="bt-bg-botanical bt-bg-botanical--right bt-bg-botanical--parallax" aria-hidden="true">
+    <img src="{{ 'botanical-silhouette-right.svg' | asset_url }}" alt="" width="300" height="600" class="bt-bg-botanical__img" loading="lazy">
+  </div>
+{%- endif -%}
+
+{%- if show_hero_botanical -%}
+  <div class="bt-hero-botanical bt-hero-botanical--full bt-hero-botanical--float" aria-hidden="true">
+    <img src="{{ 'hero-botanical.svg' | asset_url }}" alt="" width="600" height="400" class="bt-hero-botanical__img" loading="lazy">
+  </div>
+{%- endif -%}

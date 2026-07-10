@@ -1,0 +1,21 @@
+{% comment %}
+  snippets/botanical-divider.liquid — Botanical line divider SVG
+  Leaf/frond motif, warm muted tone. Decorative separator.
+{% endcomment %}
+<div class="bt-divider-botanical" aria-hidden="true">
+  <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
+    <line x1="0" y1="16" x2="40" y2="16" stroke="currentColor" stroke-width="0.75" opacity="0.3"/>
+    <path d="M54 8c0-2 2-3 3-3s2 2 2 4-2 4-3 4l-1 10M54 8c0-2-2-3-3-3s-2 2-2 4 2 4 3 4l1 10" stroke="currentColor" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+    <path d="M60 8c0-2 2-3 3-3s2 2 2 4-2 4-3 4l-1 10M60 8c0-2-2-3-3-3s-2 2-2 4 2 4 3 4l1 10" stroke="currentColor" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+    <line x1="80" y1="16" x2="120" y2="16" stroke="currentColor" stroke-width="0.75" opacity="0.3"/>
+  </svg>
+</div>
+
+{% stylesheet %}
+  .bt-divider-botanical {
+    display: flex;
+    justify-content: center;
+    padding-block: var(--bt-space-md);
+    color: var(--bt-color-secondary);
+  }
+{% endstylesheet %}

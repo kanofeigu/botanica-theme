@@ -1,0 +1,115 @@
+{% comment %}
+  blocks/light-meter.liquid — Refined light meter
+  SVG sun icon + 5-segment progressive fill dots.
+  ⚠ REPLACES the old "***" meter pattern with real SVG.
+  Visually-hidden text for screen readers; color is supplementary.
+{% endcomment %}
+{%- liquid
+  assign label = block.settings.label | default: 'Light'
+  assign level = block.settings.level | plus: 0
+  if level < 0
+    assign level = 0
+  elsif level > 5
+    assign level = 5
+  endif
+  assign level_label = 'Low'
+  case level
+    when 0
+      assign level_label = 'None'
+    when 1
+      assign level_label = 'Low'
+    when 2
+      assign level_label = 'Low to medium'
+    when 3
+      assign level_label = 'Medium'
+    when 4
+      assign level_label = 'Bright indirect'
+    when 5
+      assign level_label = 'Direct sun'
+  endcase
+-%}
+<div class="bt-light-meter" {{ block.shopify_attributes }} role="img" aria-label="{{ label }}: {{ level_label }} — {{ level }} out of 5">
+  <span class="bt-light-meter__icon" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+      <g stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <line x1="12" y1="1" x2="12" y2="4"/>
+        <line x1="12" y1="20" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/>
+        <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="4" y2="12"/>
+        <line x1="20" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/>
+        <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
+      </g>
+    </svg>
+  </span>
+  <span class="bt-light-meter__label">{{ label | escape }}</span>
+  <span class="bt-light-meter__dots" aria-hidden="true">
+    {%- for i in (1..5) -%}
+      <span class="bt-light-meter__dot{% if i <= level %} is-on{% endif %}"></span>
+    {%- endfor -%}
+  </span>
+  <span class="bt-sr-only">{{ level_label }}</span>
+</div>
+
+{% stylesheet %}
+  .bt-light-meter {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    padding: var(--bt-space-2xs) 0;
+  }
+  .bt-light-meter__icon {
+    display: flex;
+    color: var(--bt-color-secondary);
+    flex-shrink: 0;
+  }
+  .bt-light-meter__label {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: 500;
+    color: var(--bt-color-text-muted);
+    min-width: 4em;
+  }
+  .bt-light-meter__dots {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+  }
+  .bt-light-meter__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bt-color-border-light);
+    transition: background var(--bt-duration-base);
+  }
+  .bt-light-meter__dot.is-on {
+    background: var(--bt-color-primary);
+    box-shadow: 0 0 6px rgba(var(--bt-color-primary-rgb), 0.3);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.light_meter.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:blocks.light_meter.settings.label.label",
+      "default": "Light"
+    },
+    {
+      "type": "range",
+      "id": "level",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "t:blocks.light_meter.settings.level.label",
+      "info": "t:blocks.light_meter.settings.level.info"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.light_meter.name" }]
+}
+{% endschema %}

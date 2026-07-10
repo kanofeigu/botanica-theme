@@ -1,0 +1,156 @@
+{% comment %}
+  sections/faq-accordion.liquid — FAQ accordion using native <details>
+  Accessible by default: keyboard, screen reader, no JS required.
+  Uses blocks for each FAQ item (question + answer).
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign heading = section.settings.heading
+  assign has_items = false
+  for block in section.blocks
+    if block.settings.question != blank
+      assign has_items = true
+      break
+    endif
+  endfor
+-%}
+<section class="bt-section bt-faq" {{ section.shopify_attributes }}>
+  <div class="bt-container">
+    {%- if heading != blank -%}
+      <h2 class="bt-faq__heading">{{ heading | escape }}</h2>
+    {%- endif -%}
+    {%- if has_items -%}
+      <div class="bt-faq__list">
+        {%- for block in section.blocks -%}
+          {%- if block.settings.question != blank -%}
+            <details class="bt-faq__item" {{ block.shopify_attributes }}>
+              <summary class="bt-faq__question">
+                <span>{{ block.settings.question | escape }}</span>
+                <svg class="bt-faq__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </summary>
+              <div class="bt-faq__answer">
+                {%- if block.settings.answer != blank -%}
+                  {{ block.settings.answer }}
+                {%- endif -%}
+              </div>
+            </details>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .bt-faq__heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-align: center;
+    margin: 0 0 var(--bt-space-lg);
+  }
+  .bt-faq__list {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .bt-faq__item {
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-faq__item:first-child {
+    border-top: 1px solid var(--bt-color-border-light);
+  }
+  .bt-faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-space-sm);
+    padding: var(--bt-space-md) 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .bt-faq__question::-webkit-details-marker { display: none; }
+  .bt-faq__question::marker { display: none; content: none; }
+  .bt-faq__question:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  .bt-faq__icon {
+    flex-shrink: 0;
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-faq__item[open] .bt-faq__icon {
+    transform: rotate(180deg);
+  }
+  .bt-faq__answer {
+    padding: 0 0 var(--bt-space-md);
+    font-size: var(--bt-fs-body-sm);
+    line-height: var(--bt-lh-body);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-faq__answer p { margin: 0 0 0.75em; }
+  .bt-faq__answer p:last-child { margin-bottom: 0; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.faq_accordion.name",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "t:sections.faq_accordion.blocks.faq_item.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "t:sections.faq_accordion.blocks.faq_item.settings.question.label",
+          "default": "How do I know when to water my plant?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "t:sections.faq_accordion.blocks.faq_item.settings.answer.label",
+          "default": "<p>Stick your finger about 2 inches into the soil. If it feels dry, it's time to water. Most indoor plants prefer to dry out slightly between waterings.</p>"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.faq_accordion.settings.heading.label",
+      "default": "Plant care questions"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.faq_accordion.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
+      "label": "t:sections.faq_accordion.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [{
+    "name": "t:sections.faq_accordion.name",
+    "blocks": [
+      { "type": "faq_item" },
+      { "type": "faq_item" },
+      { "type": "faq_item" }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,106 @@
+{% comment %}
+  blocks/testimonial.liquid — Customer testimonial block
+  Quote + attribution + optional avatar. Editorial botanical style.
+{% endcomment %}
+{%- liquid
+  assign quote = block.settings.quote
+  assign author = block.settings.author
+  assign role_text = block.settings.role
+  assign stars = block.settings.stars | plus: 0
+-%}
+{%- if quote != blank -%}
+  <figure class="bt-testimonial" {{ block.shopify_attributes }}>
+    {%- if stars > 0 -%}
+      <div class="bt-testimonial__stars" aria-hidden="true">
+        {%- for i in (1..5) -%}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="{% if i <= stars %}var(--bt-color-secondary){% else %}none{% endif %}" stroke="var(--bt-color-secondary)" stroke-width="1"><path d="M8 1l2 4 4 .5-3 3 .5 4.5L8 11l-3.5 2 .5-4.5-3-3L6 5z"/></svg>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+    <blockquote class="bt-testimonial__quote">
+      <p>{{ quote }}</p>
+    </blockquote>
+    {%- if author != blank -%}
+      <figcaption class="bt-testimonial__attr">
+        <strong>{{ author | escape }}</strong>
+        {%- if role_text != blank -%}
+          <span>{{ role_text | escape }}</span>
+        {%- endif -%}
+      </figcaption>
+    {%- endif -%}
+  </figure>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-testimonial {
+    margin: 0;
+    padding: var(--bt-space-md);
+    background: var(--bt-color-surface);
+    border-radius: var(--bt-radius-card);
+    text-align: center;
+  }
+  .bt-testimonial__stars {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin-bottom: var(--bt-space-xs);
+  }
+  .bt-testimonial__quote {
+    margin: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-style: italic;
+    line-height: var(--bt-lh-body);
+    color: var(--bt-color-text);
+    text-wrap: balance;
+  }
+  .bt-testimonial__quote p { margin: 0; }
+  .bt-testimonial__attr {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: var(--bt-space-sm);
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-testimonial__attr strong {
+    color: var(--bt-color-text);
+    font-weight: var(--bt-fw-semibold);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.testimonial.name",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:blocks.testimonial.settings.quote.label",
+      "default": "The care guide included with every plant is incredible. I went from plant killer to proud plant parent in three months."
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "t:blocks.testimonial.settings.author.label",
+      "default": "Sarah Chen"
+    },
+    {
+      "type": "text",
+      "id": "role",
+      "label": "t:blocks.testimonial.settings.role.label",
+      "default": "Verified buyer"
+    },
+    {
+      "type": "range",
+      "id": "stars",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 5,
+      "label": "t:blocks.testimonial.settings.stars.label"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.testimonial.name" }]
+}
+{% endschema %}

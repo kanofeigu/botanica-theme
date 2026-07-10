@@ -1,0 +1,72 @@
+{% comment %}
+  blocks/heading.liquid — Reusable heading block
+  Supports h1-h4 with configurable tag, size, and alignment.
+{% endcomment %}
+{%- liquid
+  assign tag = block.settings.heading_tag | default: 'h2'
+  assign text = block.settings.text
+  assign alignment = block.settings.alignment | default: 'left'
+-%}
+{%- if text != blank -%}
+  <{{ tag }}
+    class="bt-heading bt-heading--{{ alignment }}"
+    style="text-align:{{ alignment }}"
+    {{ block.shopify_attributes }}
+  >
+    {{ text | escape }}
+  </{{ tag }}>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-heading {
+    font-family: var(--bt-font-heading);
+    font-weight: 400;
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text);
+    text-wrap: balance;
+    font-variant-numeric: oldstyle-nums;
+  }
+  .bt-heading--left { text-align: left; }
+  .bt-heading--center { text-align: center; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.heading.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:blocks.heading.settings.text.label",
+      "default": "Heading text"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "t:blocks.heading.settings.tag.label",
+      "options": [
+        { "value": "h1", "label": "t:blocks.heading.settings.tag.options__1.label" },
+        { "value": "h2", "label": "t:blocks.heading.settings.tag.options__2.label" },
+        { "value": "h3", "label": "t:blocks.heading.settings.tag.options__3.label" },
+        { "value": "h4", "label": "t:blocks.heading.settings.tag.options__4.label" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:blocks.heading.settings.alignment.label",
+      "options": [
+        { "value": "left", "label": "t:blocks.heading.settings.alignment.options__1.label" },
+        { "value": "center", "label": "t:blocks.heading.settings.alignment.options__2.label" }
+      ],
+      "default": "left"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.heading.name"
+    }
+  ]
+}
+{% endschema %}
