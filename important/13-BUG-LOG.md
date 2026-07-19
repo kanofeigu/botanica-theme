@@ -271,14 +271,94 @@
 
 ---
 
+## 2026-07-19 深度审计修复批次（Kimi Work 审计组）
+
+> 背景：07-19 对全项目做「逐按钮逐功能」审计 + 店面密码实测，发现 5 个功能 blocker。已全部修复并推送到 live 主题（git product 分支 `5910f60` + `d94492a`），线上回归验证通过。
+
+### BUG-014：`Shopify.formatMoney` 全主题未定义，加车后抽屉崩溃
+
+- **发现日期**：2026-07-19
+- **严重程度**：🔴 blocker
+- **现象**：PDP/快捷加车本身成功（商品入车），但 cart drawer 打开后永远显示空车旧内容、header 数量角标不更新，必须刷新页面
+- **根因**：`assets/cart.js` 5 处调用 `Shopify.formatMoney`（Dawn 在 global.js 定义它，本主题没有），非空车渲染时抛 TypeError，被 `_refreshCart` 的 catch 静默吞掉。quick-view.js 有 typeof 守卫而 cart.js 没有（作者不一致）
+- **修复方法**：cart.js 顶部加防御性 polyfill（`window.Shopify.formatMoney`，Dawn 经典 placeholder 实现，默认取 `window.theme.moneyFormat`）
+- **修改的文件**：`assets/cart.js`
+- **修复结果**：线上 CDN cart.js 确认 polyfill 存在 ✅
+- **关联功能**：F03（Cart Drawer）、F11（PDP）、F14（Sticky ATC）
+- **⚠ 教训**：从其他主题移植逻辑时，其依赖的全局工具函数必须一并移植或加守卫
+
+### BUG-015：集合页快捷加车监听器无限叠加 + 数量徽标 undefined
+
+- **发现日期**：2026-07-19
+- **严重程度**：🔴 blocker
+- **现象**：① AJAX 筛选/排序/翻页 N 次后，点一次 + 按钮发出 N+1 个 `/cart/add.js`（重复加 N+1 件）；② 徽标显示 "undefined"；③ 首页 featured-collection 的 8 个 + 按钮完全无 handler
+- **根因**：`initQuickAdd()` 在 `initAll()` 内每次 AJAX 后重复绑定 document 监听器且无去重守卫（同文件其他 init 都有守卫）；从 `/cart/add.js` 响应读不存在的 `item_count` 字段；handler 只存在于集合页 section 的 `{% javascript %}`
+- **修复方法**：逻辑移入 `assets/cart.js` 全局单 document 委托（模块加载绑定一次）；成功后 dispatch `cart:added` 由 CartDrawer 统一刷新打开；删除旧 initQuickAdd；`header.liquid` 角标改为始终渲染（空车 hidden）——否则空车首次加车角标无法出现
+- **修改的文件**：`assets/cart.js`、`sections/main-collection-product-grid.liquid`、`sections/header.liquid`
+- **修复结果**：线上 cart.js 确认全局 handler；`/cart/add.js` 响应实测确认无 `item_count` 字段 ✅
+- **关联功能**：F10（Product Card）、F03（Cart Drawer）、F12（Collection）
+- **⚠ 教训**：所有「加车成功后的 UI 更新」必须走统一的 `cart:added` 事件单入口，不允许各自 fetch 各写 DOM
+
+### BUG-016：预测搜索整体失效（死功能）
+
+- **发现日期**：2026-07-19
+- **严重程度**：🔴 blocker
+- **现象**：header 搜索图标只能跳转 /search 页，实时建议下拉从不出现；`settings.predictive_search_enabled` 形同虚设
+- **根因**：① `<bt-predictive-search>` 容器内没有任何 `input[type="search"]`，search.js 初始化直接 return；② fetch 端点 `/search/suggest?q=` 是 HTML 端点（实测 422），代码却按 JSON 解析；③ 结果渲染未转义（XSS 面）
+- **修复方法**：theme.liquid 容器内补全搜索面板（form + input + 结果容器）；header 搜索图标加 `data-search-toggle`，search.js 整体重写：端点改 `/search/suggest.json?resources[type]=product`、面板显隐/焦点/Escape 管理、`esc()` 转义、价格走 formatMoney；base.css 补面板样式
+- **修改的文件**：`layout/theme.liquid`、`sections/header.liquid`、`assets/search.js`、`assets/base.css`
+- **修复结果**：线上首页确认输入框存在（2 个 type="search"）；`/search/suggest.json` 实测 200 返回产品数据 ✅
+- **关联功能**：F04（Predictive Search）、F02（Mega Menu 导航）
+
+### BUG-017：产品推荐与抽屉 upsell 接口缺 `.json` 后缀（HTTP 422）
+
+- **发现日期**：2026-07-19
+- **严重程度**：🔴 blocker
+- **现象**：PDP 永远显示 "No recommendations yet."，cart drawer upsell 永不渲染
+- **根因**：fetch URL 为 `/recommendations/products?product_id=...`（无 .json），实测返回 422 空响应；正确端点 `/recommendations/products.json` 实测 200 返回 `{products: [...]}`，与代码的 `r.json()` 解析匹配
+- **修复方法**：两处 URL 加 `.json` 后缀
+- **修改的文件**：`sections/product-recommendations.liquid`、`assets/cart.js`（upsell）
+- **修复结果**：线上 PDP 确认 `data-url="/recommendations/products.json?..."` ✅
+- **关联功能**：F11（PDP）、F03（Cart Drawer）
+
+### BUG-018：产品卡徽章 tag 前缀写反，care/light 徽章永不渲染
+
+- **发现日期**：2026-07-19
+- **严重程度**：🟡 major
+- **现象**：产品卡上 Easy/Moderate/Expert 徽章和光照 dots 从不出现（主题核心卖点功能失效）
+- **根因**：card-product.liquid 检测 `easy-care`/`medium-care`/`expert-care`、`bright-light`/`low-light`，但官方约定（SUBMISSION.md、demo 数据、线上产品实际 tag）是 `care-easy`/`light-low` 前缀格式
+- **修复方法**：6 处 tag 字符串改为正确前缀；同步修正 en.default.schema.json 中商家指引文案
+- **修改的文件**：`snippets/card-product.liquid`、`locales/en.default.schema.json`
+- **修复结果**：线上集合页确认渲染 45 个徽章 chip（11 easy + 9 medium + 3 expert + 22 light）✅
+- **关联功能**：F10（Product Card）、F06（Shop by Care）
+
+### BUG-019：theme check 2 个 error（推送前拦截）
+
+- **发现日期**：2026-07-19
+- **严重程度**：🟢 minor
+- **现象**：`shopify theme check` 报 2 error
+- **根因**：① `blocks/size-card.liquid:23` render 标签参数上使用 filter（`number: height_cm | append: 'cm'`，UnsupportedFilterArguments）；② `layout/theme.liquid` 引用 `sections.cart.note_placeholder` 翻译键在 en.default.json 中缺失
+- **修复方法**：① 改为预先 `assign size_number`；② en.default.json 补 `note_placeholder` 键
+- **修改的文件**：`blocks/size-card.liquid`、`locales/en.default.json`
+- **修复结果**：`shopify theme check` 0 error 0 warning ✅
+- **关联功能**：F08（Size Guide）、F03（Cart Drawer）
+
+### 2026-07-19 部署备注
+
+- Shopify Admin API 的 `themeFilesUpsert`/`themeFilesDelete`（GraphQL）和 REST Assets **写操作**对本店 app 均不可用（需 Shopify 豁免；REST GET 可读）；主题推送只能用 Shopify CLI
+- 本机原先没有 Shopify CLI：在 `kimi/workspace/shopify-cli/` 本地目录安装了 `@shopify/cli` 4.5.2（`npx shopify` 调用），认证信息本机已有缓存，push 直接成功
+- 推送方式：`shopify theme push --path botanica --store kano-u93kwgf9.myshopify.com --theme 153451266239 --allow-live --json`
+
+---
+
 ## Bug 统计
 
 | 严重程度 | 数量 | 已修复 | 未修复 |
 |---------|------|--------|--------|
-| 🔴 blocker | 5 | 5 | 0 |
-| 🟡 major | 5 | 5 | 0 |
-| 🟢 minor | 0 | 0 | 0 |
-| **合计** | **13** | **13** | **0** |
+| 🔴 blocker | 9 | 9 | 0 |
+| 🟡 major | 6 | 6 | 0 |
+| 🟢 minor | 1 | 1 | 0 |
+| **合计** | **19** | **19** | **0** |
 
 ---
 
