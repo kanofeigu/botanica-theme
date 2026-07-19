@@ -29,6 +29,24 @@ shopify theme push --path botanica --store kano-u93kwgf9.myshopify.com --theme 1
 
 ---
 
+## 正确推送工作流（防止编辑器改动被覆盖）⚠
+
+**问题**：`shopify theme push` 会用本地所有文件覆盖远程。模板 JSON（`templates/*.json`）和 `config/settings_data.json` 里存着用户在主题编辑器里做的图片选择、区块顺序、区块设置等数据。如果本地这些文件是旧的，push 后会冲掉编辑器改动。
+
+**规则**：每次推送代码前，必须先拉取远程的配置和模板文件。
+
+```bash
+# 第1步：拉取远程配置（同步编辑器里的图片、区块设置等改动）
+shopify theme pull --theme 153451266239 --store kano-u93kwgf9.myshopify.com --only "templates/*.json,config/settings_data.json,config/settings_schema.json"
+
+# 第2步：推送全部代码（此时本地模板 JSON 已是最新，不会冲掉编辑器数据）
+shopify theme push --path botanica --store kano-u93kwgf9.myshopify.com --theme 153451266239 --allow-live --json
+```
+
+> ⚠ 如果跳过第 1 步直接 push → 编辑器里保存的图片/区块设置会重置为本地旧状态。
+
+---
+
 ## 打开预览页面
 
 预览 URL 规则：`https://<store>/?preview_theme_id=<theme_id>`
@@ -128,6 +146,7 @@ start "" "https://kano-u93kwgf9.myshopify.com/collections/all-plants" && start "
 | push 后前台不更新 | 检查是否开了密码保护（password_enabled） |
 | API token 过期 | 重新获取（curl 见上） |
 | push/pull 后导航 blocks 丢失 | 只用 push，不要 pull（BUG-005） |
+| push 后编辑器改的图片/设置被重置 | push 前先 pull templates 和 settings_data，见上方「正确推送工作流」 |
 
 ---
 

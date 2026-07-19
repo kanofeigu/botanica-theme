@@ -200,4 +200,86 @@
 
 ---
 
-*关联文档：[[09-CHANGE-MANAGEMENT]] [[10-CODE-REVIEW]] [[11-TESTING]]*
+### BUG-010：集合页快捷加车按钮（+）完全无功能
+
+- **发现日期**：2026-07-10
+- **严重程度**：🔴 blocker
+- **现象**：集合页产品卡片 hover 后出现 + 按钮，点击无任何反应，产品未加车
+- **根因**：`card-product.liquid` 中的快捷加车按钮是 `<button type="button">`，没有任何 JS click handler 或 form 包裹。`cart.js` 只实现了 cart drawer 的开关 UI，没有加车逻辑
+- **修复方法**：
+  1. 给按钮添加 `data-variant-id="{{ product.selected_or_first_available_variant.id }}"`
+  2. 在 `main-collection-product-grid.liquid` 的 JS 中添加 `initQuickAdd()` 函数：监听 `.bt-card__quick-add` 点击 → `fetch('/cart/add.js', {method:'POST', body:JSON.stringify({id,quantity:1})})` → 更新 cart count → 显示 loading/success 状态
+  3. 添加 `.is-loading` 和 `.is-added` CSS 状态样式
+- **修改的文件**：
+  - `snippets/card-product.liquid` — 按钮加 `data-variant-id` + 内联 SVG 替代 `{% render 'icon-plus' %}`
+  - `sections/main-collection-product-grid.liquid` — 新增 `initQuickAdd()` AJAX 加车函数
+  - `assets/cart.js` — 曾添加后移除（移到集合页 JS 保证加载）
+  - `sections/header.liquid` — cart count span 添加 `data-cart-count` 属性
+- **修复结果**：集合页点击 + 按钮 → 转圈 → 对勾 → 购物车数量更新 ✅
+- **关联功能**：F05（Collection 筛选系统）、F07（购物车）
+
+---
+
+### BUG-011：PDP "Add to cart" 按钮点击无反应
+
+- **发现日期**：2026-07-10
+- **严重程度**：🔴 blocker
+- **现象**：产品详情页点击 Add to cart 按钮，页面无任何反应，产品未加车
+- **根因**：`buy-buttons.liquid` 和 `variant-picker.liquid` 中的 `form="{{ product_form_id }}"` 引用的是 `main-product.liquid` 中定义的 Liquid 变量。但 block 通过 `{% content_for "blocks" %}` 渲染时，`product_form_id` 可能在某些上下文中为空值，导致 `form` 属性指向空字符串 — HTML5 规范下，`form` 属性为空值时按钮不关联任何表单，即使按钮是表单的子元素
+- **修复方法**：移除 `buy-buttons.liquid` 中 submit 按钮和 quantity 输入的 `form` 属性、移除 `variant-picker.liquid` 中 radio 输入的 `form` 属性。这些元素已经在 `<form>` 内部，HTML 原生的表单关联即可工作，不需要显式 `form` 属性
+- **修改的文件**：
+  - `blocks/buy-buttons.liquid` — 去掉 submit 按钮和 quantity 输入的 `form="{{ product_form_id }}"`
+  - `blocks/variant-picker.liquid` — 去掉 radio 输入的 `form="{{ product_form_id }}"`
+- **修复结果**：PDP 提交按钮正常关联表单，点击 Add to cart 成功加车 ✅
+- **关联功能**：F03（PDP）、F07（购物车）
+- **⚠ 教训**：`form` 属性在 HTML5 中是"覆盖父表单"的语义 — 如果属性值为空或无效 ID，按钮不属于任何表单。对于已经在表单内部的元素，不要加 `form` 属性；只在按钮确实在表单外部时才需要
+
+---
+
+### BUG-012：价格筛选使用硬编码分档，商家无法自定义
+
+- **发现日期**：2026-07-10
+- **严重程度**：🟡 major
+- **现象**：集合页价格筛选显示为下拉菜单，选项是 0-50 / 50-100 / 100-200 / 200+ 四个固定档位。商家无法在 Search & Discovery 中自定义价格范围
+- **根因**：`main-collection-product-grid.liquid` 的 `price_range` case 用 `steps = '50,100,200'` 硬编码分档，渲染为自定义 popover 下拉菜单。代码约 70 行 Liquid + 专用 JS
+- **修复方法**：改为 Shopify 原生的 From / To 数字输入框，使用 `filter.min_value` / `filter.max_value` 动态数据。商家在 Search & Discovery 配置价格策略后，输入框的最大值自动匹配集合内的最高价。添加 350ms 防抖 AJAX 提交
+- **修改的文件**：
+  - `sections/main-collection-product-grid.liquid` — 替换 `price_range` case（-70 行旧代码，+30 行新代码 + JS handler）
+  - `locales/en.default.json` — 添加 `collections.filters.from` / `collections.filters.to` 翻译键
+- **修复结果**：价格筛选显示为 From/To 输入框，支持自由输入，防抖自动筛选 ✅
+- **关联功能**：F05（Collection 筛选系统）
+
+---
+
+### BUG-013：69 个产品的 metafield 数据只有 3 个 key 有值
+
+- **发现日期**：2026-07-10
+- **严重程度**：🟡 major
+- **现象**：Search & Discovery 配置完成后，集合页只有 price 筛选出现，分类标签（养护难度、光照、尺寸等）不显示。API 查询发现多数产品没有 metafield 数据
+- **根因**：10 个 metafield 定义已创建，但产品的 metafield 数据从未被批量填充。历史操作中 metafield 写入可能部分失败（类似 BUG-009）
+- **修复方法**：
+  1. 从产品 tags 中提取已有数据（例如 `care-easy` → `care_level: easy`）
+  2. 编写 Node.js 脚本 `write-metafields.mjs`，用 GraphQL `metafieldsSet`（variables 格式，避免 JSON→GraphQL 字面量转换的语法错误）批量写入
+  3. 23 批次写入 571 个 metafield 值，68/69 产品成功填充
+- **修改的文件**：
+  - `scripts/write-metafields.mjs`（新建）— 批量 metafield 写入脚本
+  - `scripts/map-metafields.mjs`（新建）— tags→metafield 映射测试脚本
+  - `scripts/apply-metafields.mjs`（新建）— 备选方案
+- **修复结果**：68 个产品拥有完整的 10 维 metafield 数据（care_level / difficulty / light_needs / water_needs / plant_size / pet_safe / air_purifying / plant_color / growth_habit / placement），Search & Discovery 配置后可正常筛选 ✅
+- **关联功能**：F05（Collection 筛选系统）、F14（产品数据管理）
+- **⚠ 教训**：GraphQL mutation 中不能直接嵌入 `JSON.stringify()` 作为 inline argument — Shopify 的 GraphQL parser 要求 GraphQL 字面量格式（无引号 key），需要改用 GraphQL variables（`$metafields: [MetafieldsSetInput!]!`）传递 JSON 数据
+
+---
+
+## Bug 统计
+
+| 严重程度 | 数量 | 已修复 | 未修复 |
+|---------|------|--------|--------|
+| 🔴 blocker | 5 | 5 | 0 |
+| 🟡 major | 5 | 5 | 0 |
+| 🟢 minor | 0 | 0 | 0 |
+| **合计** | **13** | **13** | **0** |
+
+---
+
+*关联文档：[[09-CHANGE-MANAGEMENT]] [[10-CODE-REVIEW]] [[11-TESTING]] [[18-AUDIT-METHODOLOGY]]*

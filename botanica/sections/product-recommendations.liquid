@@ -13,7 +13,7 @@
 <product-recommendations
   class="bt-recommendations"
   {{ section.shopify_attributes }}
-  data-url="{{ routes.product_recommendations_url }}?product_id={{ product.id }}&limit={{ limit }}"
+  data-url="{{ routes.product_recommendations_url }}.json?product_id={{ product.id }}&limit={{ limit }}"
   data-limit="{{ limit }}"
   aria-label="{{ heading | escape }}"
 >

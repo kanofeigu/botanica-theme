@@ -2,7 +2,7 @@
 
 > 位置：`E:\ccfold\shopify\important\09-CHANGE-MANAGEMENT.md`
 > 每次更新功能都必须考虑与其关联的其他功能是否受影响
-> 最后更新：2026-07-06
+> 最后更新：2026-07-10
 
 ---
 
@@ -206,7 +206,17 @@ shopify theme check --path botanica    # 必须 0 error
 | 2026-07-07 | 创建 10 个 metafield 定义 + 填充 69 个产品 | GraphQL `metafieldDefinitionCreate` + `metafieldsSet` | Search & Discovery 筛选 | 筛选用数据就绪 |
 | 2026-07-07 | 主题打包 zip + 用户导入发布 | `shopify theme package` → admin 导入 | 新主题 #153451266239 | 用户在后台 Publish |
 | 2026-07-07 | OAuth client_credentials 认证获取 token | Partner Dashboard App | API 操作权限 | `shpua_` token 24h 有效 |
+| 2026-07-10 | 修复 header.liquid VariableName 警告 | `sections/header.liquid` | 全站 header | `_promo_fid`→`promo_fid`、`_child`→`child_link` |
+| 2026-07-10 | 修复 verify.ps1 JSONC 误报 + 白名单清理 | `verify.ps1` | 验证管线 | 23 个 JSON 误报消除 |
+| 2026-07-10 | 价格筛选从硬编码分档改为范围输入（BUG-012） | `sections/main-collection-product-grid.liquid`、`locales/en.default.json` | collection 页面筛选 | From/To 输入框 + 防抖 AJAX |
+| 2026-07-10 | 修复集合页快捷加车按钮无功能（BUG-010） | `snippets/card-product.liquid`、`sections/main-collection-product-grid.liquid`、`sections/header.liquid` | collection 页面产品卡 | AJAX `/cart/add.js` + data-variant-id |
+| 2026-07-10 | 修复 PDP Add to cart 按钮无反应（BUG-011） | `blocks/buy-buttons.liquid`、`blocks/variant-picker.liquid` | PDP 表单提交 | 移除无效的 `form="{{ product_form_id }}"` |
+| 2026-07-10 | 批量填充 68 产品 10 维 metafield（BUG-013） | scripts/（新建 3 个） | Search & Discovery 筛选数据 | 571 个 metafield 值，GraphQL variables 格式 |
+| 2026-07-10 | 新建功能审计方法文档 | `important/18-AUDIT-METHODOLOGY.md` | 开发流程 | 泛用交互链路追踪法 |
+| 2026-07-10 | 新建商店操作指令文档 | `important/23-STORE-OPERATIONS.md` | 运维 | 推送/预览/编辑器/API Token 命令 |
+| 2026-07-10 | 更新 LESSONS-LEARNED 问题模式 16 | `important/15-LESSONS-LEARNED.md` | 开发流程 | 合规审计 ≠ 功能验证 |
+| 2026-07-10 | 推送到 GitHub product 分支 | git | 版本控制 | `github.com/kanofeigu/botanica-theme` |
 
 ---
 
-*关联文档：[[04-FEATURE-TREE]] [[10-CODE-REVIEW]] [[11-TESTING]] [[13-BUG-LOG]]*
+*关联文档：[[04-FEATURE-TREE]] [[10-CODE-REVIEW]] [[11-TESTING]] [[13-BUG-LOG]] [[18-AUDIT-METHODOLOGY]]*

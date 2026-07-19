@@ -14,26 +14,26 @@
 
   assign care_label = ''
   assign care_class = ''
-  if product.tags contains 'easy-care'
+  if product.tags contains 'care-easy'
     assign care_label = 'Easy'
     assign care_class = 'bt-chip--easy'
-  elsif product.tags contains 'medium-care'
+  elsif product.tags contains 'care-medium'
     assign care_label = 'Moderate'
     assign care_class = 'bt-chip--medium'
-  elsif product.tags contains 'expert-care'
+  elsif product.tags contains 'care-expert'
     assign care_label = 'Expert'
     assign care_class = 'bt-chip--expert'
   endif
 
   assign light_label = ''
   assign light_dots = 0
-  if product.tags contains 'bright-light'
+  if product.tags contains 'light-bright'
     assign light_label = 'Bright'
     assign light_dots = 3
-  elsif product.tags contains 'medium-light'
+  elsif product.tags contains 'light-medium'
     assign light_label = 'Medium'
     assign light_dots = 2
-  elsif product.tags contains 'low-light'
+  elsif product.tags contains 'light-low'
     assign light_label = 'Low'
     assign light_dots = 1
   endif

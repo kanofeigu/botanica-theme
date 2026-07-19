@@ -115,78 +115,137 @@
   {% sections 'footer-group' %}
 
   {%- if settings.cart_type == 'drawer' -%}
-    <bt-cart-drawer class="bt-cart-drawer" role="dialog" aria-modal="true" aria-label="{{ 'sections.cart.title' | t }}">
+    {%- liquid
+      assign free_shipping_threshold = settings.free_shipping_threshold | default: 50
+      assign free_shipping_msg = 'sections.cart.free_shipping_remaining_html' | t: amount: '{amount}'
+      assign free_shipping_reached = 'sections.cart.free_shipping_reached' | t
+      assign cart_title = 'sections.cart.title' | t
+      assign cart_empty = 'sections.cart.empty' | t
+      assign cart_subtotal = 'sections.cart.subtotal' | t
+      assign cart_checkout = 'sections.cart.checkout' | t
+      assign cart_view = 'sections.cart.view_cart' | t
+      assign close_label = 'accessibility.close' | t
+      assign gift_note_label = 'sections.cart.note' | t | default: 'Add a gift note'
+    -%}
+    <bt-cart-drawer
+      class="bt-cart-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-label="{{ cart_title }}"
+      data-free-shipping-threshold="{{ free_shipping_threshold }}"
+      data-free-shipping-msg="{{ free_shipping_msg | escape }}"
+      data-free-shipping-reached="{{ free_shipping_reached | escape }}"
+    >
       <div class="bt-cart-drawer__overlay" data-cart-overlay></div>
       <div class="bt-cart-drawer__panel">
         <div class="bt-cart-drawer__header">
-          <h2 class="bt-h3">{{ 'sections.cart.title' | t }}</h2>
-          <button type="button" class="bt-header__icon-btn" data-cart-close aria-label="{{ 'accessibility.close' | t }}">
+          <h2 class="bt-h3">{{ cart_title }}</h2>
+          <button type="button" class="bt-header__icon-btn" data-cart-close aria-label="{{ close_label }}">
             {% render 'icon-close' %}
           </button>
         </div>
         <div class="bt-cart-drawer__body" data-cart-drawer-body>
-          {%- if cart.item_count > 0 -%}
-            {%- if settings.show_free_shipping_bar -%}
+
+          {% comment %} Free shipping progress bar — JS will update dynamically {% endcomment %}
+          <div class="bt-cart-drawer__shipping" data-cart-shipping role="status" hidden>
+            {%- if cart.item_count > 0 and settings.show_free_shipping_bar -%}
               {%- liquid
                 assign threshold = settings.free_shipping_threshold | times: 100
                 assign remaining = threshold | minus: cart.total_price
               -%}
               {%- if remaining > 0 -%}
-                <div class="bt-cart-drawer__shipping" role="status">
-                  {%- assign remaining_formatted = remaining | money -%}
-                  <p class="bt-cart-drawer__shipping-msg">{{ 'sections.cart.free_shipping_remaining_html' | t: amount: remaining_formatted }}</p>
-                  <div class="bt-cart-drawer__shipping-track"><div class="bt-cart-drawer__shipping-fill" style="width: {{ cart.total_price | times: 100 | divided_by: threshold }}%"></div></div>
-                </div>
+                {%- assign remaining_formatted = remaining | money -%}
+                <p class="bt-cart-drawer__shipping-msg">{{ 'sections.cart.free_shipping_remaining_html' | t: amount: remaining_formatted }}</p>
+                <div class="bt-cart-drawer__shipping-track"><div class="bt-cart-drawer__shipping-fill" style="width: {{ cart.total_price | times: 100 | divided_by: threshold }}%"></div></div>
               {%- else -%}
-                <p class="bt-cart-drawer__shipping-msg bt-cart-drawer__shipping-msg--reached" role="status">{{ 'sections.cart.free_shipping_reached' | t }}</p>
+                <p class="bt-cart-drawer__shipping-msg bt-cart-drawer__shipping-msg--reached">{{ 'sections.cart.free_shipping_reached' | t }}</p>
               {%- endif -%}
             {%- endif -%}
-            <ul class="bt-cart-drawer__items" role="list">
-              {%- for item in cart.items -%}
-                <li class="bt-cart-drawer__item" role="listitem">
-                  <div class="bt-cart-drawer__item-media">
-                    {%- if item.image -%}
-                      {{ item.image | image_url: width: 150 | image_tag: loading: 'lazy', widths: '75, 150', alt: item.title }}
-                    {%- endif -%}
-                  </div>
-                  <div class="bt-cart-drawer__item-info">
-                    <a href="{{ item.url }}" class="bt-cart-drawer__item-title">{{ item.product.title }}</a>
-                    {%- if item.variant.title != 'Default Title' -%}
-                      <p class="bt-cart-drawer__item-variant">{{ item.variant.title }}</p>
-                    {%- endif -%}
-                    <div class="bt-cart-drawer__item-qty-row">
-                      <input type="number" name="updates[]" value="{{ item.quantity }}" min="1" class="bt-input bt-cart-drawer__qty" aria-label="{{ 'products.product.quantity.label' | t }}" readonly>
-                      <span>{{ item.final_line_price | money }}</span>
-                    </div>
-                  </div>
-                  <a href="{{ item.url_to_remove }}" class="bt-cart-drawer__item-remove" aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}">{% render 'icon-close' %}</a>
-                </li>
-              {%- endfor -%}
-            </ul>
-          {%- else -%}
-            <div class="bt-cart-drawer__empty">
-              <p>{{ 'sections.cart.empty' | t }}</p>
-            </div>
-          {%- endif -%}
-        </div>
-        {%- if cart.item_count > 0 -%}
-          <div class="bt-cart-drawer__footer">
-            <div class="bt-cart-drawer__total">
-              <span>{{ 'sections.cart.subtotal' | t }}</span>
-              <strong>{{ cart.total_price | money }}</strong>
-            </div>
-            <a href="{{ routes.cart_url }}" class="bt-btn bt-btn--secondary bt-btn--block">{{ 'sections.cart.view_cart' | t }}</a>
-            <form action="{{ routes.cart_url }}" method="post">
-              <button type="submit" name="checkout" class="bt-btn bt-btn--primary bt-btn--block bt-btn--lg">{{ 'sections.cart.checkout' | t }}</button>
-            </form>
           </div>
-        {%- endif -%}
+
+          {% comment %} Empty state — visible when cart is empty {% endcomment %}
+          <div class="bt-cart-drawer__empty" data-cart-empty{% if cart.item_count > 0 %} hidden{% endif %}>
+            <p>{{ cart_empty }}</p>
+          </div>
+
+          {% comment %} Cart items — rendered by JS after first load {% endcomment %}
+          <ul class="bt-cart-drawer__items" role="list" data-cart-items{% if cart.item_count == 0 %} hidden{% endif %}>
+            {%- for item in cart.items -%}
+              <li class="bt-cart-drawer__item" role="listitem">
+                <div class="bt-cart-drawer__item-media">
+                  {%- if item.image -%}
+                    <a href="{{ item.url }}">{{ item.image | image_url: width: 150 | image_tag: loading: 'lazy', widths: '75, 150', alt: item.title }}</a>
+                  {%- endif -%}
+                </div>
+                <div class="bt-cart-drawer__item-info">
+                  <a href="{{ item.url }}" class="bt-cart-drawer__item-title">{{ item.product.title }}</a>
+                  {%- if item.variant.title != 'Default Title' -%}
+                    <p class="bt-cart-drawer__item-variant">{{ item.variant.title }}</p>
+                  {%- endif -%}
+                  <div class="bt-cart-drawer__item-qty-row">
+                    {% render 'qty-stepper', item_key: item.key, quantity: item.quantity, product_title: item.product.title %}
+                    <span class="bt-cart-drawer__item-price">
+                      {%- if item.variant.compare_at_price > item.final_price -%}
+                        <span class="bt-cart-drawer__item-compare">{{ item.variant.compare_at_price | money }}</span>
+                      {%- endif -%}
+                      {{ item.final_line_price | money }}
+                    </span>
+                  </div>
+                </div>
+                <button type="button" class="bt-cart-drawer__item-remove" data-action="remove" data-key="{{ item.key }}" aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}">
+                  {% render 'icon-trash' %}
+                </button>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          {% comment %} Upsell recommendations — loaded dynamically by JS {% endcomment %}
+          <div class="bt-cart-drawer__upsell" data-cart-upsell></div>
+        </div>
+
+        {% comment %} Footer — always rendered, hidden when empty {% endcomment %}
+        <div class="bt-cart-drawer__footer" data-cart-drawer-footer{% if cart.item_count == 0 %} hidden{% endif %}>
+          {% comment %} Gift note {% endcomment %}
+          <div class="bt-cart-drawer__note">
+            <label for="CartDrawerNote" class="bt-cart-drawer__note-label">{{ gift_note_label }}</label>
+            <textarea id="CartDrawerNote" class="bt-input bt-cart-drawer__note-input" name="note" data-cart-gift-note rows="2" placeholder="{{ 'sections.cart.note_placeholder' | t | default: 'Special instructions…' }}">{{ cart.note }}</textarea>
+          </div>
+
+          <div class="bt-cart-drawer__total">
+            <span>{{ cart_subtotal }}</span>
+            <strong data-cart-subtotal>{{ cart.total_price | money }}</strong>
+          </div>
+
+          <a href="{{ routes.cart_url }}" class="bt-btn bt-btn--secondary bt-btn--block bt-btn--sm" data-cart-view-btn{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart_view }}</a>
+          <form action="{{ routes.cart_url }}" method="post" data-cart-checkout-form{% if cart.item_count == 0 %} hidden{% endif %}>
+            <button type="submit" name="checkout" class="bt-btn bt-btn--primary bt-btn--block bt-btn--lg">{{ cart_checkout }}</button>
+          </form>
+        </div>
       </div>
     </bt-cart-drawer>
   {%- endif -%}
 
   <bt-predictive-search class="bt-predictive" hidden>
-    <div class="bt-predictive__results bt-predictive-results" role="listbox" aria-label="{{ 'general.search.results' | t }}"></div>
+    <div class="bt-predictive__bar bt-container">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="bt-predictive__form">
+        <input
+          type="search"
+          name="q"
+          class="bt-input bt-predictive__input"
+          placeholder="{{ 'general.search.placeholder' | t }}"
+          aria-label="{{ 'general.search.search' | t }}"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        >
+        <input type="hidden" name="type" value="product">
+        <button type="button" class="bt-header__icon-btn bt-predictive__close" data-predictive-close aria-label="{{ 'accessibility.close' | t }}">
+          {% render 'icon-close' %}
+        </button>
+      </form>
+    </div>
+    <div class="bt-predictive__results bt-predictive-results bt-container" role="listbox" aria-label="{{ 'general.search.results' | t }}" hidden></div>
   </bt-predictive-search>
 
   <ul hidden>

@@ -494,54 +494,14 @@
       });
     }
 
-    /* ════════════════════════════════════════════
-       QUICK-ADD TO CART (AJAX)
-       ════════════════════════════════════════════ */
-    function initQuickAdd() {
-      var adding = false;
-      document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.bt-card__quick-add');
-        if (!btn) return;
-        e.preventDefault();
-        e.stopPropagation();
-        var variantId = btn.getAttribute('data-variant-id');
-        if (!variantId || adding) return;
-        adding = true;
-        btn.classList.add('is-loading');
-        btn.disabled = true;
-        fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: variantId, quantity: 1 })
-        })
-        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function (cart) {
-          btn.classList.remove('is-loading');
-          btn.classList.add('is-added');
-          btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-          var countEl = document.querySelector('[data-cart-count]');
-          if (countEl) countEl.textContent = cart.item_count;
-          setTimeout(function () {
-            btn.classList.remove('is-added');
-            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg><span class="bt-sr-only">Add to cart</span>';
-            btn.disabled = false;
-            adding = false;
-          }, 1800);
-        })
-        .catch(function (err) {
-          console.warn('quick-add failed:', err);
-          btn.classList.remove('is-loading');
-          btn.disabled = false;
-          adding = false;
-        });
-      });
-    }
+    /* Quick-add is handled globally in assets/cart.js (single
+       delegated listener) so it also works on the homepage and
+       survives AJAX grid swaps without duplicate handlers. */
 
     function initAll() {
       initPopovers();
       initDetails();
       initMobileSidebar();
-      initQuickAdd();
     }
 
     initAll();

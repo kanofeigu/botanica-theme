@@ -245,16 +245,14 @@
 
     {% comment %} Actions: search, cart, mobile toggle {% endcomment %}
     <div class="bt-header__actions">
-      <a href="{{ routes.search_url }}" class="bt-header__icon-btn bt-interactive" aria-label="{{ 'general.search.search' | t }}">
+      <a href="{{ routes.search_url }}" class="bt-header__icon-btn bt-interactive" aria-label="{{ 'general.search.search' | t }}" data-search-toggle aria-expanded="false">
         {% render 'icon-search' %}
       </a>
 
-      <a href="{{ routes.cart_url }}" class="bt-header__icon-btn bt-interactive bt-header__cart" aria-label="{{ 'sections.cart.title' | t }}">
+      <button type="button" data-cart-toggle class="bt-header__icon-btn bt-interactive bt-header__cart" aria-label="{{ 'sections.cart.title' | t }}">
         {% render 'icon-cart' %}
-        {%- if cart.item_count > 0 -%}
-          <span class="bt-header__cart-dot" aria-hidden="true" data-cart-count>{{ cart.item_count }}</span>
-        {%- endif -%}
-      </a>
+        <span class="bt-header__cart-dot" aria-hidden="true" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+      </button>
 
       <button type="button" class="bt-header__icon-btn bt-interactive bt-header__hamburger" aria-label="{{ 'accessibility.menu' | t }}" aria-expanded="false" data-mobile-toggle>
         {% render 'icon-hamburger' %}

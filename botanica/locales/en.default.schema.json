@@ -116,11 +116,11 @@
         },
         "show_care": {
           "label": "Care level badge",
-          "info": "Shows difficulty badge (Easy/Medium/Expert) based on product tags like 'easy-care'"
+          "info": "Shows difficulty badge (Easy/Medium/Expert) based on product tags like 'care-easy'"
         },
         "show_light": {
           "label": "Light level badge",
-          "info": "Shows light need icon based on product tags like 'bright-light'"
+          "info": "Shows light need icon based on product tags like 'light-bright'"
         }
       }
     },

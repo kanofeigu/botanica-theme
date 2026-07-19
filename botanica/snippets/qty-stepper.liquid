@@ -1,0 +1,11 @@
+
+{% comment %} qty-stepper.liquid — Reusable quantity stepper. Pass item_key and quantity. {% endcomment %}
+<div class="bt-qty-stepper" data-qty-stepper>
+  <button type="button" class="bt-qty-stepper__btn" data-action="qty-minus" data-key="{{ item_key }}" aria-label="{{ 'products.product.quantity.decrease' | t: product: product_title | default: 'Decrease quantity' }}">
+    {% render 'icon-minus' %}
+  </button>
+  <span class="bt-qty-stepper__value" data-qty-value>{{ quantity | default: 1 }}</span>
+  <button type="button" class="bt-qty-stepper__btn" data-action="qty-plus" data-key="{{ item_key }}" aria-label="{{ 'products.product.quantity.increase' | t: product: product_title | default: 'Increase quantity' }}">
+    {% render 'icon-plus' %}
+  </button>
+</div>
