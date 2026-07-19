@@ -18,10 +18,11 @@
   endif
   assign height_in = height_cm | divided_by: 2.54 | round: 1
   assign pot_in = pot_cm | divided_by: 2.54 | round: 1
+  assign size_number = height_cm | append: 'cm'
 -%}
 <div class="bt-size-card bt-lift" {{ block.shopify_attributes }}>
   {% render 'specimen-tag',
-    number: height_cm | append: 'cm',
+    number: size_number,
     label: 'Plant size',
     value: title
   %}

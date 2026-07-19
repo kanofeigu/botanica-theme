@@ -1074,6 +1074,7 @@
       "estimated_total": "Estimated total",
       "new_estimated_total": "New estimated total",
       "note": "Order special instructions",
+      "note_placeholder": "Special instructions…",
       "checkout": "Check out",
       "view_cart": "View cart",
       "empty": "Your cart is empty",
