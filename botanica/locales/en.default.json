@@ -1107,6 +1107,13 @@
         "image": "Product image"
       },
       "update": "Update",
+      "remove": "Remove",
+      "note_label": "Order note",
+      "note_save": "Save note",
+      "note_saved": "Saved",
+      "each_price": "{{ price }} each",
+      "sold_out": "Sold out",
+      "you_may_also_like": "You may also like",
       "login": {
         "title": "Have an account?",
         "paragraph_html": "<a href=\"{{ link }}\" class=\"link underlined-link\">Log in</a> to check out faster."

@@ -391,6 +391,15 @@
         },
         "free_shipping_threshold": {
           "label": "Free shipping threshold"
+        },
+        "show_order_note": {
+          "label": "Order note"
+        },
+        "show_recommendations": {
+          "label": "Product recommendations"
+        },
+        "recommendations_heading": {
+          "label": "Recommendations heading"
         }
       }
     },
