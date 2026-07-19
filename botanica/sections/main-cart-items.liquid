@@ -33,7 +33,7 @@
             {%- for item in cart.items -%}
               {%- assign unit_price = item.final_price | money -%}
               <li
-                class="bt-cart__item{% unless item.available %} bt-cart__item--soldout{% endunless %}"
+                class="bt-cart__item{% unless item.variant.available %} bt-cart__item--soldout{% endunless %}"
                 role="listitem"
                 data-cart-item
                 data-key="{{ item.key }}"
@@ -69,11 +69,11 @@
                     {{ 'sections.cart.each_price' | t: price: unit_price }}
                   </p>
 
-                  {%- unless item.available -%}
+                  {%- unless item.variant.available -%}
                     <p class="bt-cart__item-soldout" role="alert">{{ 'sections.cart.sold_out' | t }}</p>
                   {%- endunless -%}
 
-                  {%- if item.available -%}
+                  {%- if item.variant.available -%}
                     <div class="bt-cart__item-stepper">
                       {% render 'qty-stepper', item_key: item.key, quantity: item.quantity, product_title: item.product.title %}
                     </div>
