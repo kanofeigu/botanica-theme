@@ -6,6 +6,8 @@
 
 > ★ **用户说"继续 Botanica 项目"时，必须先读 `important/` 目录。** 该目录是项目运行时的完整文档体系（架构、生命周期、功能树、修改检查、bug 日志、经验教训）。先读 `important/README.md`，再按需读其他文件。
 
+> ★ **删除规则（2026-07-19 用户明确要求）**：任何删除操作必须可恢复，禁止永久删除。本地文件 → 送 Windows 回收站（PowerShell `Microsoft.VisualBasic.FileIO.FileSystem` + `SendToRecycleBin`），不用 `rm -rf`；Shopify 商品/资源 → 不 delete，改 `status: ARCHIVED`（后台可恢复）；git 文件 → 用 `git rm`（历史可恢复）。
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project overview
