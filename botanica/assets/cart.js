@@ -47,40 +47,36 @@ if (typeof window.Shopify.formatMoney !== 'function') {
   };
 }
 
-/* Intercept product forms — AJAX add-to-cart → drawer */
+/* Intercept product forms — AJAX add-to-cart → drawer
+   Document-level submit delegation: covers PDP forms, quick-view
+   dialog forms and any form injected later by AJAX — no one-time
+   DOM scan required. */
 (function() {
-  function interceptForms() {
-    document.querySelectorAll('form[action*="/cart/add"]').forEach(function(form) {
-      if (form.dataset.ajaxIntercepted) return;
-      form.dataset.ajaxIntercepted = 'true';
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var btn = form.querySelector('[type="submit"]');
-        if (btn) { btn.disabled = true; btn.classList.add('bt-btn--loading'); }
-        fetch('/cart/add.js', { method: 'POST', body: new FormData(form) })
-          .then(function(res) {
-            if (!res.ok) throw new Error('Add failed');
-            return res.json();
-          })
-          .then(function(data) {
-            document.dispatchEvent(new CustomEvent('cart:added', { detail: data }));
-          })
-          .catch(function() {
-            form.submit();
-          })
-          .finally(function() {
-            if (btn) { btn.disabled = false; btn.classList.remove('bt-btn--loading'); }
-          });
+  document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (!form || form.tagName !== 'FORM') return;
+    var action = form.getAttribute('action') || '';
+    if (action.indexOf('/cart/add') === -1) return;
+    e.preventDefault();
+    var btn = form.querySelector('[type="submit"]');
+    if (btn) { btn.disabled = true; btn.classList.add('bt-btn--loading'); }
+    fetch('/cart/add.js', { method: 'POST', body: new FormData(form) })
+      .then(function(res) {
+        if (!res.ok) throw new Error('Add failed');
+        return res.json();
+      })
+      .then(function(data) {
+        document.dispatchEvent(new CustomEvent('cart:added', { detail: data }));
+      })
+      .catch(function() {
+        // Native submit() does not fire a submit event, so this
+        // cannot re-enter the delegated listener (no recursion).
+        form.submit();
+      })
+      .finally(function() {
+        if (btn) { btn.disabled = false; btn.classList.remove('bt-btn--loading'); }
       });
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', interceptForms);
-  } else {
-    interceptForms();
-  }
-  /* Re-check after Shopify sections load (theme editor) */
-  document.addEventListener('shopify:section:load', interceptForms);
+  });
 })();
 
 /* ────────────────────────────────────────────────────────────

@@ -11,6 +11,7 @@
   assign show_sold = show_sold_out_badge | default: settings.show_sold_out_badge
   assign show_care = show_care_badge | default: settings.show_care_badge | default: false
   assign show_light = show_light_badge | default: settings.show_light_badge | default: false
+  assign show_qv = show_quick_view | default: true
 
   assign care_label = ''
   assign care_class = ''
@@ -65,7 +66,7 @@
       </button>
     {%- endif -%}
 
-    {%- if block and block.settings.show_quick_view -%}
+    {%- if show_qv -%}
       {%- render 'quick-view-trigger', product: product -%}
     {%- endif -%}
   </div>

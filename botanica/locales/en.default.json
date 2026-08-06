@@ -206,6 +206,9 @@
       "view_product": "View product",
       "quick_view": "Quick view",
       "quick_view_label": "Quick view: {{ product_name }}",
+      "quick_view_close": "Close quick view",
+      "quick_view_error": "Unable to load product. Please try again.",
+      "view_details": "View full details",
       "media": {
         "gallery_viewer": "Gallery Viewer",
         "gallery": "Product gallery",

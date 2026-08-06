@@ -545,6 +545,13 @@
   background: var(--bt-color-surface-hover);
 }
 
+/* Selected variant option inside quick view */
+.bt-quick-view-dialog [data-qv-variant].is-selected {
+  background: var(--bt-color-primary);
+  color: var(--bt-color-primary-contrast);
+  border-color: var(--bt-color-primary);
+}
+
 .bt-quick-view__media {
   aspect-ratio: 4 / 5;
   background: var(--bt-color-surface);
