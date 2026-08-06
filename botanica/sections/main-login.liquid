@@ -1,21 +1,46 @@
 {% comment %} main-login.liquid — Customer login page. Original. Zero Dawn code. {% endcomment %}
-<div class="bt-section bt-login" {{ section.shopify_attributes }}>
+<div class="bt-section bt-login" {{ section.shopify_attributes }} data-bt-login>
   <div class="bt-container" style="max-width: 480px;">
-    <h1 class="bt-h1 bt-text-center">{{ 'customer.login.title' | t }}</h1>
-    {%- form 'customer_login', class: 'bt-login__form bt-stack-md' -%}
-      <div><label for="CustomerEmail" class="bt-label">{{ 'customer.login.email' | t }}</label><input type="email" id="CustomerEmail" name="customer[email]" class="bt-input" required autocomplete="email" autofocus></div>
-      {%- if form.password_needed -%}
-        <div><label for="CustomerPassword" class="bt-label">{{ 'customer.login.password' | t }}</label><input type="password" id="CustomerPassword" name="customer[password]" class="bt-input" required autocomplete="current-password"></div>
-      {%- endif -%}
-      <button type="submit" class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block">{{ 'customer.login.sign_in' | t }}</button>
-      <p class="bt-text-center bt-fs-body-sm"><a href="{{ routes.account_register_url }}">{{ 'customer.login.create_account' | t }}</a></p>
-      {%- if form.errors -%}<p class="bt-form-error bt-text-center" role="alert">{{ form.errors | default_errors }}</p>{%- endif -%}
-    {%- endform -%}
+    <div class="bt-login__view" id="login" data-bt-login-view="login">
+      <h1 class="bt-h1 bt-text-center">{{ 'customer.login.title' | t }}</h1>
+      {%- form 'customer_login', class: 'bt-login__form bt-stack-md' -%}
+        <div><label for="CustomerEmail" class="bt-label">{{ 'customer.login.email' | t }}</label><input type="email" id="CustomerEmail" name="customer[email]" class="bt-input" required autocomplete="email" autofocus></div>
+        {%- if form.password_needed -%}
+          <div>
+            <label for="CustomerPassword" class="bt-label">{{ 'customer.login.password' | t }}</label>
+            <input type="password" id="CustomerPassword" name="customer[password]" class="bt-input" required autocomplete="current-password">
+            <p class="bt-login__forgot bt-fs-body-sm"><a href="#recover">{{ 'customer.login.forgot_password' | t }}</a></p>
+          </div>
+        {%- endif -%}
+        <button type="submit" class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block">{{ 'customer.login.sign_in' | t }}</button>
+        <p class="bt-text-center bt-fs-body-sm"><a href="{{ routes.account_register_url }}">{{ 'customer.login.create_account' | t }}</a></p>
+        {%- if form.errors -%}<div class="bt-form-error bt-text-center" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+      {%- endform -%}
+    </div>
+
+    <div class="bt-login__view" id="recover" data-bt-login-view="recover">
+      <h1 class="bt-h1 bt-text-center">{{ 'customer.login.recover_title' | t }}</h1>
+      <p class="bt-login__subtext bt-text-center bt-fs-body-sm">{{ 'customer.login.recover_subtext' | t }}</p>
+      {%- form 'recover_customer_password', class: 'bt-login__form bt-stack-md' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="bt-form-success bt-text-center" role="status">{{ 'customer.login.recover_success' | t }}</p>
+        {%- endif -%}
+        <div><label for="RecoverEmail" class="bt-label">{{ 'customer.login.email' | t }}</label><input type="email" id="RecoverEmail" name="email" class="bt-input" required autocomplete="email"></div>
+        <button type="submit" class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block">{{ 'customer.login.recover_submit' | t }}</button>
+        <p class="bt-text-center bt-fs-body-sm"><a href="#login">{{ 'customer.login.back_to_login' | t }}</a></p>
+        {%- if form.errors -%}<div class="bt-form-error bt-text-center" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+      {%- endform -%}
+    </div>
   </div>
 </div>
 
+<script src="{{ 'customer-login.js' | asset_url }}" defer="defer"></script>
+
 {% stylesheet %}
   .bt-login__form { margin-top: var(--bt-space-lg); }
+  .bt-login__forgot { margin-top: var(--bt-space-xs); text-align: right; }
+  .bt-login__subtext { margin-top: var(--bt-space-sm); color: var(--bt-color-text-muted, inherit); }
+  .bt-login [hidden] { display: none; }
 {% endstylesheet %}
 
 {% schema %}
