@@ -32,9 +32,13 @@
             <p class="bt-multicolumn__text">{{ block.settings.text | escape }}</p>
           {%- endif -%}
           {%- if block.settings.link_label != blank -%}
-            <a href="{{ block.settings.link | default: '#' }}" class="bt-btn bt-btn--outline bt-btn--sm">
-              {{ block.settings.link_label | escape }}
-            </a>
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="bt-btn bt-btn--outline bt-btn--sm">
+                {{ block.settings.link_label | escape }}
+              </a>
+            {%- else -%}
+              <p class="bt-multicolumn__text">{{ block.settings.link_label | escape }}</p>
+            {%- endif -%}
           {%- endif -%}
         </div>
       {%- endfor -%}

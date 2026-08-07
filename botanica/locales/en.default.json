@@ -434,6 +434,7 @@
       "title": "Account",
       "details": "Account details",
       "view_addresses": "View addresses",
+      "manage_addresses": "Manage addresses ({{ count }})",
       "return": "Return to Account details"
     },
     "account_fallback": "Account",
@@ -1469,7 +1470,19 @@
       }
     },
     "main_collection_banner": {
-      "name": "Collection banner"
+      "name": "Collection banner",
+      "specimens": {
+        "one": "{{ count }} specimen",
+        "other": "{{ count }} specimens"
+      },
+      "settings": {
+        "show_image": {
+          "label": "Show collection image"
+        },
+        "show_description": {
+          "label": "Show collection description"
+        }
+      }
     },
     "main_collection_product_grid": {
       "name": "Product grid",

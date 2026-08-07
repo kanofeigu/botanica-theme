@@ -13,6 +13,13 @@
   assign show_light = show_light_badge | default: settings.show_light_badge | default: false
   assign show_qv = show_quick_view | default: true
 
+  comment
+    LCP control: callers pass loading: 'eager', fetchpriority: 'high'
+    for the first above-the-fold cards; everyone else stays lazy/auto.
+  endcomment
+  assign primary_loading = loading | default: 'lazy'
+  assign primary_fetch = fetchpriority | default: 'auto'
+
   assign care_label = ''
   assign care_class = ''
   if product.tags contains 'care-easy'
@@ -43,7 +50,7 @@
   <div class="bt-card__media" style="aspect-ratio: {{ aspect }}">
     <a href="{{ product.url }}" aria-label="{{ product.title }}" class="bt-card__media-link">
       {%- if product.featured_media -%}
-        {{ product.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,400,500,600', sizes: '(min-width: 990px) 33vw, 50vw', alt: product.featured_media.alt | default: product.title, class: 'bt-product-card__image' }}
+        {{ product.featured_media | image_url: width: 600 | image_tag: loading: primary_loading, fetchpriority: primary_fetch, widths: '300,400,500,600', sizes: '(min-width: 990px) 33vw, 50vw', alt: product.featured_media.alt | default: product.title, class: 'bt-product-card__image' }}
         {%- if show_secondary_image and product.media[1] != blank -%}
           {{ product.media[1] | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,400,500,600', sizes: '(min-width: 990px) 33vw, 50vw', alt: product.media[1].alt | default: product.title, class: 'bt-product-card__image bt-card__secondary-image' }}
         {%- endif -%}

@@ -536,7 +536,12 @@
       }
     },
     "contact_form": {
-      "name": "Contact Form"
+      "name": "Contact Form",
+      "settings": {
+        "show_title": {
+          "label": "Show page title"
+        }
+      }
     },
     "rich_text": {
       "name": "Rich text",
@@ -926,6 +931,15 @@
         },
         "show_description": {
           "label": "Show description"
+        },
+        "show_vendor": {
+          "label": "Show vendor"
+        },
+        "show_price": {
+          "label": "Show price"
+        },
+        "show_buy_button": {
+          "label": "Show buy button"
         },
         "padding_top": {
           "label": "Top padding"

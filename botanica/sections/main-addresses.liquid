@@ -1,21 +1,111 @@
-{% comment %} main-addresses.liquid — Customer addresses page. Original. {% endcomment %}
+{% comment %} main-addresses.liquid — Customer addresses page: list / add / edit / delete. Original. {% endcomment %}
 <div class="bt-section bt-addresses" {{ section.shopify_attributes }}>
   <div class="bt-container" style="max-width: 720px;">
     <h1 class="bt-h1">{{ 'customer.addresses.title' | t }}</h1>
     <a href="{{ routes.account_url }}" style="color: var(--bt-color-primary); font-size: var(--bt-fs-body-sm);">&larr; {{ 'customer.account.return' | t }}</a>
+
+    <div style="margin-top: var(--bt-space-lg);">
+      <button type="button" class="bt-btn bt-btn--primary" data-bt-address-toggle="AddressNewForm" aria-expanded="false" aria-controls="AddressNewForm">
+        {{ 'customer.addresses.add_new' | t }}
+      </button>
+      <div id="AddressNewForm" class="bt-addresses__form bt-card" hidden>
+        <div class="bt-card__body">
+          <h2 class="bt-card__title">{{ 'customer.addresses.add_new' | t }}</h2>
+          {%- form 'customer_address', customer.new_address, class: 'bt-stack-md' -%}
+            {% render 'address-form-fields', id_prefix: 'AddressNew', addr: customer.new_address %}
+            <div class="bt-addresses__form-actions">
+              <button type="submit" class="bt-btn bt-btn--primary">{{ 'customer.addresses.add' | t }}</button>
+              <button type="button" class="bt-btn bt-btn--outline" data-bt-address-toggle="AddressNewForm" aria-expanded="true" aria-controls="AddressNewForm">{{ 'customer.addresses.cancel' | t }}</button>
+            </div>
+            {%- if form.errors -%}<div class="bt-form-error" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+          {%- endform -%}
+        </div>
+      </div>
+    </div>
+
     <div style="margin-top: var(--bt-space-lg);" class="bt-grid bt-grid--2">
       {%- for address in customer.addresses -%}
-        <div class="bt-card"><div class="bt-card__body">
-          <h3 class="bt-card__title">{{ address.first_name }} {{ address.last_name }}</h3>
-          <p class="bt-card__price">{{ address | format_address }}</p>
-        </div></div>
+        <div class="bt-addresses__item">
+          <div class="bt-card"><div class="bt-card__body">
+            {%- if address == customer.default_address -%}
+              <span class="bt-badge">{{ 'customer.addresses.default' | t }}</span>
+            {%- endif -%}
+            <h3 class="bt-card__title">{{ address.first_name }} {{ address.last_name }}</h3>
+            <p class="bt-card__price">{{ address | format_address }}</p>
+            <div class="bt-addresses__actions">
+              <button type="button" class="bt-btn bt-btn--outline bt-btn--sm" data-bt-address-toggle="AddressEditForm-{{ address.id }}" aria-expanded="false" aria-controls="AddressEditForm-{{ address.id }}">
+                {{ 'customer.addresses.edit' | t }}
+              </button>
+              {%- form 'customer_address', address, class: 'bt-addresses__delete' -%}
+                <input type="hidden" name="_method" value="delete">
+                <button type="submit" class="bt-btn bt-btn--outline bt-btn--sm" data-bt-address-delete="{{ 'customer.addresses.delete_confirm' | t | escape }}">
+                  {{ 'customer.addresses.delete' | t }}
+                </button>
+              {%- endform -%}
+            </div>
+          </div></div>
+          <div id="AddressEditForm-{{ address.id }}" class="bt-addresses__form bt-card" hidden>
+            <div class="bt-card__body">
+              <h2 class="bt-card__title">{{ 'customer.addresses.edit_address' | t }}</h2>
+              {%- form 'customer_address', address, class: 'bt-stack-md' -%}
+                {% render 'address-form-fields', id_prefix: 'Address-{{ address.id }}', addr: address %}
+                <div class="bt-addresses__form-actions">
+                  <button type="submit" class="bt-btn bt-btn--primary">{{ 'customer.addresses.update' | t }}</button>
+                  <button type="button" class="bt-btn bt-btn--outline" data-bt-address-toggle="AddressEditForm-{{ address.id }}" aria-expanded="true" aria-controls="AddressEditForm-{{ address.id }}">{{ 'customer.addresses.cancel' | t }}</button>
+                </div>
+                {%- if form.errors -%}<div class="bt-form-error" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+              {%- endform -%}
+            </div>
+          </div>
+        </div>
       {%- endfor -%}
     </div>
   </div>
 </div>
 
+{% javascript %}
+  (function () {
+    /* Toggle add/edit address forms (vanilla, delegation-free: section is never AJAX-swapped). */
+    document.querySelectorAll('[data-bt-address-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = document.getElementById(btn.getAttribute('data-bt-address-toggle'));
+        if (!target) return;
+        var willOpen = target.hasAttribute('hidden');
+        if (willOpen) { target.removeAttribute('hidden'); } else { target.setAttribute('hidden', ''); }
+        document.querySelectorAll('[data-bt-address-toggle="' + target.id + '"]').forEach(function (b) {
+          b.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+      });
+    });
+
+    /* Restore selected country on edit forms (data-default from the address). */
+    document.querySelectorAll('select[data-address-country]').forEach(function (sel) {
+      var def = sel.getAttribute('data-default');
+      if (!def) return;
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].text === def || sel.options[i].value === def) { sel.selectedIndex = i; break; }
+      }
+    });
+
+    /* Delete confirmation (message carried in data attribute from locale). */
+    document.querySelectorAll('[data-bt-address-delete]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        if (!window.confirm(btn.getAttribute('data-bt-address-delete'))) e.preventDefault();
+      });
+    });
+  })();
+{% endjavascript %}
+
 {% stylesheet %}
   .bt-addresses .bt-h1 { margin-bottom: var(--bt-space-xs); }
+  .bt-addresses__form { margin-top: var(--bt-space-md); }
+  .bt-addresses__form .bt-card__title { margin-bottom: var(--bt-space-sm); }
+  .bt-addresses__item { display: flex; flex-direction: column; gap: var(--bt-space-sm); }
+  .bt-addresses__actions { display: flex; gap: var(--bt-space-2xs); margin-top: var(--bt-space-sm); align-items: center; }
+  .bt-addresses__delete { margin: 0; }
+  .bt-addresses__form-actions { display: flex; gap: var(--bt-space-2xs); }
+  .bt-addresses__default-label { display: flex; align-items: center; gap: var(--bt-space-2xs); font-size: var(--bt-fs-body-sm); cursor: pointer; }
+  .bt-addresses .bt-badge { margin-bottom: var(--bt-space-2xs); display: inline-block; }
 {% endstylesheet %}
 
 {% schema %}

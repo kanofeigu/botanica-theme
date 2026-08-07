@@ -4,9 +4,10 @@
 {% endcomment %}
 {%- liquid
   assign platform = block.settings.platform | default: 'instagram'
-  assign link = block.settings.link | default: '#'
+  assign link = block.settings.link
   assign label = 'Follow us on ' | append: platform
 -%}
+{%- if link != blank -%}
 <a
   href="{{ link }}"
   class="bt-social-item"
@@ -33,6 +34,7 @@
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
   {%- endcase -%}
 </a>
+{%- endif -%}
 
 {% stylesheet %}
   .bt-social-item {

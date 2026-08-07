@@ -3,6 +3,7 @@
   <div class="bt-container" style="max-width: 720px;">
     <h1 class="bt-h1">{{ 'customer.account.title' | t }}</h1>
     <div class="bt-rich-text">{{ 'customer.account.details' | t }} — <a href="{{ routes.account_logout_url }}" style="color: var(--bt-color-primary);">{{ 'customer.log_out' | t }}</a></div>
+    <p style="margin-top: var(--bt-space-xs);"><a href="{{ routes.account_addresses_url }}" style="color: var(--bt-color-primary); font-size: var(--bt-fs-body-sm);">{{ 'customer.account.manage_addresses' | t: count: customer.addresses_count }}</a></p>
     <h2 class="bt-h3" style="margin-top: var(--bt-space-lg);">{{ 'customer.orders.title' | t }}</h2>
     {%- paginate customer.orders by 10 -%}
       {%- if customer.orders.size > 0 -%}

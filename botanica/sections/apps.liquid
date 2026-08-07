@@ -7,7 +7,7 @@
   single app's internal DOM — so the theme passes Theme Store's
   "core function must not depend on a specific app" rule.
 {% endcomment %}
-<section class="bt-apps bt-section" {{ section.shopify_attributes }}>
+<section class="bt-apps bt-section" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container bt-apps__inner">
     {% content_for "blocks" %}
   </div>

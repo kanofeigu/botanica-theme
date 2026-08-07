@@ -2,7 +2,9 @@
 <div class="bt-section bt-contact" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <div style="max-width: 600px; margin-inline: auto;">
-      <h1 class="bt-h1 bt-text-center">{{ page.title }}</h1>
+      {%- if section.settings.show_title -%}
+        <h1 class="bt-h1 bt-text-center">{{ page.title }}</h1>
+      {%- endif -%}
       {%- form 'contact', class: 'bt-contact__form bt-stack-md' -%}
         {%- if form.posted_successfully? -%}
           <p class="bt-form-success" role="alert">{{ 'contact.form.post_success' | t }}</p>
@@ -31,5 +33,7 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.contact_form.name", "presets": [{ "name": "t:sections.contact_form.name" }] }
+{ "name": "t:sections.contact_form.name", "settings": [
+  { "type": "checkbox", "id": "show_title", "label": "t:sections.contact_form.settings.show_title.label", "default": false }
+], "presets": [{ "name": "t:sections.contact_form.name" }] }
 {% endschema %}

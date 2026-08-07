@@ -13,6 +13,7 @@
 <product-recommendations
   class="bt-recommendations"
   {{ section.shopify_attributes }}
+  style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
   data-url="{{ routes.product_recommendations_url }}.json?product_id={{ product.id }}&limit={{ limit }}"
   data-limit="{{ limit }}"
   aria-label="{{ heading | escape }}"

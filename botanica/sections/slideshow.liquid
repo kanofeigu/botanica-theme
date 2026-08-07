@@ -61,8 +61,8 @@
                 {%- if block.settings.text != blank -%}
                   <p class="bt-slideshow__text">{{ block.settings.text | escape }}</p>
                 {%- endif -%}
-                {%- if block.settings.link_label != blank -%}
-                  <a href="{{ block.settings.link | default: '#' }}" class="bt-btn bt-btn--primary">
+                {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+                  <a href="{{ block.settings.link }}" class="bt-btn bt-btn--primary">
                     {{ block.settings.link_label | escape }}
                   </a>
                 {%- endif -%}

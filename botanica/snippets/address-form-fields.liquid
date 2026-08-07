@@ -1,0 +1,61 @@
+{% comment %}
+  address-form-fields.liquid — Shared customer address fields.
+  Must be rendered INSIDE a {% form 'customer_address', ... %} block so
+  the `form` object is in scope.
+  Accepts:
+    id_prefix {String} — unique prefix for input ids (e.g. 'AddressNew' or 'Address-{{ address.id }}')
+    addr      {Address} — address object (customer.new_address for the create form)
+  Original. Zero external dependencies.
+{% endcomment %}
+<div class="bt-grid bt-grid--2">
+  <div>
+    <label class="bt-label" for="{{ id_prefix }}-FirstName">{{ 'customer.addresses.first_name' | t }}</label>
+    <input type="text" id="{{ id_prefix }}-FirstName" name="address[first_name]" class="bt-input" value="{{ form.first_name }}" autocomplete="given-name">
+  </div>
+  <div>
+    <label class="bt-label" for="{{ id_prefix }}-LastName">{{ 'customer.addresses.last_name' | t }}</label>
+    <input type="text" id="{{ id_prefix }}-LastName" name="address[last_name]" class="bt-input" value="{{ form.last_name }}" autocomplete="family-name">
+  </div>
+</div>
+<div>
+  <label class="bt-label" for="{{ id_prefix }}-Company">{{ 'customer.addresses.company' | t }}</label>
+  <input type="text" id="{{ id_prefix }}-Company" name="address[company]" class="bt-input" value="{{ form.company }}" autocomplete="organization">
+</div>
+<div>
+  <label class="bt-label" for="{{ id_prefix }}-Address1">{{ 'customer.addresses.address1' | t }}</label>
+  <input type="text" id="{{ id_prefix }}-Address1" name="address[address1]" class="bt-input" value="{{ form.address1 }}" autocomplete="address-line1">
+</div>
+<div>
+  <label class="bt-label" for="{{ id_prefix }}-Address2">{{ 'customer.addresses.address2' | t }}</label>
+  <input type="text" id="{{ id_prefix }}-Address2" name="address[address2]" class="bt-input" value="{{ form.address2 }}" autocomplete="address-line2">
+</div>
+<div class="bt-grid bt-grid--2">
+  <div>
+    <label class="bt-label" for="{{ id_prefix }}-City">{{ 'customer.addresses.city' | t }}</label>
+    <input type="text" id="{{ id_prefix }}-City" name="address[city]" class="bt-input" value="{{ form.city }}" autocomplete="address-level2">
+  </div>
+  <div>
+    <label class="bt-label" for="{{ id_prefix }}-Zip">{{ 'customer.addresses.zip' | t }}</label>
+    <input type="text" id="{{ id_prefix }}-Zip" name="address[zip]" class="bt-input" value="{{ form.zip }}" autocapitalize="characters" autocomplete="postal-code">
+  </div>
+</div>
+<div>
+  <label class="bt-label" for="{{ id_prefix }}-Country">{{ 'customer.addresses.country' | t }}</label>
+  <select id="{{ id_prefix }}-Country" name="address[country]" class="bt-select" data-address-country data-default="{{ form.country }}" autocomplete="country-name">
+    {{ all_country_option_tags }}
+  </select>
+</div>
+<div>
+  <label class="bt-label" for="{{ id_prefix }}-Province">{{ 'customer.addresses.province' | t }}</label>
+  <input type="text" id="{{ id_prefix }}-Province" name="address[province]" class="bt-input" value="{{ form.province }}" autocomplete="address-level1">
+</div>
+<div>
+  <label class="bt-label" for="{{ id_prefix }}-Phone">{{ 'customer.addresses.phone' | t }}</label>
+  <input type="tel" id="{{ id_prefix }}-Phone" name="address[phone]" class="bt-input" value="{{ form.phone }}" autocomplete="tel">
+</div>
+<div>
+  <label class="bt-addresses__default-label" for="{{ id_prefix }}-Default">
+    <input type="checkbox" id="{{ id_prefix }}-Default" name="address[default]" value="1" {% if addr == customer.default_address %}checked{% endif %}>
+    {{ 'customer.addresses.set_default' | t }}
+  </label>
+</div>

@@ -47,6 +47,13 @@ if (typeof window.Shopify.formatMoney !== 'function') {
   };
 }
 
+/* HTML-escape helper for strings interpolated into innerHTML. */
+function btEsc(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
 /* Intercept product forms — AJAX add-to-cart → drawer
    Document-level submit delegation: covers PDP forms, quick-view
    dialog forms and any form injected later by AJAX — no one-time
@@ -59,6 +66,9 @@ if (typeof window.Shopify.formatMoney !== 'function') {
     if (action.indexOf('/cart/add') === -1) return;
     e.preventDefault();
     var btn = form.querySelector('[type="submit"]');
+    /* Remember pre-submit disabled state: a sold-out ATC must stay
+       disabled after the (failed) request instead of being re-enabled. */
+    var btnWasDisabled = btn ? btn.disabled : false;
     if (btn) { btn.disabled = true; btn.classList.add('bt-btn--loading'); }
     fetch('/cart/add.js', { method: 'POST', body: new FormData(form) })
       .then(function(res) {
@@ -74,7 +84,10 @@ if (typeof window.Shopify.formatMoney !== 'function') {
         form.submit();
       })
       .finally(function() {
-        if (btn) { btn.disabled = false; btn.classList.remove('bt-btn--loading'); }
+        if (btn) {
+          if (!btnWasDisabled) btn.disabled = false;
+          btn.classList.remove('bt-btn--loading');
+        }
       });
   });
 })();
@@ -134,7 +147,6 @@ if (!customElements.get('bt-cart-drawer')) {
       this.toggleBtn = document.querySelector('[data-cart-toggle]');
       this.closeBtn = this.querySelector('[data-cart-close]');
       this.overlay = this.querySelector('[data-cart-overlay]');
-      this.badge = document.querySelector('[data-cart-count-badge]');
       this.giftNote = this.querySelector('[data-cart-gift-note]');
       this.shippingEl = this.querySelector('[data-cart-shipping]');
       this.itemsEl = this.querySelector('[data-cart-items]');
@@ -286,10 +298,10 @@ if (!customElements.get('bt-cart-drawer')) {
 
     _itemHTML(item) {
       var img = item.image
-        ? '<img src="' + item.image + '" alt="' + item.title + '" width="80" height="80" loading="lazy">'
+        ? '<img src="' + item.image + '" alt="' + btEsc(item.title) + '" width="80" height="80" loading="lazy">'
         : '<div class="bt-cart-drawer__item-placeholder"></div>';
       var variant = item.variant_title && item.variant_title !== 'Default Title'
-        ? '<p class="bt-cart-drawer__item-variant">' + item.variant_title + '</p>'
+        ? '<p class="bt-cart-drawer__item-variant">' + btEsc(item.variant_title) + '</p>'
         : '';
       var compareAt = item.variant_compare_at_price && item.variant_compare_at_price > item.final_price
         ? '<span class="bt-cart-drawer__item-compare">' + Shopify.formatMoney(item.variant_compare_at_price, window.theme.moneyFormat) + '</span>'
@@ -298,7 +310,7 @@ if (!customElements.get('bt-cart-drawer')) {
       return '<li class="bt-cart-drawer__item" role="listitem">' +
         '<div class="bt-cart-drawer__item-media"><a href="' + item.url + '">' + img + '</a></div>' +
         '<div class="bt-cart-drawer__item-info">' +
-          '<a href="' + item.url + '" class="bt-cart-drawer__item-title">' + item.product_title + '</a>' +
+          '<a href="' + item.url + '" class="bt-cart-drawer__item-title">' + btEsc(item.product_title) + '</a>' +
           variant +
           '<div class="bt-cart-drawer__item-qty-row">' +
             '<div class="bt-qty-stepper" data-qty-stepper>' +
@@ -339,9 +351,9 @@ if (!customElements.get('bt-cart-drawer')) {
           var imgSrc = p.images[0]?.src || p.featured_image;
           html += '<div class="bt-cart-upsell__item">' +
             '<div class="bt-cart-upsell__media">' +
-              (imgSrc ? '<img src="' + imgSrc + '" alt="' + p.title + '" width="100" height="100" loading="lazy">' : '<div class="bt-cart-upsell__placeholder"></div>') +
+              (imgSrc ? '<img src="' + imgSrc + '" alt="' + btEsc(p.title) + '" width="100" height="100" loading="lazy">' : '<div class="bt-cart-upsell__placeholder"></div>') +
             '</div>' +
-            '<p class="bt-cart-upsell__name">' + p.title + '</p>' +
+            '<p class="bt-cart-upsell__name">' + btEsc(p.title) + '</p>' +
             '<span class="bt-cart-upsell__price">' + price + '</span>' +
             '<button type="button" class="bt-btn bt-btn--sm bt-btn--primary" data-upsell-add data-variant-id="' + v.id + '">Add</button>' +
           '</div>';

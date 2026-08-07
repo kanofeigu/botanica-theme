@@ -5,7 +5,7 @@
   block but original markup/CSS.
 {% endcomment %}
 {%- if section.settings.body != blank or section.settings.heading != blank -%}
-  <section class="bt-guarantee" {{ section.shopify_attributes }}>
+  <section class="bt-guarantee" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
     <div class="bt-container bt-guarantee__inner">
       <span class="bt-guarantee__mark" aria-hidden="true">
         <svg width="56" height="56" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">

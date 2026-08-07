@@ -199,7 +199,12 @@
           {%- if collection.products.size > 0 -%}
             <div class="bt-grid bt-grid--{{ columns_desktop }}">
               {%- for product in collection.products -%}
-                {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
+                {%- if forloop.index <= 4 -%}
+                  {% comment %} First row = LCP candidates: eager + high priority {% endcomment %}
+                  {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, loading: 'eager', fetchpriority: 'high' %}
+                {%- else -%}
+                  {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
+                {%- endif -%}
               {%- endfor -%}
             </div>
           {%- else -%}
@@ -226,6 +231,35 @@
        No full page reload, no screen flash.
        ════════════════════════════════════════════ */
     var ajaxing = false;
+
+    /* Shared popover state: document/window listeners for sort/price popovers
+       are registered ONCE (guarded by popoverShared.bound) so repeated AJAX
+       grid rebuilds never stack duplicate global handlers. Handlers re-check
+       root.isConnected to drop references to swapped-out DOM. */
+    var popoverShared = { active: null, bound: false };
+    function bindPopoverGlobals() {
+      if (popoverShared.bound) return; popoverShared.bound = true;
+      document.addEventListener('click', function (e) {
+        var a = popoverShared.active;
+        if (a && !a.root.isConnected) { popoverShared.active = null; return; }
+        if (a && !a.root.contains(e.target) && !a.menu.contains(e.target)) a.hide();
+      });
+      document.addEventListener('keydown', function (e) {
+        var a = popoverShared.active;
+        if (a && !a.root.isConnected) { popoverShared.active = null; return; }
+        if (a && e.key === 'Escape') { a.hide(); a.btn.focus(); }
+      });
+      window.addEventListener('scroll', function () {
+        var a = popoverShared.active;
+        if (a && !a.root.isConnected) { popoverShared.active = null; return; }
+        if (a) a.position();
+      }, true);
+      window.addEventListener('resize', function () {
+        var a = popoverShared.active;
+        if (a && !a.root.isConnected) { popoverShared.active = null; return; }
+        if (a) a.position();
+      });
+    }
 
     function ajaxNavigate(url, pushState) {
       if (ajaxing) return;
@@ -309,6 +343,7 @@
       }
       function show() {
         open = true;
+        popoverShared.active = api;
         if (opts.matchWidth) menu.style.width = btn.offsetWidth + 'px';
         document.body.appendChild(menu);
         menu.hidden = false;
@@ -321,6 +356,7 @@
       }
       function hide() {
         open = false;
+        if (popoverShared.active === api) popoverShared.active = null;
         menu.classList.remove('is-open');
         btn.setAttribute('aria-expanded', 'false');
         setTimeout(function () {
@@ -334,11 +370,9 @@
         }, 220);
       }
 
+      var api = { root: root, menu: menu, btn: btn, hide: hide, position: position };
+      bindPopoverGlobals();
       btn.addEventListener('click', function (e) { e.stopPropagation(); if (open) hide(); else show(); });
-      document.addEventListener('click', function (e) { if (open && !root.contains(e.target) && !menu.contains(e.target)) hide(); });
-      document.addEventListener('keydown', function (e) { if (open && e.key === 'Escape') { hide(); btn.focus(); } });
-      window.addEventListener('scroll', function () { if (open) position(); }, true);
-      window.addEventListener('resize', function () { if (open) position(); });
 
       root.querySelectorAll(optionSel).forEach(function (opt) {
         opt.addEventListener('mouseenter', function () {
@@ -469,7 +503,16 @@
         }
       }
 
-      window.addEventListener('popstate', function (e) {
+      window.addEventListener('popstate', function () {
+        if (ajaxing) {
+          /* A filter/sort request is in flight: retry once shortly; if it is
+             still busy, fall back to a full reload of the (already updated)
+             URL instead of silently dropping the back/forward navigation. */
+          setTimeout(function () {
+            if (ajaxing) { window.location.reload(); } else { ajaxNavigate(window.location.href, false); }
+          }, 300);
+          return;
+        }
         ajaxNavigate(window.location.href, false);
       });
     }
@@ -477,20 +520,32 @@
     /* ════════════════════════════════════════════
        MOBILE SIDEBAR
        ════════════════════════════════════════════ */
+    var mobileSidebarBound = false;
     function initMobileSidebar() {
       var filterToggle = document.querySelector('[data-filter-toggle]');
       var sidebar = document.querySelector('[data-sidebar]');
       if (!filterToggle || !sidebar) return;
-      if (filterToggle._btMobileInit) return; filterToggle._btMobileInit = true;
-      filterToggle.addEventListener('click', function () {
-        sidebar.classList.toggle('is-open');
-        document.body.classList.toggle('bt-filter-open');
-      });
+      if (!filterToggle._btMobileInit) {
+        filterToggle._btMobileInit = true;
+        filterToggle.addEventListener('click', function () {
+          var sb = document.querySelector('[data-sidebar]');
+          if (!sb) return;
+          sb.classList.toggle('is-open');
+          document.body.classList.toggle('bt-filter-open');
+        });
+      }
+      /* Outside-click closes the drawer: document listener registered once
+         (guarded), elements re-resolved at event time so the single handler
+         keeps working across AJAX grid rebuilds without stacking. */
+      if (mobileSidebarBound) return; mobileSidebarBound = true;
       document.addEventListener('click', function (e) {
-        if (document.body.classList.contains('bt-filter-open') && !sidebar.contains(e.target) && !filterToggle.contains(e.target)) {
-          sidebar.classList.remove('is-open');
-          document.body.classList.remove('bt-filter-open');
-        }
+        if (!document.body.classList.contains('bt-filter-open')) return;
+        var sb = document.querySelector('[data-sidebar]');
+        var tg = document.querySelector('[data-filter-toggle]');
+        if (!sb) return;
+        if (sb.contains(e.target) || (tg && tg.contains(e.target))) return;
+        sb.classList.remove('is-open');
+        document.body.classList.remove('bt-filter-open');
       });
     }
 

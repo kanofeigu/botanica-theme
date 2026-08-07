@@ -2,29 +2,35 @@
 <div class="bt-section bt-list-collections" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-h1 bt-text-center">{{ 'collections.general.title' | t }}</h1>
-    <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
-      {%- for collection in collections -%}
-        <div class="bt-card bt-card--hover">
-          <div class="bt-card__media" style="aspect-ratio: 1/1">
-            <a href="{{ collection.url }}">
-              {%- if collection.featured_image -%}
-                {{ collection.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,400,600', sizes: '(min-width: 990px) 33vw, 100vw', alt: collection.title }}
-              {%- else -%}
-                {{ 'collection-1' | placeholder_svg_tag: 'bt-card__placeholder' }}
-              {%- endif -%}
-            </a>
+    {%- paginate collections by 24 -%}
+      <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
+        {%- for collection in collections -%}
+          <div class="bt-card bt-card--hover">
+            <div class="bt-card__media" style="aspect-ratio: 1/1">
+              <a href="{{ collection.url }}">
+                {%- if collection.featured_image -%}
+                  {{ collection.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,400,600', sizes: '(min-width: 990px) 33vw, 100vw', alt: collection.title }}
+                {%- else -%}
+                  {{ 'collection-1' | placeholder_svg_tag: 'bt-card__placeholder' }}
+                {%- endif -%}
+              </a>
+            </div>
+            <div class="bt-card__body bt-text-center">
+              <h2 class="bt-card__title"><a href="{{ collection.url }}">{{ collection.title }}</a></h2>
+            </div>
           </div>
-          <div class="bt-card__body bt-text-center">
-            <h2 class="bt-card__title"><a href="{{ collection.url }}">{{ collection.title }}</a></h2>
-          </div>
-        </div>
-      {%- endfor -%}
-    </div>
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}
+        <div class="bt-list-collections__pagination">{% render 'pagination', paginate: paginate %}</div>
+      {%- endif -%}
+    {%- endpaginate -%}
   </div>
 </div>
 
 {% stylesheet %}
   .bt-list-collections .bt-h1 { margin-bottom: var(--bt-space-xl); }
+  .bt-list-collections__pagination { margin-top: var(--bt-space-xl); display: flex; justify-content: center; }
 {% endstylesheet %}
 
 {% schema %}
