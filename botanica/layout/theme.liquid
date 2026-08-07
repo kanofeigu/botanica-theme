@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="{{ settings.colors_background }}">
+  {%- for scheme in settings.color_schemes limit: 1 -%}{%- assign default_scheme = scheme -%}{%- endfor -%}
+  <meta name="theme-color" content="{{ default_scheme.settings.background }}">
   <link rel="canonical" href="{{ canonical_url }}">
 
   {%- if settings.favicon != blank -%}
@@ -60,16 +61,47 @@
     {{ body_font_bold_italic | font_face: font_display: 'swap' }}
     {{ settings.heading_font | font_face: font_display: 'swap' }}
 
-    :root {
-      --bt-color-bg: {{ settings.colors_background }};
-      --bt-color-surface: {{ settings.colors_surface }};
-      --bt-color-text: {{ settings.colors_text }};
-      --bt-color-text-muted: {{ settings.colors_text_muted }};
-      --bt-color-primary: {{ settings.colors_primary }};
-      --bt-color-primary-contrast: {{ settings.colors_primary_contrast }};
-      --bt-color-secondary: {{ settings.colors_secondary }};
-      --bt-color-border: {{ settings.colors_border }};
+    {%- comment -%}
+      Color schemes — one .color-scheme-N class per scheme defined in
+      settings_data.json (merchant-editable under Theme settings → Colors).
+      scheme-1 doubles as the :root global default so uncategorized surfaces
+      (body, drawers) keep the base palette. Derived tokens (hover / tint /
+      border-light / shadows) resolve from these vars at point of use via
+      color-mix() in design-tokens.css, so they adapt per scheme automatically.
+      Surface / muted derive in Liquid: light schemes lift surface and soften
+      text; dark schemes invert the direction.
+    {%- endcomment -%}
+    {%- for scheme in settings.color_schemes -%}
+      {%- assign bg_brightness = scheme.settings.background | color_brightness -%}
+      {%- if bg_brightness > 128 -%}
+        {%- assign scheme_surface = scheme.settings.background | color_lighten: 2 -%}
+        {%- assign scheme_muted = scheme.settings.text | color_lighten: 12 -%}
+      {%- else -%}
+        {%- assign scheme_surface = scheme.settings.background | color_lighten: 6 -%}
+        {%- assign scheme_muted = scheme.settings.text | color_darken: 12 -%}
+      {%- endif -%}
+      {% if forloop.index == 1 %}:root,{% endif %}
+      .color-{{ scheme.id }} {
+        --bt-color-bg: {{ scheme.settings.background }};
+        --bt-color-bg-rgb: {{ scheme.settings.background.red }}, {{ scheme.settings.background.green }}, {{ scheme.settings.background.blue }};
+        --bt-color-surface: {{ scheme_surface }};
+        --bt-color-text: {{ scheme.settings.text }};
+        --bt-color-text-rgb: {{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }};
+        --bt-color-text-muted: {{ scheme_muted }};
+        --bt-color-primary: {{ scheme.settings.button }};
+        --bt-color-primary-rgb: {{ scheme.settings.button.red }}, {{ scheme.settings.button.green }}, {{ scheme.settings.button.blue }};
+        --bt-color-primary-contrast: {{ scheme.settings.button_label }};
+        --bt-color-primary-contrast-rgb: {{ scheme.settings.button_label.red }}, {{ scheme.settings.button_label.green }}, {{ scheme.settings.button_label.blue }};
+        --bt-color-secondary: {{ scheme.settings.accent }};
+        --bt-color-secondary-rgb: {{ scheme.settings.accent.red }}, {{ scheme.settings.accent.green }}, {{ scheme.settings.accent.blue }};
+        --bt-color-border: {{ scheme.settings.shadow }};
+        {%- if scheme.settings.background_gradient != blank %}
+          --bt-color-bg-gradient: {{ scheme.settings.background_gradient }};
+        {%- endif %}
+      }
+    {%- endfor -%}
 
+    :root {
       --bt-font-heading: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
       --bt-font-body: {{ settings.body_font.family }}, {{ settings.body_font.fallback_families }};
       --bt-fs-body: {{ settings.body_scale | divided_by: 100.0 }}rem;

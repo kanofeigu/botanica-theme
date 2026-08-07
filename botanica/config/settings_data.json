@@ -3,14 +3,6 @@
   "presets": {
     "Botanical": {
       "logo_width": 120,
-      "colors_background": "#F5F1E8",
-      "colors_surface": "#FAF7EF",
-      "colors_text": "#2E2A24",
-      "colors_text_muted": "#4D4840",
-      "colors_primary": "#4A6B4F",
-      "colors_primary_contrast": "#FFFFFF",
-      "colors_secondary": "#C97D5A",
-      "colors_border": "#2E2A24",
       "heading_font": "fraunces_n4",
       "body_font": "inter_n4",
       "body_scale": 100,
@@ -28,18 +20,67 @@
       "cart_type": "drawer",
       "show_free_shipping_bar": true,
       "free_shipping_threshold": "50",
-      "show_currency_code": true
+      "show_currency_code": true,
+      "color_schemes": {
+        "scheme-1": {
+          "settings": {
+            "background": "#F5F1E8",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#4A6B4F",
+            "button_label": "#FFFFFF",
+            "accent": "#C97D5A",
+            "shadow": "#2E2A24"
+          }
+        },
+        "scheme-2": {
+          "settings": {
+            "background": "#FAF7EF",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#4A6B4F",
+            "button_label": "#FFFFFF",
+            "accent": "#C97D5A",
+            "shadow": "#2E2A24"
+          }
+        },
+        "scheme-3": {
+          "settings": {
+            "background": "#2E3D2F",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#2E3D2F",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        },
+        "scheme-4": {
+          "settings": {
+            "background": "#F6E9E1",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#B56A48",
+            "button_label": "#FFFFFF",
+            "accent": "#4A6B4F",
+            "shadow": "#2E2A24"
+          }
+        },
+        "scheme-5": {
+          "settings": {
+            "background": "#211D18",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#211D18",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        }
+      }
     },
     "Home & Decor": {
       "logo_width": 120,
-      "colors_background": "#FFFFFF",
-      "colors_surface": "#F7F7F5",
-      "colors_text": "#1A1A1A",
-      "colors_text_muted": "#6B6B6B",
-      "colors_primary": "#2C2C2C",
-      "colors_primary_contrast": "#FFFFFF",
-      "colors_secondary": "#8B7355",
-      "colors_border": "#1A1A1A",
       "heading_font": "fraunces_n4",
       "body_font": "inter_n4",
       "body_scale": 100,
@@ -57,18 +98,67 @@
       "cart_type": "drawer",
       "show_free_shipping_bar": true,
       "free_shipping_threshold": "75",
-      "show_currency_code": true
+      "show_currency_code": true,
+      "color_schemes": {
+        "scheme-1": {
+          "settings": {
+            "background": "#FFFFFF",
+            "background_gradient": "",
+            "text": "#1A1A1A",
+            "button": "#2C2C2C",
+            "button_label": "#FFFFFF",
+            "accent": "#8B7355",
+            "shadow": "#1A1A1A"
+          }
+        },
+        "scheme-2": {
+          "settings": {
+            "background": "#F7F7F5",
+            "background_gradient": "",
+            "text": "#1A1A1A",
+            "button": "#2C2C2C",
+            "button_label": "#FFFFFF",
+            "accent": "#8B7355",
+            "shadow": "#1A1A1A"
+          }
+        },
+        "scheme-3": {
+          "settings": {
+            "background": "#2E3D2F",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#2E3D2F",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        },
+        "scheme-4": {
+          "settings": {
+            "background": "#F6E9E1",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#B56A48",
+            "button_label": "#FFFFFF",
+            "accent": "#4A6B4F",
+            "shadow": "#2E2A24"
+          }
+        },
+        "scheme-5": {
+          "settings": {
+            "background": "#211D18",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#211D18",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        }
+      }
     },
     "Wellness": {
       "logo_width": 100,
-      "colors_background": "#FAF5F0",
-      "colors_surface": "#FFFBF7",
-      "colors_text": "#3D2E2A",
-      "colors_text_muted": "#7A6A60",
-      "colors_primary": "#B5533A",
-      "colors_primary_contrast": "#FFFFFF",
-      "colors_secondary": "#C97D5A",
-      "colors_border": "#3D2E2A",
       "heading_font": "fraunces_n4",
       "body_font": "inter_n4",
       "body_scale": 100,
@@ -86,7 +176,64 @@
       "cart_type": "drawer",
       "show_free_shipping_bar": true,
       "free_shipping_threshold": "60",
-      "show_currency_code": true
+      "show_currency_code": true,
+      "color_schemes": {
+        "scheme-1": {
+          "settings": {
+            "background": "#FAF5F0",
+            "background_gradient": "",
+            "text": "#3D2E2A",
+            "button": "#B5533A",
+            "button_label": "#FFFFFF",
+            "accent": "#C97D5A",
+            "shadow": "#3D2E2A"
+          }
+        },
+        "scheme-2": {
+          "settings": {
+            "background": "#FFFBF7",
+            "background_gradient": "",
+            "text": "#3D2E2A",
+            "button": "#B5533A",
+            "button_label": "#FFFFFF",
+            "accent": "#C97D5A",
+            "shadow": "#3D2E2A"
+          }
+        },
+        "scheme-3": {
+          "settings": {
+            "background": "#2E3D2F",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#2E3D2F",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        },
+        "scheme-4": {
+          "settings": {
+            "background": "#F6E9E1",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#B56A48",
+            "button_label": "#FFFFFF",
+            "accent": "#4A6B4F",
+            "shadow": "#2E2A24"
+          }
+        },
+        "scheme-5": {
+          "settings": {
+            "background": "#211D18",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#211D18",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        }
+      }
     }
   }
 }

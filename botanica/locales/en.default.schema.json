@@ -18,16 +18,14 @@
     "colors": {
       "name": "Colors",
       "settings": {
-        "palette": {
-          "header": "Color palette",
+        "scheme": {
           "background": "Background",
-          "surface": "Surface / Card",
+          "background_gradient": "Background gradient",
           "text": "Text",
-          "text_muted": "Muted text",
-          "primary": "Primary accent",
-          "primary_contrast": "On-primary text",
-          "secondary": "Secondary accent",
-          "border": "Border / lines"
+          "button": "Button",
+          "button_label": "Button label",
+          "accent": "Accent",
+          "shadow": "Border / shadow"
         }
       }
     },
@@ -262,16 +260,36 @@
             "heading": {
               "label": "Column heading"
             },
-            "link_text_1": { "label": "Link 1 text" },
-            "link_url_1": { "label": "Link 1 URL" },
-            "link_text_2": { "label": "Link 2 text" },
-            "link_url_2": { "label": "Link 2 URL" },
-            "link_text_3": { "label": "Link 3 text" },
-            "link_url_3": { "label": "Link 3 URL" },
-            "link_text_4": { "label": "Link 4 text" },
-            "link_url_4": { "label": "Link 4 URL" },
-            "link_text_5": { "label": "Link 5 text" },
-            "link_url_5": { "label": "Link 5 URL" }
+            "link_text_1": {
+              "label": "Link 1 text"
+            },
+            "link_url_1": {
+              "label": "Link 1 URL"
+            },
+            "link_text_2": {
+              "label": "Link 2 text"
+            },
+            "link_url_2": {
+              "label": "Link 2 URL"
+            },
+            "link_text_3": {
+              "label": "Link 3 text"
+            },
+            "link_url_3": {
+              "label": "Link 3 URL"
+            },
+            "link_text_4": {
+              "label": "Link 4 text"
+            },
+            "link_url_4": {
+              "label": "Link 4 URL"
+            },
+            "link_text_5": {
+              "label": "Link 5 text"
+            },
+            "link_url_5": {
+              "label": "Link 5 URL"
+            }
           }
         }
       }
@@ -354,30 +372,61 @@
     "risk_free_guarantee": {
       "name": "Risk-Free Guarantee",
       "settings": {
-        "heading": { "label": "Heading" },
-        "body": { "label": "Body" },
-        "padding_top": { "label": "Top padding" },
-        "padding_bottom": { "label": "Bottom padding" }
+        "color_scheme": {
+          "label": "Color scheme"
+        },
+        "heading": {
+          "label": "Heading"
+        },
+        "body": {
+          "label": "Body"
+        },
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
       }
     },
     "product_care_guide": {
       "name": "Care guide",
       "settings": {
-        "eyebrow": { "label": "Eyebrow" },
-        "heading": { "label": "Heading" },
-        "body": { "label": "Body" },
-        "image": { "label": "Image" },
-        "padding_top": { "label": "Top padding" },
-        "padding_bottom": { "label": "Bottom padding" }
+        "eyebrow": {
+          "label": "Eyebrow"
+        },
+        "heading": {
+          "label": "Heading"
+        },
+        "body": {
+          "label": "Body"
+        },
+        "image": {
+          "label": "Image"
+        },
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
       }
     },
     "product_recommendations": {
       "name": "Product recommendations",
       "settings": {
-        "heading": { "label": "Heading" },
-        "limit": { "label": "Number of products" },
-        "padding_top": { "label": "Top padding" },
-        "padding_bottom": { "label": "Bottom padding" }
+        "heading": {
+          "label": "Heading"
+        },
+        "limit": {
+          "label": "Number of products"
+        },
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
       }
     },
     "main_cart_items": {
@@ -517,8 +566,12 @@
     "apps": {
       "name": "Apps",
       "settings": {
-        "padding_top": { "label": "Top padding" },
-        "padding_bottom": { "label": "Bottom padding" }
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
       }
     },
     "all": {
@@ -731,8 +784,12 @@
         },
         "image_fit": {
           "label": "Image fit",
-          "options__1": { "label": "Cover (fill area)" },
-          "options__2": { "label": "Contain (show full image)" }
+          "options__1": {
+            "label": "Cover (fill area)"
+          },
+          "options__2": {
+            "label": "Contain (show full image)"
+          }
         },
         "eyebrow": {
           "label": "Eyebrow"
@@ -1268,15 +1325,25 @@
       "settings": {
         "picker_type": {
           "label": "Picker style",
-          "options__1": { "label": "Buttons" },
-          "options__2": { "label": "Image swatches" }
+          "options__1": {
+            "label": "Buttons"
+          },
+          "options__2": {
+            "label": "Image swatches"
+          }
         },
         "swatch_option_index": {
           "label": "Swatch option",
           "info": "Which option to show as image swatches (0 = first, 1 = second)",
-          "options__1": { "label": "First option" },
-          "options__2": { "label": "Second option" },
-          "options__3": { "label": "Third option" }
+          "options__1": {
+            "label": "First option"
+          },
+          "options__2": {
+            "label": "Second option"
+          },
+          "options__3": {
+            "label": "Third option"
+          }
         }
       }
     },
@@ -1301,22 +1368,44 @@
     "size_guide_link": {
       "name": "Plant size guide link",
       "settings": {
-        "button_label": { "label": "Button label" },
-        "heading": { "label": "Dialog heading" },
-        "content": { "label": "Size content" },
-        "page": { "label": "Page (overrides content)" }
+        "button_label": {
+          "label": "Button label"
+        },
+        "heading": {
+          "label": "Dialog heading"
+        },
+        "content": {
+          "label": "Size content"
+        },
+        "page": {
+          "label": "Page (overrides content)"
+        }
       }
     },
     "care_icons": {
       "name": "Care icon grid",
       "settings": {
-        "heading": { "label": "Heading" },
-        "label": { "label": "Cell label" },
-        "value": { "label": "Cell value" },
-        "light": { "header": "Light" },
-        "water": { "header": "Water" },
-        "humidity": { "header": "Humidity" },
-        "toxicity": { "header": "Toxicity" }
+        "heading": {
+          "label": "Heading"
+        },
+        "label": {
+          "label": "Cell label"
+        },
+        "value": {
+          "label": "Cell value"
+        },
+        "light": {
+          "header": "Light"
+        },
+        "water": {
+          "header": "Water"
+        },
+        "humidity": {
+          "header": "Humidity"
+        },
+        "toxicity": {
+          "header": "Toxicity"
+        }
       }
     },
     "field_note": {
@@ -1652,21 +1741,41 @@
     "mega_menu": {
       "name": "Mega menu",
       "settings": {
-        "trigger_text": { "label": "Trigger text" },
-        "menu": { "label": "Menu" },
-        "promo_image": { "label": "Promo image" },
-        "promo_heading": { "label": "Promo heading" },
-        "promo_text": { "label": "Promo text" },
-        "promo_link": { "label": "Promo link" },
-        "promo_link_label": { "label": "Promo link label" }
+        "trigger_text": {
+          "label": "Trigger text"
+        },
+        "menu": {
+          "label": "Menu"
+        },
+        "promo_image": {
+          "label": "Promo image"
+        },
+        "promo_heading": {
+          "label": "Promo heading"
+        },
+        "promo_text": {
+          "label": "Promo text"
+        },
+        "promo_link": {
+          "label": "Promo link"
+        },
+        "promo_link_label": {
+          "label": "Promo link label"
+        }
       }
     },
     "filter_group": {
       "name": "Filter group",
       "settings": {
-        "heading": { "label": "Heading" },
-        "link_list": { "label": "Link list" },
-        "show_count": { "label": "Show product count" }
+        "heading": {
+          "label": "Heading"
+        },
+        "link_list": {
+          "label": "Link list"
+        },
+        "show_count": {
+          "label": "Show product count"
+        }
       }
     },
     "care_card": {
@@ -1731,9 +1840,15 @@
     "complementary_products": {
       "name": "Complementary products",
       "settings": {
-        "heading": { "label": "Heading" },
-        "collection": { "label": "Collection" },
-        "max_products": { "label": "Max products" }
+        "heading": {
+          "label": "Heading"
+        },
+        "collection": {
+          "label": "Collection"
+        },
+        "max_products": {
+          "label": "Max products"
+        }
       }
     },
     "pickup_availability": {

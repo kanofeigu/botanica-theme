@@ -6,8 +6,7 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */
-{
+ */{
   "sections": {
     "main": {
       "type": "main-product",
@@ -153,7 +152,8 @@
         "heading": "Risk-Free Guarantee",
         "body": "<p>In the (very) rare case you receive a damaged plant, our 14-day guarantee has you covered. We send replacements right away, and also share tips on how to revive any damaged foliage!</p>",
         "padding_top": 32,
-        "padding_bottom": 32
+        "padding_bottom": 32,
+        "color_scheme": "scheme-3"
       }
     },
     "care_guide": {

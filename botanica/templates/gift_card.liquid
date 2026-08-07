@@ -4,20 +4,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="{{ settings.colors_background }}">
+  {%- for scheme in settings.color_schemes limit: 1 -%}{%- assign default_scheme = scheme -%}{%- endfor -%}
+  <meta name="theme-color" content="{{ default_scheme.settings.background }}">
   <link rel="canonical" href="{{ canonical_url }}">
   {%- if settings.favicon != blank -%}
     <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
   {%- endif -%}
   {%- assign formatted_balance = gift_card.balance | money_without_trailing_zeros -%}
   <title>{{ 'gift_cards.issued.title' | t: value: formatted_balance, shop: shop.name }}</title>
+  {%- liquid
+    assign gc_bg = default_scheme.settings.background | default: '#F5F1E8'
+    assign gc_bg_brightness = gc_bg | color_brightness
+    if gc_bg_brightness > 128
+      assign gc_surface = gc_bg | color_lighten: 2
+    else
+      assign gc_surface = gc_bg | color_lighten: 6
+    endif
+  -%}
   {% style %}
     :root {
-      --bt-color-bg: {{ settings.colors_background }};
-      --bt-color-surface: {{ settings.colors_surface }};
-      --bt-color-text: {{ settings.colors_text }};
-      --bt-color-primary: {{ settings.colors_primary }};
-      --bt-color-primary-contrast: {{ settings.colors_primary_contrast }};
+      --bt-color-bg: {{ gc_bg }};
+      --bt-color-surface: {{ gc_surface }};
+      --bt-color-text: {{ default_scheme.settings.text | default: '#2E2A24' }};
+      --bt-color-primary: {{ default_scheme.settings.button | default: '#4A6B4F' }};
+      --bt-color-primary-contrast: {{ default_scheme.settings.button_label | default: '#FFFFFF' }};
       --bt-radius-card: {{ settings.card_corner_radius }}px;
       --bt-radius-btn: {{ settings.button_corner_radius }}px;
       --bt-font-heading: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
