@@ -13,7 +13,7 @@
   endif
   assign shipping_remaining_tmpl = 'sections.cart.free_shipping_remaining_html' | t: amount: '{amount}'
 -%}
-<div class="bt-cart bt-section" {{ section.shopify_attributes }}>
+<div class="bt-cart bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-h1 bt-cart__heading">{{ 'sections.cart.title' | t }}</h1>
 
@@ -770,6 +770,7 @@
   "name": "t:sections.main_cart_items.name",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     { "type": "checkbox", "id": "show_free_shipping_bar", "label": "t:sections.main_cart.settings.show_free_shipping_bar.label", "default": true },
     { "type": "text", "id": "free_shipping_threshold", "label": "t:sections.main_cart.settings.free_shipping_threshold.label", "default": "50" },
     { "type": "checkbox", "id": "show_order_note", "label": "t:sections.main_cart.settings.show_order_note.label", "default": true },

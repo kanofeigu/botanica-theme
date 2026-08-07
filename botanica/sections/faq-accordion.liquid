@@ -14,7 +14,7 @@
     endif
   endfor
 -%}
-<section class="bt-section bt-faq" {{ section.shopify_attributes }}>
+<section class="bt-section bt-faq color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     {%- if heading != blank -%}
       <h2 class="bt-faq__heading">{{ heading | escape }}</h2>
@@ -125,6 +125,7 @@
     }
   ],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

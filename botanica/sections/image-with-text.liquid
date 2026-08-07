@@ -11,7 +11,7 @@
   assign aspect_style = parts[0] | append: ' / ' | append: parts[1]
 -%}
 <section
-    class="bt-section bt-image-text"
+    class="bt-section bt-image-text color-{{ section.settings.color_scheme }}"
     {{ section.shopify_attributes }}
     style="--bt-iwt-padding-top: {{ section.settings.padding_top }}px; --bt-iwt-padding-bottom: {{ section.settings.padding_bottom }}px; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
   >
@@ -92,6 +92,7 @@
   "tag": "section",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "image_picker",
       "id": "image",

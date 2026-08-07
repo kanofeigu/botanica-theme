@@ -1,5 +1,5 @@
 {% comment %} main-search.liquid — Original search with predictive results and theme blocks. Zero Dawn code. {% endcomment %}
-<div class="bt-search bt-section" {{ section.shopify_attributes }}>
+<div class="bt-search bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-h1 bt-text-center">{{ 'general.search.search' | t }}</h1>
     <form action="{{ routes.search_url }}" method="get" class="bt-search__form" role="search">
@@ -46,6 +46,7 @@
 
 {% schema %}
 { "name": "t:sections.main_search.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "range", "id": "columns_desktop", "min":2,"max":4,"step":1,"default":3,"label":"t:sections.main_search.settings.columns_desktop.label" }
 ] }
 {% endschema %}

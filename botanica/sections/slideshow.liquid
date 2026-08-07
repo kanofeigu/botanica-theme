@@ -15,7 +15,7 @@
   endfor
 -%}
 {%- if slide_count > 0 -%}
-  <section class="bt-section bt-slideshow" {{ section.shopify_attributes }}>
+  <section class="bt-section bt-slideshow color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
     <div class="bt-container">
       {%- if heading != blank -%}
         <h2 class="bt-slideshow__heading">{{ heading | escape }}</h2>
@@ -213,6 +213,7 @@
     }
   ],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

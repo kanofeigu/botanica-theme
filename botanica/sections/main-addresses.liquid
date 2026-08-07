@@ -1,5 +1,5 @@
 {% comment %} main-addresses.liquid — Customer addresses page: list / add / edit / delete. Original. {% endcomment %}
-<div class="bt-section bt-addresses" {{ section.shopify_attributes }}>
+<div class="bt-section bt-addresses color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container" style="max-width: 720px;">
     <h1 class="bt-h1">{{ 'customer.addresses.title' | t }}</h1>
     <a href="{{ routes.account_url }}" style="color: var(--bt-color-primary); font-size: var(--bt-fs-body-sm);">&larr; {{ 'customer.account.return' | t }}</a>
@@ -109,5 +109,7 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_addresses.name", "presets": [{ "name": "t:sections.main_addresses.name" }] }
+{ "name": "t:sections.main_addresses.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }
+], "presets": [{ "name": "t:sections.main_addresses.name" }] }
 {% endschema %}

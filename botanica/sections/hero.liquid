@@ -23,7 +23,7 @@
   assign min_height = section.settings.min_height | default: 'auto'
 -%}
 <section
-  class="bt-hero bt-hero--{{ layout }}"
+  class="bt-hero bt-hero--{{ layout }} color-{{ section.settings.color_scheme }}"
   {{ section.shopify_attributes }}
   style="--bt-hero-min-height: {% if min_height != 'auto' %}{{ min_height }}vh{% else %}auto{% endif %}; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
 >
@@ -312,6 +312,7 @@
   "tag": "section",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "select",
       "id": "layout",

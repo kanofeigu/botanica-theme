@@ -10,7 +10,7 @@
   assign show_buy = section.settings.show_buy_button
 -%}
 {%- if product_ref != blank -%}
-  <section class="bt-section bt-featured-product" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  <section class="bt-section bt-featured-product color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
     <div class="bt-container">
       <div class="bt-featured-product__grid">
         <div class="bt-featured-product__media">
@@ -143,6 +143,7 @@
   "name": "t:sections.featured_product.name",
   "tag": "section",
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "product",
       "id": "product",

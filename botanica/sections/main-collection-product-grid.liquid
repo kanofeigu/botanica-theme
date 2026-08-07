@@ -36,7 +36,7 @@
   endfor
 -%}
 
-<div class="bt-collection-grid bt-section" {{ section.shopify_attributes }}>
+<div class="bt-collection-grid bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
 
     {% comment %} ══════════════ TOOLBAR: count + sort (mobile filter trigger) ══════════════ {% endcomment %}
@@ -1123,6 +1123,7 @@
   "name": "t:sections.main_collection_product_grid.name",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "range",
       "id": "products_per_page",

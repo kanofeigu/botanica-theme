@@ -1,6 +1,6 @@
 {% comment %} custom-liquid.liquid — Mandatory Custom Liquid section for Theme Store compliance. {% endcomment %}
 {%- if section.settings.custom_liquid != blank -%}
-  <div class="bt-section bt-custom-liquid" {{ section.shopify_attributes }}>
+  <div class="bt-section bt-custom-liquid color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
     <div class="bt-container">{{ section.settings.custom_liquid }}</div>
   </div>
 {%- endif -%}
@@ -11,6 +11,7 @@
 
 {% schema %}
 { "name": "t:sections.custom_liquid.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "liquid", "id": "custom_liquid", "label": "t:sections.custom_liquid.settings.liquid.label", "info": "t:sections.custom_liquid.settings.liquid.info" }
 ], "presets": [{ "name": "t:sections.custom_liquid.name" }] }
 {% endschema %}

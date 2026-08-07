@@ -13,7 +13,7 @@
   endif
 -%}
 
-<section class="bt-product bt-section" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-product bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     <div class="bt-product__grid bt-product__grid--{{ section.settings.gallery_layout }}">
 
@@ -304,6 +304,7 @@
 
 {% schema %}
 { "name": "t:sections.main_product.name", "tag": "section", "blocks": [{ "type": "@theme" }, { "type": "@app" }], "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "product", "id": "product", "label": "t:sections.main_product.settings.product.label" },
   { "type": "select", "id": "gallery_layout", "label": "t:sections.main_product.settings.gallery_layout.label", "options": [{"value":"thumb_left","label":"t:sections.main_product.settings.gallery_layout.options__1.label"},{"value":"thumb_below","label":"t:sections.main_product.settings.gallery_layout.options__2.label"},{"value":"stacked","label":"t:sections.main_product.settings.gallery_layout.options__3.label"}], "default": "thumb_below" },
   { "type": "checkbox", "id": "sticky_care", "label": "t:sections.main_product.settings.sticky_care.label", "default": true },

@@ -1,5 +1,5 @@
 {% comment %} main-account.liquid — Customer account page. Original. {% endcomment %}
-<div class="bt-section bt-account" {{ section.shopify_attributes }}>
+<div class="bt-section bt-account color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container" style="max-width: 720px;">
     <h1 class="bt-h1">{{ 'customer.account.title' | t }}</h1>
     <div class="bt-rich-text">{{ 'customer.account.details' | t }} — <a href="{{ routes.account_logout_url }}" style="color: var(--bt-color-primary);">{{ 'customer.log_out' | t }}</a></div>
@@ -31,5 +31,7 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_account.name", "presets": [{ "name": "t:sections.main_account.name" }] }
+{ "name": "t:sections.main_account.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }
+], "presets": [{ "name": "t:sections.main_account.name" }] }
 {% endschema %}

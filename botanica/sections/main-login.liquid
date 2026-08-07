@@ -1,5 +1,5 @@
 {% comment %} main-login.liquid — Customer login page. Original. Zero Dawn code. {% endcomment %}
-<div class="bt-section bt-login" {{ section.shopify_attributes }} data-bt-login>
+<div class="bt-section bt-login color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} data-bt-login>
   <div class="bt-container" style="max-width: 480px;">
     <div class="bt-login__view" id="login" data-bt-login-view="login">
       <h1 class="bt-h1 bt-text-center">{{ 'customer.login.title' | t }}</h1>
@@ -44,5 +44,5 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_login.name", "presets": [{ "name": "t:sections.main_login.name" }] }
+{ "name": "t:sections.main_login.name", "settings": [{ "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }], "presets": [{ "name": "t:sections.main_login.name" }] }
 {% endschema %}

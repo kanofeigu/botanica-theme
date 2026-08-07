@@ -1,5 +1,5 @@
 {% comment %} main-blog.liquid — Editorial blog listing. Cover images, tag badges. Zero Dawn code. {% endcomment %}
-<div class="bt-section bt-blog" {{ section.shopify_attributes }}>
+<div class="bt-section bt-blog color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-blog__title bt-h1 bt-text-center">{{ blog.title }}</h1>
 
@@ -118,6 +118,7 @@
 
 {% schema %}
 { "name": "t:sections.main_blog.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "range", "id": "articles_per_page", "min":3,"max":12,"step":3,"default":6,"label":"t:sections.main_blog.settings.articles_per_page.label" },
   { "type": "range", "id": "columns_desktop", "min":1,"max":4,"step":1,"default":3,"label":"t:sections.main_blog.settings.columns_desktop.label" }
 ], "presets": [{ "name": "t:sections.main_blog.name" }] }

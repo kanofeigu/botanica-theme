@@ -1,5 +1,5 @@
 {% comment %} footer.liquid — Botanica v3 original footer with brand, links, newsletter blocks. {% endcomment %}
-<footer class="bt-footer" role="contentinfo">
+<footer class="bt-footer color-{{ section.settings.color_scheme }}" role="contentinfo">
   <div class="bt-footer__inner bt-container">
     <div class="bt-footer__grid bt-grid bt-grid--{{ section.settings.column_count }}">
       {%- for block in section.blocks -%}
@@ -105,6 +105,7 @@
 
 {% schema %}
 { "name": "t:sections.footer.name", "class": "section-footer", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "select", "id": "column_count", "label": "t:sections.footer.settings.columns.label", "options": [{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"}], "default": "3" }
 ], "blocks": [
   { "type": "brand", "name": "t:sections.footer.blocks.brand.name", "settings": [

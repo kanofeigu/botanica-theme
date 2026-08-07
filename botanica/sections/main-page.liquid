@@ -1,5 +1,5 @@
 {% comment %} main-page.liquid — Original page section. Zero Dawn code. {% endcomment %}
-<div class="bt-section bt-page" {{ section.shopify_attributes }}>
+<div class="bt-section bt-page color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <div class="bt-rich-text" style="max-width: var(--bt-content-max); margin-inline: auto;">
       <h1 class="bt-h1">{{ page.title }}</h1>
@@ -14,5 +14,5 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_page.name", "presets": [{ "name": "t:sections.main_page.name" }] }
+{ "name": "t:sections.main_page.name", "settings": [{ "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }], "presets": [{ "name": "t:sections.main_page.name" }] }
 {% endschema %}

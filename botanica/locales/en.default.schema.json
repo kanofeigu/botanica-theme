@@ -190,6 +190,11 @@
     }
   },
   "sections": {
+    "all": {
+      "colors": {
+        "label": "Color scheme"
+      }
+    },
     "header": {
       "name": "Header",
       "settings": {
@@ -572,11 +577,6 @@
         "padding_bottom": {
           "label": "Bottom padding"
         }
-      }
-    },
-    "all": {
-      "colors": {
-        "label": "Color scheme"
       }
     },
     "custom_liquid": {

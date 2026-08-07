@@ -1,5 +1,5 @@
 {% comment %} contact-form.liquid — Original contact form section. Zero Dawn code. {% endcomment %}
-<div class="bt-section bt-contact" {{ section.shopify_attributes }}>
+<div class="bt-section bt-contact color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <div style="max-width: 600px; margin-inline: auto;">
       {%- if section.settings.show_title -%}
@@ -34,6 +34,7 @@
 
 {% schema %}
 { "name": "t:sections.contact_form.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "checkbox", "id": "show_title", "label": "t:sections.contact_form.settings.show_title.label", "default": false }
 ], "presets": [{ "name": "t:sections.contact_form.name" }] }
 {% endschema %}

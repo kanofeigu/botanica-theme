@@ -1,5 +1,5 @@
 {% comment %} main-collection-banner.liquid — Botanical editorial collection hero. Specimen-frame image, field-journal heading, decorative illustration. Zero Dawn code. {% endcomment %}
-<div class="bt-collection-hero bt-section" {{ section.shopify_attributes }}>
+<div class="bt-collection-hero bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
 
     {%- if section.settings.show_collection_image and collection.image -%}
@@ -150,6 +150,7 @@
 {
   "name": "t:sections.main_collection_banner.name",
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "checkbox",
       "id": "show_collection_image",

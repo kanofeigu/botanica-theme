@@ -1,5 +1,5 @@
 {% comment %} main-order.liquid — Customer order detail page. Original. {% endcomment %}
-<div class="bt-section bt-order" {{ section.shopify_attributes }}>
+<div class="bt-section bt-order color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container" style="max-width: 720px;">
     <h1 class="bt-h1">{{ 'customer.order.title' | t: name: order.name }}</h1>
     <p style="margin-bottom: var(--bt-space-sm); color: var(--bt-color-text-muted);">{{ order.created_at | date: '%B %d, %Y' }} &mdash; {{ order.financial_status_label }}</p>
@@ -23,5 +23,5 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_order.name", "presets": [{ "name": "t:sections.main_order.name" }] }
+{ "name": "t:sections.main_order.name", "settings": [{ "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }], "presets": [{ "name": "t:sections.main_order.name" }] }
 {% endschema %}

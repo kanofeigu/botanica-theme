@@ -1,5 +1,5 @@
 {% comment %} main-list-collections.liquid — Original collections list. Zero Dawn code. {% endcomment %}
-<div class="bt-section bt-list-collections" {{ section.shopify_attributes }}>
+<div class="bt-section bt-list-collections color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-h1 bt-text-center">{{ 'collections.general.title' | t }}</h1>
     {%- paginate collections by 24 -%}
@@ -35,6 +35,7 @@
 
 {% schema %}
 { "name": "t:sections.main_list_collections.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "range", "id": "columns_desktop", "min":2,"max":4,"step":1,"default":3,"label":"t:sections.main_list_collections.settings.columns_desktop.label" }
 ], "presets": [{ "name": "t:sections.main_list_collections.name" }] }
 {% endschema %}

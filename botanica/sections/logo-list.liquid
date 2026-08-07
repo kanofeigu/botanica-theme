@@ -3,7 +3,7 @@
   Uses logo-item blocks. Responsive auto-grid.
   All-original. Zero Dawn code.
 {% endcomment %}
-<section class="bt-section bt-logo-list" {{ section.shopify_attributes }}>
+<section class="bt-section bt-logo-list color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     {%- if section.settings.heading != blank -%}
       <h2 class="bt-logo-list__heading">{{ section.settings.heading | escape }}</h2>
@@ -38,6 +38,7 @@
   "tag": "section",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

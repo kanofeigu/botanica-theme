@@ -3,7 +3,7 @@
   Centered editorial text area. Uses text/heading/eyebrow blocks.
   All-original. Zero Dawn code.
 {% endcomment %}
-<section class="bt-section bt-rich-text" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-section bt-rich-text color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container bt-rich-text__inner">
     {% content_for "blocks" %}
   </div>
@@ -23,6 +23,7 @@
   "tag": "section",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "range",
       "id": "padding_top",

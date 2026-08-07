@@ -5,7 +5,7 @@
   ★ Refined SVG meters replace old *** pattern. Data all from block settings.
   All-original. Zero Dawn code.
 {% endcomment %}
-<section class="bt-section bt-shop-by-care" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-section bt-shop-by-care color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     {%- if section.settings.heading != blank -%}
       <h2 class="bt-shop-by-care__heading">{{ section.settings.heading | escape }}</h2>
@@ -70,6 +70,7 @@
   "tag": "section",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

@@ -10,7 +10,7 @@
   assign show_count = section.settings.show_product_count | default: false
 -%}
 {%- if section.settings.collections != blank -%}
-  <section class="bt-section bt-collection-list" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  <section class="bt-section bt-collection-list color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
     <div class="bt-container">
       {%- if heading != blank -%}
         <h2 class="bt-collection-list__heading">{{ heading | escape }}</h2>
@@ -113,6 +113,7 @@
   "name": "t:sections.collection_list.name",
   "tag": "section",
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

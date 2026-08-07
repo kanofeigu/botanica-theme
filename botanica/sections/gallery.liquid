@@ -7,7 +7,7 @@
   assign heading = section.settings.heading
   assign columns = section.settings.columns_desktop | default: 3
 -%}
-<section class="bt-section bt-gallery" {{ section.shopify_attributes }}>
+<section class="bt-section bt-gallery color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     {%- if heading != blank -%}
       <h2 class="bt-gallery__heading">{{ heading | escape }}</h2>
@@ -48,6 +48,7 @@
   "tag": "section",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

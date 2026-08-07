@@ -1,5 +1,5 @@
 {% comment %} main-404.liquid — Original 404 page. Zero Dawn code. {% endcomment %}
-<div class="bt-section bt-404 bt-text-center" {{ section.shopify_attributes }}>
+<div class="bt-section bt-404 bt-text-center color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-h1">{{ 'general.404.title' | t }}</h1>
     <p style="margin-block: var(--bt-space-sm) var(--bt-space-lg); color: var(--bt-color-text-muted);">{{ 'general.404.subtext' | t }}</p>
@@ -12,5 +12,7 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_404.name", "presets": [{ "name": "t:sections.main_404.name" }] }
+{ "name": "t:sections.main_404.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }
+], "presets": [{ "name": "t:sections.main_404.name" }] }
 {% endschema %}

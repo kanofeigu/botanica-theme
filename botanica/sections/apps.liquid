@@ -7,7 +7,7 @@
   single app's internal DOM — so the theme passes Theme Store's
   "core function must not depend on a specific app" rule.
 {% endcomment %}
-<section class="bt-apps bt-section" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-apps bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container bt-apps__inner">
     {% content_for "blocks" %}
   </div>
@@ -160,6 +160,7 @@
   "tag": "section",
   "blocks": [{ "type": "@app" }],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40, "label": "t:sections.apps.settings.padding_top.label" },
     { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40, "label": "t:sections.apps.settings.padding_bottom.label" }
   ],

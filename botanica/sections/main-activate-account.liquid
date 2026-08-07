@@ -1,5 +1,5 @@
 {% comment %} main-activate-account.liquid — Activate customer account. Original. {% endcomment %}
-<div class="bt-section bt-activate-account" {{ section.shopify_attributes }}>
+<div class="bt-section bt-activate-account color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container" style="max-width: 480px;">
     <h1 class="bt-h1 bt-text-center">{{ 'customer.activate_account.title' | t }}</h1>
     {%- form 'activate_customer_password', class: 'bt-stack-md' -%}
@@ -16,5 +16,7 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_activate_account.name", "presets": [{ "name": "t:sections.main_activate_account.name" }] }
+{ "name": "t:sections.main_activate_account.name", "settings": [
+  { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }
+], "presets": [{ "name": "t:sections.main_activate_account.name" }] }
 {% endschema %}

@@ -1,5 +1,5 @@
 {% comment %} main-register.liquid — Customer registration page. Original. {% endcomment %}
-<div class="bt-section bt-register" {{ section.shopify_attributes }}>
+<div class="bt-section bt-register color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container" style="max-width: 480px;">
     <h1 class="bt-h1 bt-text-center">{{ 'customer.register.title' | t }}</h1>
     {%- form 'create_customer', class: 'bt-register__form bt-stack-md' -%}
@@ -19,5 +19,5 @@
 {% endstylesheet %}
 
 {% schema %}
-{ "name": "t:sections.main_register.name", "presets": [{ "name": "t:sections.main_register.name" }] }
+{ "name": "t:sections.main_register.name", "settings": [{ "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }], "presets": [{ "name": "t:sections.main_register.name" }] }
 {% endschema %}

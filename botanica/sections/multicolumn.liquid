@@ -7,7 +7,7 @@
   assign heading = section.settings.heading
   assign columns = section.settings.columns_desktop | default: 3
 -%}
-<section class="bt-section bt-multicolumn" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-section bt-multicolumn color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     {%- if heading != blank -%}
       <h2 class="bt-multicolumn__heading">{{ heading | escape }}</h2>
@@ -146,6 +146,7 @@
     }
   ],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

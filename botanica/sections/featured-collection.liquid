@@ -10,7 +10,7 @@
   assign columns = section.settings.columns_desktop | default: 3
 -%}
 {%- if collection != blank -%}
-  <section class="bt-section bt-featured-collection bt-dappled-light" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  <section class="bt-section bt-featured-collection bt-dappled-light color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
     <div class="bt-container">
       {%- if heading != blank -%}
         <div class="bt-featured-collection__header">
@@ -74,6 +74,7 @@
   "name": "t:sections.featured_collection.name",
   "tag": "section",
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

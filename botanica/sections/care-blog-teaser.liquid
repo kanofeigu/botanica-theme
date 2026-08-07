@@ -15,7 +15,7 @@
   assign show_date = section.settings.show_date | default: true
   assign show_author = section.settings.show_author | default: false
 -%}
-<section class="bt-section bt-care-blog" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-section bt-care-blog color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     {%- if heading != blank -%}
       <div class="bt-care-blog__header">
@@ -226,6 +226,7 @@
     }
   ],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "text",
       "id": "heading",

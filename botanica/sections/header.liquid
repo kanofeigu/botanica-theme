@@ -7,7 +7,7 @@
   assign logo_width_2x = logo_width | times: 2
 -%}
 
-<header class="bt-header{% if sticky %} bt-header--sticky{% endif %}" role="banner" {{ section.shopify_attributes }}>
+<header class="bt-header{% if sticky %} bt-header--sticky{% endif %} color-{{ section.settings.color_scheme }}" role="banner" {{ section.shopify_attributes }}>
   <div class="bt-header__bar bt-container">
 
     {% comment %} Logo {% endcomment %}
@@ -1170,6 +1170,7 @@
     }
   ],
   "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "link_list",
       "id": "menu",
