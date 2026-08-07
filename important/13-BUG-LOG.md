@@ -541,14 +541,27 @@
 
 ---
 
+### BUG-036：「Pairs well with」横向滚动条 hover 弹入导致页面形变
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟢 minor
+- **现象**：用户实测反馈——鼠标移入 PDP「Pairs well with…」推荐搭配区时，横向滚动条突然出现，挤占容器盒内高度，下方内容瞬间下移又回弹（页面形变）
+- **根因**：`.bt-complementary__list` 是 `overflow-x: auto` 滚动容器且设 `scrollbar-width: thin`（仅 Firefox 生效），Chrome/Edge 下无 `::-webkit-scrollbar` 规则——指针进入滚动区时浏览器弹出原生滚动条，经典滚动条会侵入盒内空间造成 reflow
+- **修复方法**：滚动条整体隐藏（`scrollbar-width: none` + `::-webkit-scrollbar { display: none }`），沿用主题既有 `.bt-plant-scroll` 先例；滚动功能保留（拖拽/滚轮/scroll-snap）。PDP 缩略图列 `.bt-product__thumbnails` 同款隐患一并处理
+- **修改的文件**：`blocks/complementary-products.liquid`、`sections/main-product.liquid`
+- **修复结果**：线上编译 CSS 确认两条隐藏规则生效 ✅（git `1996ae9`）
+- **关联功能**：F11（PDP）、F10（Product Card）
+
+---
+
 ## Bug 统计
 
 | 严重程度 | 数量 | 已修复 | 未修复 |
 |---------|------|--------|--------|
 | 🔴 blocker | 11 | 11 | 0 |
 | 🟡 major | 16 | 16 | 0 |
-| 🟢 minor | 5 | 5 | 0 |
-| **合计** | **35** | **35** | **0** |
+| 🟢 minor | 6 | 6 | 0 |
+| **合计** | **36** | **36** | **0** |
 
 ## 观察项（暂不修复，记录在案）
 
