@@ -219,7 +219,8 @@
     z-index: 1;
   }
   .bt-product__placeholder { width: 100%; height: 100%; background: var(--bt-color-surface); }
-  .bt-product__thumbnails { display: flex; gap: var(--bt-space-2xs); overflow-x: auto; padding: 4px; scrollbar-width: thin; }
+  .bt-product__thumbnails { display: flex; gap: var(--bt-space-2xs); overflow-x: auto; padding: 4px; scrollbar-width: none; }
+  .bt-product__thumbnails::-webkit-scrollbar { display: none; }
   .bt-product__thumb { flex-shrink: 0; width: 72px; height: 90px; border-radius: var(--bt-radius-sm); overflow: hidden; border: 2px solid transparent; cursor: pointer; padding: 0; background: var(--bt-color-bg); transition: border-color var(--bt-duration-fast); }
   .bt-product__thumb.is-active, .bt-product__thumb:hover { border-color: var(--bt-color-primary); }
   .bt-product__thumb img { width: 100%; height: 100%; object-fit: cover; }

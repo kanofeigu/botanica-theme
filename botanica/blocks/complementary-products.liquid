@@ -90,7 +90,12 @@
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     padding-bottom: var(--bt-space-2xs);
-    scrollbar-width: thin;
+    /* Hide scrollbar entirely — a pop-in scrollbar intrudes into the box and
+       reflows everything below (page "jumps" when the pointer enters). */
+    scrollbar-width: none;
+  }
+  .bt-complementary__list::-webkit-scrollbar {
+    display: none;
   }
   .bt-complementary__item {
     flex: 0 0 auto;
