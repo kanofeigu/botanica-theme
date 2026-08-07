@@ -2,7 +2,7 @@
 
 > 位置：`E:\ccfold\shopify\important\13-BUG-LOG.md`
 > 每次修改 bug 都需要记录：bug 原因、修复方法、修复所修改的文件、修复结果
-> 最后更新：2026-07-06
+> 最后更新：2026-08-07
 
 ---
 
@@ -351,14 +351,214 @@
 
 ---
 
+## 2026-08-07 收尾批次（审计 P2 清单 + 用户实测反馈）
+
+> 背景：07-19 审计报告的 P2 清单逐项收尾，叠加用户实测反馈（soldout 误判、mega menu 测试数据、购物车页重设计）。全部修复经 `shopify theme check` 0 error、CLI push 上线、线上抽查通过。
+> git 提交链（product 分支）：`a26fb1e`（购物车页重设计）→ `28b345a`（soldout）→ `e4c1c33`（mega menu）→ `653c982`（Quick View）→ `366e6c7`（找回密码）→ `a7dd4a2`（批次A PDP 交互包）→ `01bae9b`（批次B 杂项包）→ `833ef06`（氛围层性能）。
+> 非 bug 变更（不单独立条目）：购物车页整体重设计（双栏 + sticky 摘要卡 + AJAX 步进器 + 订单备注 + 推荐区，`a26fb1e`）；本地删除一律走回收站规则写入 CLAUDE.md（`9e2dd3e`）。
+
+### BUG-020：购物车行 soldout 徽标误判
+
+- **发现日期**：2026-07-19
+- **严重程度**：🟡 major
+- **现象**：用户反馈「添加商品到购物车之后，购物车里面的商品会显示 soldout」——有库存可售的商品在 cart 行上被盖上 Sold out 徽标
+- **根因**：购物车重设计时用了 `item.available` 判断售罄状态，但 cart 行的 `item` 是 line item 对象，其 `available` 语义不可靠（部分上下文恒为 false）；应判断 `item.variant.available`
+- **修复方法**：cart 行模板判断条件改为 `item.variant.available`
+- **修改的文件**：`sections/main-cart-items.liquid`
+- **修复结果**：线上实测加车后不再误显示 Sold out ✅（git `28b345a`）
+- **关联功能**：F03（Cart Drawer）、F07（购物车）
+
+### BUG-021：mega menu 推广位挂着 "1111" 测试数据上线
+
+- **发现日期**：2026-07-19
+- **严重程度**：🟡 major
+- **现象**：导航 mega menu 右侧推广位显示标题 "1111" 的测试内容和占位图，直接暴露在 live 店面
+- **根因**：开发期在 theme editor 配了测试 mega-promo 块，之后从未替换为真实内容
+- **修复方法**：替换为 Golden Pothos 真实推广（文案 + 链接），推广图经 `fileCreate` 上传到 Shopify Files（不放在主题 assets，商家可在后台自行更换）
+- **修改的文件**：`sections/header-group.json`（块数据）；Shopify Files（新增图片资源）
+- **修复结果**：线上 mega menu 显示真实推广 ✅（git `e4c1c33`）
+- **关联功能**：F01（Header 导航系统）
+- **⚠ 教训**：提交前检查清单应包含「theme editor 测试数据清零」一项
+
+### BUG-022：Quick View 按钮全店无响应 + 弹窗 3 处缺陷
+
+- **发现日期**：2026-07-19
+- **严重程度**：🔴 blocker
+- **现象**：产品卡片 Quick View（眼睛图标）点击无任何反应——主题核心卖点功能整体失效
+- **根因**：`quick-view.js` 与弹窗 markup 存在，但卡片上的触发按钮从未绑定事件（ snippet 版与 block 版样式/逻辑不同步）；弹窗本身另有 3 处缺陷（变体切换不刷新、加车后抽屉不更新、关闭后状态残留）
+- **修复方法**：触发逻辑接入卡片按钮；修复弹窗变体切换刷新、加车成功后走统一 `cart:added` 事件、关闭时重置内部状态
+- **修改的文件**：`assets/quick-view.js`、`snippets/quick-view-trigger.liquid`、`snippets/card-product.liquid`、`layout/theme.liquid`、`assets/cart.js`、`locales/en.default.json`
+- **修复结果**：线上实测 Quick View 打开/变体切换/加车全链路正常 ✅（git `653c982`）
+- **关联功能**：F10（Product Card）、F03（Cart Drawer）
+
+### BUG-023：找回密码视图缺失
+
+- **发现日期**：2026-07-19
+- **严重程度**：🟡 major
+- **现象**：登录页没有「忘记密码」入口对应的 recover 表单视图，客户无法自助重置密码
+- **根因**：`templates/customers/login.json` 只配了登录 section，没有 recover 视图所需的第二 section / 视图切换
+- **修复方法**：登录页实现 login / recover 双视图（`#recover` hash 切换），补 `recover_customer_password` 表单、5 个翻译键与切换 JS；顺带修复 login 表单错误输出的非法嵌套
+- **修改的文件**：`sections/main-login.liquid`、`assets/customer-login.js`（新建）、`locales/en.default.json`
+- **修复结果**：recover 视图可切换渲染 ✅（git `366e6c7`）。注：本店开的是新版客户账户，主题登录页整体不渲染，审核环境（经典账户）才生效，属正常
+- **关联功能**：F09（客户账户）
+
+### BUG-024：PDP variant 变更事件链断裂（价格/ATC/Sticky 全不同步）
+
+- **发现日期**：2026-08-07
+- **严重程度**：🔴 blocker
+- **现象**：PDP 切换变体（尺寸/颜色）后，价格不变、Add to cart 按钮状态不变、sticky ATC 不更新、数量选择器在部分布局下失效——变体体系事实上半瘫
+- **根因**：`variant-selects.js` 变更后从未 dispatch 统一事件，`product-price` / `buy-buttons` / `sticky-atc` 各 block 没有订阅入口，各自为战；sticky-atc block 甚至没有被启用进 `product.json` 模板；quantity-selector 依赖 buy-buttons 内部结构，独立放置时不工作
+- **修复方法**：
+  1. `variant-selects.js` 变更时 dispatch `theme:variantChange`（携带 variant 对象）
+  2. `product-price` / `buy-buttons` / `sticky-atc` 统一订阅该事件刷新
+  3. sticky-atc 启用并加入 `product.json`
+  4. quantity-selector 改造为独立可用
+- **修改的文件**：`assets/variant-selects.js`、`assets/sticky-atc.js`、`blocks/buy-buttons.liquid`、`blocks/product-price.liquid`、`blocks/quantity-selector.liquid`、`blocks/sticky-atc.liquid`、`blocks/variant-picker.liquid`、`sections/main-product.liquid`、`sections/featured-product.liquid`、`templates/product.json`
+- **修复结果**：theme check 0 error；线上 PDP 实测 sticky-atc 渲染、变体切换价格同步 ✅（git `a7dd4a2`）
+- **关联功能**：F11（PDP）、F14（Sticky ATC）
+- **⚠ 教训**：多 block 协作的状态变更必须走统一事件总线（`theme:variantChange`），禁止 block 间直接 DOM 互查
+
+### BUG-025：complementary-products「加车」是假的
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major
+- **现象**：PDP 推荐搭配区（"Pairs well with"）的加车按钮点击后无实际请求，纯 UI 表演
+- **根因**：按钮只有样式，没有接 `/cart/add.js`
+- **修复方法**：按钮接 Cart API 真加车，成功后 dispatch `cart:added` 走统一刷新
+- **修改的文件**：`blocks/complementary-products.liquid`
+- **修复结果**：推荐搭配可真实加车 ✅（git `a7dd4a2`）
+- **关联功能**：F11（PDP）、F03（Cart Drawer）
+
+### BUG-026：quick-view 注入产品数据未转义（XSS 面）
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major
+- **现象**：quick-view 弹窗把产品标题/描述直接 `innerHTML` 注入，产品数据若含 HTML 会被执行
+- **修复方法**：注入前统一 `esc()` 转义；价格走 formatMoney
+- **修改的文件**：`assets/quick-view.js`、`snippets/card-product.liquid`
+- **修复结果**：theme check 0 error ✅（git `a7dd4a2`）
+- **关联功能**：F10（Product Card）
+
+### BUG-027：首页 hero / slideshow CTA 死链
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major
+- **现象**：首页两个主 CTA 按钮点击无跳转（href 为空或 `#`）
+- **根因**：section schema 的 link 设置默认空，`templates/index.json` 预设里没配目标
+- **修复方法**：`index.json` 配好真实跳转目标（/collections/all 等）
+- **修改的文件**：`templates/index.json`、`sections/hero.liquid`、`sections/slideshow.liquid`
+- **修复结果**：线上实测 CTA 链接有效 ✅（git `01bae9b`）
+- **关联功能**：F15（首页）
+
+### BUG-028：账户地址管理无表单
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major
+- **现象**：账户地址页只列出已有地址，无法新增/编辑/删除——没有表单
+- **根因**：`main-addresses.liquid` 从未实现地址表单
+- **修复方法**：新增 `snippets/address-form-fields.liquid` 复用表单字段，地址页实现 新增/编辑/删除 全套（Shopify 原生 customer_address form）
+- **修改的文件**：`snippets/address-form-fields.liquid`（新建）、`sections/main-addresses.liquid`、`sections/main-account.liquid` 等账户系 section
+- **修复结果**：theme check 0 error ✅（git `01bae9b`）
+- **关联功能**：F09（客户账户）
+
+### BUG-029：collection-banner 三处视觉问题
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟢 minor
+- **现象**：集合页头图的三处问题（图片显示、遮罩、描述文案）
+- **修复方法**：逐项修正
+- **修改的文件**：`sections/main-collection-banner.liquid`
+- **修复结果**：线上渲染正常 ✅（git `01bae9b`）
+- **关联功能**：F12（Collection）
+
+### BUG-030：搜索 / 集合列表 / 集合网格分页缺失
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major
+- **现象**：搜索结果、集合列表页结果超过一页时无法翻页（无 paginate 或 paginate 未渲染）
+- **修复方法**：三个 section 补 `{% paginate %}` + 分页器渲染
+- **修改的文件**：`sections/main-search.liquid`、`sections/main-list-collections.liquid`、`sections/main-collection-product-grid.liquid`
+- **修复结果**：分页器正常渲染翻页 ✅（git `01bae9b`）
+- **关联功能**：F12（Collection）、F13（Search）
+
+### BUG-031：contact-form 双标题 + schema 翻译键错位
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟢 minor
+- **现象**：联系页出现两个标题；theme editor 中 contact-form 设置项显示 `translation missing`
+- **根因**：① section 与 page 模板各渲染一次标题；② contact-form 的 schema 翻译键错放在 `en.default.json`（schema 键必须在 `en.default.schema.json`）
+- **修复方法**：去掉重复标题；把该组 schema 键从 `en.default.json` 移到 `en.default.schema.json`
+- **修改的文件**：`sections/contact-form.liquid`、`locales/en.default.json`、`locales/en.default.schema.json`
+- **修复结果**：线上确认无 translation missing ✅（git `01bae9b`）
+- **关联功能**：F17（内容页）
+- **⚠ 教训**：`t:` 用 `en.default.json`，`schema 内 name/settings` 用 `en.default.schema.json`，两者不通用
+
+### BUG-032：footer 社交 / 支付图标不渲染
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟢 minor
+- **现象**：footer 配置了社交链接和支付图标，前台一律不显示
+- **根因**：`social-item.liquid` block 与 footer 的支付图标渲染逻辑缺失/未接线
+- **修复方法**：补 social-item 渲染与 `shop.enabled_payment_types` 支付图标输出
+- **修改的文件**：`blocks/social-item.liquid`、`sections/footer.liquid`
+- **修复结果**：footer 图标正常渲染 ✅（git `01bae9b`）
+- **关联功能**：F02（Footer）
+
+### BUG-033：`default: '#'` 裸链接无防护
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟢 minor
+- **现象**：多个 section 的链接设置默认 `'#'`，商家忘配时前台输出裸 `#` 死链
+- **修复方法**：全主题扫描，链接为空或为 `#` 时不输出 href / 不渲染按钮
+- **修改的文件**：`sections/apps.liquid`、`sections/multicolumn.liquid`、`sections/product-care-guide.liquid`、`sections/risk-free-guarantee.liquid` 等多个 section
+- **修复结果**：无裸 `#` 链接残留 ✅（git `01bae9b`）。注：`blocks/button-group.liquid` 的 block 版 default:'#' 仍未加防护，列入观察项
+- **关联功能**：全局
+
+### BUG-034：cart / quick-view 事件监听器泄漏
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major
+- **现象**：cart.js / quick-view.js 部分 handler 在重复初始化路径下重复绑定，长期浏览后一次点击触发多次请求（BUG-015 同类问题的残余面）
+- **修复方法**：统一改为单 document 委托 + 绑定去重守卫；清理嵌套的错误 handler
+- **修改的文件**：`assets/cart.js`、`assets/quick-view.js`
+- **修复结果**：重复绑定路径清除 ✅（git `01bae9b`）
+- **关联功能**：F03（Cart Drawer）、F10（Product Card）
+
+### BUG-035：氛围层异步 CSS 导致 CLS 0.93，LCP 未优化
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major
+- **现象**：Lighthouse 移动端实测首页 CLS 0.926、集合页 CLS 0.951（远超 0.1 警戒线），首页 perf 55、集合页 perf 50
+- **根因**：`.bt-ambience` 氛围层的结构样式（fixed 定位等）放在异步加载的 `botanical-effects.css`，样式到达前页面按无氛围层排版，到达后全量重排；装饰图与首屏产品图没有加载优先级区分
+- **修复方法**：
+  1. 结构样式迁入 section 内联 `{% stylesheet %}`（首屏即定版）
+  2. 装饰图 `fetchpriority="low"`
+  3. 首页/集合页前 4 张产品图 `loading="eager"` + `fetchpriority="high"`
+- **修改的文件**：`assets/effects.css`（-102 行结构样式）、`sections/botanical-ambience.liquid`、`snippets/botanical-ambience.liquid`、`sections/featured-collection.liquid`
+- **修复结果**：Lighthouse 移动端复测——首页 perf 55→80、PDP 75→90、集合页 50→81，三页 CLS 全部归零，a11y 维持 95-97 ✅（git `833ef06`）
+- **关联功能**：F16（氛围层/动效系统）
+- **⚠ 教训**：影响布局的结构样式永远跟首屏 CSS 走，异步 CSS 只能放纯装饰性样式
+
+---
+
 ## Bug 统计
 
 | 严重程度 | 数量 | 已修复 | 未修复 |
 |---------|------|--------|--------|
-| 🔴 blocker | 9 | 9 | 0 |
-| 🟡 major | 6 | 6 | 0 |
-| 🟢 minor | 1 | 1 | 0 |
-| **合计** | **19** | **19** | **0** |
+| 🔴 blocker | 11 | 11 | 0 |
+| 🟡 major | 16 | 16 | 0 |
+| 🟢 minor | 5 | 5 | 0 |
+| **合计** | **35** | **35** | **0** |
+
+## 观察项（暂不修复，记录在案）
+
+- `image_tag` 的 `class` 参数线上不渲染：Shopify 平台行为，无视觉影响
+- newsletter schema locale 整组缺失：低优先，待补
+- `blocks/button-group.liquid`（block 版）`default:'#'` 未加防护
+- `blocks/quick-view-trigger.liquid`（block 版）样式未同步 snippet 新版
+- color schemes 重构（Theme Store 现行要求）：0 处实现，49 个 section 大重构，破版风险高，是否执行待与 owner 确认（现有 8 个独立 color 设置功能等效）
+- 文档站域名 botanica-theme.com 未注册（NXDOMAIN）+ 缺 support_email：需 owner 自行注册上线
+- 店铺数据：库存全 0（available=true 不影响销售）；tag 体系前 57 旧后 12 新未统一；截图待重截
 
 ---
 
