@@ -42,6 +42,7 @@
     constructor() {
       super();
       this.variants = [];
+      this.product = null;
       this.moneyFormat = (window.theme && window.theme.moneyFormat) || '${{amount}}';
       this.i18n = (window.theme && window.theme.variantI18n) || {
         inStock: 'In stock',
@@ -64,6 +65,11 @@
       if (!node) return;
       try { this.variants = JSON.parse(node.textContent); }
       catch (e) { this.variants = []; }
+      const productNode = this.querySelector('[data-product]');
+      if (productNode) {
+        try { this.product = JSON.parse(productNode.textContent); }
+        catch (e) { this.product = null; }
+      }
     }
 
     attachListeners() {
@@ -92,8 +98,18 @@
       return this.variants.find((v) => Number(v.id) === Number(id)) || null;
     }
 
-    /** Sync UI from the variant id present in the hidden input on load. */
+    /**
+     * Sync UI from the variant id present in the hidden input on load.
+     * Only runs when the URL explicitly pins a variant (?variant=ID) —
+     * otherwise keep the server-rendered "From $X" range price on
+     * price_varies products instead of overwriting it with an exact price.
+     */
     syncFromCurrentVariant() {
+      let hasVariantParam = false;
+      try {
+        hasVariantParam = new URLSearchParams(window.location.search).has('variant');
+      } catch (e) { hasVariantParam = false; }
+      if (!hasVariantParam) return;
       const idInput = document.querySelector('[data-variant-id]');
       if (idInput && idInput.value) {
         const v = this.findVariantById(idInput.value);
@@ -138,18 +154,32 @@
         history.replaceState(history.state, '', url.toString());
       }
 
-      // 4. Price + compare
+      // 4. Price + compare + unit price
       const current = document.querySelector('[data-current-price]');
       const compare = document.querySelector('[data-compare-price]');
+      // Dedicated value hook so the sr-only "Regular price:" label survives.
+      const compareValue = compare
+        ? (compare.querySelector('[data-compare-price-value]') || compare)
+        : null;
       if (current) {
         current.textContent = money(variant.price, this.moneyFormat);
       }
       if (compare) {
         if (variant.compare_at_price && variant.compare_at_price > variant.price) {
-          compare.textContent = money(variant.compare_at_price, this.moneyFormat);
+          if (compareValue) compareValue.textContent = money(variant.compare_at_price, this.moneyFormat);
           compare.hidden = false;
         } else {
           compare.hidden = true;
+        }
+      }
+      const unitWrap = document.querySelector('[data-unit-price-wrap]');
+      const unitValue = document.querySelector('[data-unit-price]');
+      if (unitWrap) {
+        if (variant.available && variant.unit_price_measurement && variant.unit_price != null) {
+          if (unitValue) unitValue.textContent = money(variant.unit_price, this.moneyFormat);
+          unitWrap.hidden = false;
+        } else {
+          unitWrap.hidden = true;
         }
       }
 
@@ -183,6 +213,12 @@
 
       // 8. Disable radios for unavailable sibling variants on this option
       this.markSiblingAvailability(variant);
+
+      // 9. Broadcast the fully-applied variant for other components
+      //    (sticky-atc.js updates its price/button state from this).
+      document.dispatchEvent(new CustomEvent('theme:variantChange', {
+        detail: { variant: variant, product: this.product || null }
+      }));
     }
 
     swapMainMedia(media) {
@@ -225,9 +261,11 @@
           if (!candidate || !candidate.available) {
             label.classList.add('is-unavailable');
             input.setAttribute('aria-disabled', 'true');
+            input.disabled = true;
           } else {
             label.classList.remove('is-unavailable');
             input.removeAttribute('aria-disabled');
+            input.disabled = false;
           }
         });
       });
@@ -243,6 +281,9 @@
       }
       const live = document.querySelector('[data-aria-live], [data-price-live]');
       if (live) live.textContent = this.i18n.unavailable || 'Unavailable';
+      document.dispatchEvent(new CustomEvent('theme:variantChange', {
+        detail: { variant: null, product: this.product || null }
+      }));
     }
   }
 

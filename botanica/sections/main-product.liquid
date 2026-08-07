@@ -13,12 +13,12 @@
   endif
 -%}
 
-<section class="bt-product bt-section" {{ section.shopify_attributes }}>
+<section class="bt-product bt-section" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     <div class="bt-product__grid bt-product__grid--{{ section.settings.gallery_layout }}">
 
       <bt-product-gallery class="bt-product__gallery" role="region" aria-label="{{ 'products.product.media.gallery' | t }}">
-        <div class="bt-product__main-media" data-gallery-main data-gallery-zoom>
+        <div class="bt-product__main-media" data-gallery-main>
           {%- if selected_product.featured_media -%}
             {{ selected_product.featured_media | image_url: width: 1000 | image_tag:
               loading: 'eager', fetchpriority: 'high',
@@ -314,7 +314,8 @@
   {"type":"product-price"},
   {"type":"variant-picker","settings":{"picker_type":"swatch","swatch_option_index":"1"}},
   {"type":"size-guide-link"},
-  {"type":"buy-buttons","settings":{"show_dynamic_checkout":false,"show_quantity":true,"show_cart_icon":false,"show_trust_badges":false}},
+  {"type":"quantity-selector"},
+  {"type":"buy-buttons","settings":{"show_dynamic_checkout":false,"show_quantity":false,"show_cart_icon":false,"show_trust_badges":false}},
   {"type":"care-icons"},
   {"type":"pickup-availability"},
   {"type":"editorial-quote"},

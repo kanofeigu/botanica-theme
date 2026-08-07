@@ -7,6 +7,14 @@
     assign target = all_products.first
   endif
   assign variant = target.selected_or_first_available_variant
+  assign on_sale = false
+  if variant.compare_at_price > variant.price
+    assign on_sale = true
+  endif
+  assign show_unit_price = false
+  if variant.available and variant.unit_price_measurement
+    assign show_unit_price = true
+  endif
 -%}
 
 <div class="bt-product-price" {{ block.shopify_attributes }}>
@@ -17,18 +25,19 @@
       {{ variant.price | money }}
     {%- endif -%}
   </span>
-  {%- if variant.compare_at_price > variant.price -%}
-    <s class="bt-product-price__compare" data-compare-price>
-      <span class="bt-sr-only">{{ 'products.product.price.regular_price' | t }}: </span>
-      {{ variant.compare_at_price | money }}
-    </s>
-  {%- endif -%}
-  {%- if variant.available and variant.unit_price_measurement -%}
+  {%- comment -%} Compare price is always rendered (hidden when not on sale) so
+    variant-selects.js can reveal it when switching to a sale variant; the JS
+    only touches [data-compare-price-value] so the sr-only label survives. {%- endcomment -%}
+  <s class="bt-product-price__compare" data-compare-price{% unless on_sale %} hidden{% endunless %}>
+    <span class="bt-sr-only">{{ 'products.product.price.regular_price' | t }}: </span>
+    <span data-compare-price-value>{{ variant.compare_at_price | money }}</span>
+  </s>
+  <span class="bt-product-price__unit-wrap" data-unit-price-wrap{% unless show_unit_price %} hidden{% endunless %}>
     <span class="bt-product-price__unit bt-sr-only">
       {{ 'products.product.price.unit_price' | t }}
     </span>
     <span data-unit-price>{{ variant.unit_price | money }}</span>
-  {%- endif -%}
+  </span>
 </div>
 
 <div aria-live="polite" class="bt-sr-only" data-price-live></div>

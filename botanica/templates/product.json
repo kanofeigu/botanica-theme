@@ -46,14 +46,22 @@
             "content": "<p>Heights are measured from the soil line to the top of foliage.</p><ul><li><strong>Small</strong> — ~25cm / 10\" tall, 10cm / 4\" pot. Desk, shelf, windowsill.</li><li><strong>Medium</strong> — ~40cm / 16\" tall, 15cm / 6\" pot. Side table, plant stand.</li><li><strong>Large</strong> — ~80cm / 31\" tall, 20cm / 8\" pot. Corner statement, entry.</li></ul>"
           }
         },
+        "quantity": {
+          "type": "quantity-selector",
+          "settings": {}
+        },
         "buy": {
           "type": "buy-buttons",
           "settings": {
-            "show_quantity": true,
+            "show_quantity": false,
             "show_cart_icon": false,
             "show_dynamic_checkout": false,
             "show_trust_badges": false
           }
+        },
+        "sticky_atc": {
+          "type": "sticky-atc",
+          "settings": {}
         },
         "care_quick": {
           "type": "care-icons",
@@ -104,6 +112,7 @@
           "type": "complementary-products",
           "settings": {
             "heading": "Pairs well with…",
+            "collection": "all-plants",
             "max_products": 4
           }
         },
@@ -121,7 +130,9 @@
         "price",
         "variant_picker",
         "size_guide_link",
+        "quantity",
         "buy",
+        "sticky_atc",
         "care_quick",
         "description",
         "field_note",

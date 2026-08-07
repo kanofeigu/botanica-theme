@@ -19,11 +19,14 @@
 >
   <div class="bt-sticky-atc__info">
     <div class="bt-sticky-atc__title">{{ current_product.title }}</div>
+    {%- unless current_product.has_only_default_variant -%}
+      <div class="bt-sticky-atc__variant" data-sticky-variant>{{ first_variant.title }}</div>
+    {%- endunless -%}
     <div class="bt-sticky-atc__price" aria-live="polite">
-      {%- if current_product.compare_at_price > current_product.price -%}
-        <s style="color:var(--bt-color-text-muted);font-size:var(--bt-fs-body-xs);margin-right:4px">{{ current_product.compare_at_price | money }}</s>
-      {%- endif -%}
-      {{ first_variant.price | money }}
+      {%- comment -%} Compare price is always rendered (hidden when not on sale)
+        so sticky-atc.js can reveal it when switching to a sale variant. {%- endcomment -%}
+      <s class="bt-sticky-atc__compare" data-sticky-compare{% unless first_variant.compare_at_price > first_variant.price %} hidden{% endunless %}>{{ first_variant.compare_at_price | money }}</s>
+      <span data-sticky-price>{{ first_variant.price | money }}</span>
     </div>
   </div>
   <button
@@ -31,16 +34,86 @@
     form="{{ product_form_id }}"
     name="add"
     class="bt-btn bt-btn--primary bt-sticky-atc__btn"
+    data-sticky-button
     {% unless first_variant.available %}disabled{% endunless %}
     aria-label="{{ 'products.product.add_to_cart' | t }} — {{ current_product.title }}"
   >
-    {%- if first_variant.available -%}
-      {{ 'products.product.add_to_cart' | t }}
-    {%- else -%}
-      {{ 'products.product.sold_out' | t }}
-    {%- endif -%}
+    <span data-sticky-label>
+      {%- if first_variant.available -%}
+        {{ 'products.product.add_to_cart' | t }}
+      {%- else -%}
+        {{ 'products.product.sold_out' | t }}
+      {%- endif -%}
+    </span>
   </button>
 </bt-sticky-atc>
+
+{% stylesheet %}
+  /* Critical sticky-bar styles live on the block itself (moved out of the
+     async print-loaded effects.css) so the bar never flashes unstyled. */
+  .bt-sticky-atc {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bt-color-bg);
+    border-top: 1px solid var(--bt-color-border-medium);
+    padding: var(--bt-space-sm) var(--bt-space-md);
+    z-index: var(--bt-z-sticky);
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-sm);
+    transform: translateY(100%);
+    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+    box-shadow: 0 -4px 16px rgba(var(--bt-color-text-rgb), 0.06);
+  }
+  .bt-sticky-atc.is-visible {
+    transform: translateY(0);
+  }
+  .bt-sticky-atc__info {
+    flex: 1;
+    min-width: 0;
+  }
+  .bt-sticky-atc__title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .bt-sticky-atc__variant {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .bt-sticky-atc__price {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+  }
+  .bt-sticky-atc__compare {
+    color: var(--bt-color-text-muted);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-normal);
+    margin-right: 4px;
+  }
+  .bt-sticky-atc__btn {
+    flex-shrink: 0;
+    padding: 0.6em 1.5em;
+    min-height: 40px;
+  }
+  /* Utility to prevent sticky ATC from covering content */
+  .bt-has-sticky-atc {
+    padding-bottom: 80px;
+  }
+  @media print {
+    .bt-sticky-atc { display: none; }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {

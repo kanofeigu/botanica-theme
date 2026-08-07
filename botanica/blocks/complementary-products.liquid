@@ -50,16 +50,19 @@
                 </span>
               </div>
             </a>
-            <a
-              href="{{ upsell_url }}"
-              class="bt-complementary__atc"
-              aria-label="{{ 'products.product.add_to_cart' | t }} — {{ upsell_product.title | escape }}"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-              <span class="visually-hidden">{{ 'products.product.add_to_cart' | t }}</span>
-            </a>
+            {%- if upsell_variant -%}
+              <button
+                type="button"
+                class="bt-card__quick-add bt-complementary__atc"
+                data-variant-id="{{ upsell_variant.id }}"
+                aria-label="{{ 'products.product.add_to_cart' | t }} — {{ upsell_product.title | escape }}"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="visually-hidden">{{ 'products.product.add_to_cart' | t }}</span>
+              </button>
+            {%- endif -%}
           </li>
         {%- endunless -%}
       {%- endfor -%}
@@ -150,10 +153,13 @@
     margin-right: 4px;
     text-decoration: line-through;
   }
-  .bt-complementary__atc {
+  /* Scoped under .bt-complementary so these rules always win over the
+     card-product .bt-card__quick-add base styles if both stylesheets load. */
+  .bt-complementary .bt-complementary__atc {
     position: absolute;
     bottom: var(--bt-space-2xs);
     right: var(--bt-space-2xs);
+    left: auto;
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -168,12 +174,20 @@
     transform: scale(0.8);
     transition: all var(--bt-duration-fast) var(--bt-ease-out);
   }
-  .bt-complementary__item:hover .bt-complementary__atc {
+  .bt-complementary__item:hover .bt-complementary__atc,
+  .bt-complementary .bt-complementary__atc.is-loading,
+  .bt-complementary .bt-complementary__atc.is-added {
     opacity: 1;
     transform: scale(1);
   }
-  .bt-complementary__atc:hover {
+  .bt-complementary .bt-complementary__atc:hover {
     background: var(--bt-color-primary-hover);
+  }
+  @media (hover: none) {
+    .bt-complementary .bt-complementary__atc {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   @media (min-width: 750px) {

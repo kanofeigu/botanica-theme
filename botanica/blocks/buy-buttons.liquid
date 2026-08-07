@@ -76,31 +76,8 @@
   {%- endif -%}
 </div>
 
-{% javascript %}
-  (function () {
-    document.addEventListener('click', function (e) {
-      var btn = e.target.closest('.bt-qty__btn');
-      if (!btn) return;
-      var controls = btn.closest('.bt-qty__controls');
-      if (!controls) return;
-      var input = controls.querySelector('input[type="number"]');
-      if (!input) return;
-      var min = parseInt(input.getAttribute('min') || '1', 10);
-      if (isNaN(min) || min < 1) min = 1;
-      var max = parseInt(input.getAttribute('max') || '', 10);
-      if (isNaN(max) || max < 1) max = 9999;  /* no/zero max attr = effectively unlimited */
-      var cur = parseInt(input.value || '1', 10);
-      if (isNaN(cur) || cur < 1) cur = min;
-      if (btn.getAttribute('name') === 'plus') {
-        cur = Math.min(cur + 1, max);
-      } else if (btn.getAttribute('name') === 'minus') {
-        cur = Math.max(cur - 1, min);
-      }
-      input.value = cur;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-  })();
-{% endjavascript %}
+{% comment %} Quantity +/- logic lives in blocks/quantity-selector.liquid
+  (one globally-guarded delegated listener) — not duplicated here. {% endcomment %}
 
 {% stylesheet %}
   /* ── Buy panel — cream surface background matching Hey Rooted pattern ── */

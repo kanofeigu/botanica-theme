@@ -5,13 +5,12 @@
 {% endcomment %}
 {%- liquid
   assign product_ref = section.settings.product
-  assign show_vendor = section.settings.show_vendor | default: false
-  assign show_price = section.settings.show_price | default: true
-  assign show_quantity = section.settings.show_quantity | default: false
-  assign show_buy = section.settings.show_buy_button | default: true
+  assign show_vendor = section.settings.show_vendor
+  assign show_price = section.settings.show_price
+  assign show_buy = section.settings.show_buy_button
 -%}
 {%- if product_ref != blank -%}
-  <section class="bt-section bt-featured-product" {{ section.shopify_attributes }}>
+  <section class="bt-section bt-featured-product" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
     <div class="bt-container">
       <div class="bt-featured-product__grid">
         <div class="bt-featured-product__media">
@@ -54,12 +53,6 @@
             </div>
           {%- endif -%}
           <div class="bt-featured-product__actions">
-            {%- if show_quantity -%}
-              <div class="bt-featured-product__qty">
-                <label for="Quantity-{{ section.id }}" class="bt-sr-only">{{ 'products.product.quantity.label' | t }}</label>
-                <input type="number" id="Quantity-{{ section.id }}" name="quantity" value="1" min="1" class="bt-input" style="width:80px">
-              </div>
-            {%- endif -%}
             {%- if show_buy -%}
               <a href="{{ product_ref.url }}" class="bt-btn bt-btn--primary">
                 {{ 'products.product.view_product' | t }}
@@ -159,6 +152,24 @@
       "type": "checkbox",
       "id": "show_description",
       "label": "t:sections.featured_product.settings.show_description.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:sections.featured_product.settings.show_vendor.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "t:sections.featured_product.settings.show_price.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_button",
+      "label": "t:sections.featured_product.settings.show_buy_button.label",
       "default": true
     },
     {

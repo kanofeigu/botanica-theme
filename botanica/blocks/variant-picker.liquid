@@ -81,6 +81,15 @@
     <script type="application/json" data-selected-variant>
       {{ current_variant | json }}
     </script>
+    <script type="application/json" data-product>
+      {
+        "id": {{ product.id | json }},
+        "title": {{ product.title | json }},
+        "handle": {{ product.handle | json }},
+        "url": {{ product.url | json }},
+        "vendor": {{ product.vendor | json }}
+      }
+    </script>
   </variant-selects>
 {%- endunless -%}
 

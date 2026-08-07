@@ -157,13 +157,19 @@ class BtQuickView extends HTMLElement {
     }
   }
 
+  _esc(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
   _render(product) {
     if (!this.dialog) return;
     this._product = product;
     const strings = this._strings();
     const image = product.featured_image || (product.images && product.images[0]);
     const imageSrc = image ? image.src : '';
-    const imageAlt = product.title;
+    const imageAlt = this._esc(product.title);
     const moneyFormat = window.theme?.moneyFormat || '${{amount}}';
     const selected = product.variants.find((v) => v.available) || product.variants[0];
     const price = this._formatMoney(selected ? selected.price : product.price, moneyFormat);
@@ -179,8 +185,8 @@ class BtQuickView extends HTMLElement {
         ${imageSrc ? `<img src="${imageSrc}" alt="${imageAlt}" loading="lazy" width="600" height="750">` : '<div class="bt-skeleton" style="width:100%;height:100%"></div>'}
       </div>
       <div class="bt-quick-view__info">
-        <span class="bt-eyebrow">${product.vendor || ''}</span>
-        <h2 class="bt-h2">${product.title}</h2>
+        <span class="bt-eyebrow">${this._esc(product.vendor || '')}</span>
+        <h2 class="bt-h2">${this._esc(product.title)}</h2>
         <div class="bt-product__price-line" style="display:flex;align-items:center;gap:8px">
           <span class="bt-h3" style="color:var(--bt-color-primary)" data-qv-price>${price}</span>
           <s style="color:var(--bt-color-text-muted);font-size:var(--bt-fs-body)" data-qv-compare ${comparePrice ? '' : 'hidden'}>${comparePrice || ''}</s>
@@ -207,13 +213,13 @@ class BtQuickView extends HTMLElement {
     if (!option) return '';
     return `
       <div style="margin-top:var(--bt-space-xs)">
-        <label class="bt-label">${option.name}</label>
-        <div style="display:flex;flex-wrap:wrap;gap:8px" role="group" aria-label="${option.name}">
+        <label class="bt-label">${this._esc(option.name)}</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" role="group" aria-label="${this._esc(option.name)}">
           ${option.values.map((val) => {
             const variant = product.variants.find(v => v.option1 === val);
             const available = variant ? variant.available : true;
             const isSelected = variant && selectedId && String(variant.id) === String(selectedId);
-            return `<button type="button" class="bt-btn bt-btn--secondary bt-btn--sm${isSelected ? ' is-selected' : ''}" style="min-height:36px;font-size:var(--bt-fs-body-xs)" ${!available ? 'disabled' : ''} data-qv-variant="${variant ? variant.id : ''}" aria-pressed="${isSelected ? 'true' : 'false'}">${val}</button>`;
+            return `<button type="button" class="bt-btn bt-btn--secondary bt-btn--sm${isSelected ? ' is-selected' : ''}" style="min-height:36px;font-size:var(--bt-fs-body-xs)" ${!available ? 'disabled' : ''} data-qv-variant="${variant ? variant.id : ''}" aria-pressed="${isSelected ? 'true' : 'false'}">${this._esc(val)}</button>`;
           }).join('')}
         </div>
       </div>

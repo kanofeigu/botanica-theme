@@ -10,12 +10,42 @@
     <button type="button" class="bt-qty__btn" name="minus" aria-label="{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}">
       <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10" stroke="currentColor" stroke-width="2"/></svg>
     </button>
-    <input type="number" name="quantity" id="Quantity-{{ section.id }}" class="bt-qty__input" value="1" min="1" {% comment %}theme-check-disable UndefinedObject{% endcomment %}form="{{ product_form_id }}"{% comment %}theme-check-enable UndefinedObject{% endcomment %}>
+    <input type="number" name="quantity" id="Quantity-{{ section.id }}" class="bt-qty__input" value="1" min="1">
     <button type="button" class="bt-qty__btn" name="plus" aria-label="{{ 'products.product.quantity.increase' | t: product: product.title | escape }}">
       <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg>
     </button>
   </div>
 </div>
+
+{% javascript %}
+  /* Self-contained qty stepper: ONE document-level delegated listener,
+     globally guarded so multiple quantity blocks never double-bind.
+     (Consolidated here from buy-buttons.liquid.) */
+  if (!window.__btQtyStepperBound) {
+    window.__btQtyStepperBound = true;
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.bt-qty__btn');
+      if (!btn) return;
+      var controls = btn.closest('.bt-qty__controls');
+      if (!controls) return;
+      var input = controls.querySelector('input[name="quantity"]');
+      if (!input) return;
+      var min = parseInt(input.getAttribute('min') || '1', 10);
+      if (isNaN(min) || min < 1) min = 1;
+      var max = parseInt(input.getAttribute('max') || '', 10);
+      if (isNaN(max) || max < 1) max = 9999;  /* no/zero max attr = effectively unlimited */
+      var cur = parseInt(input.value || '1', 10);
+      if (isNaN(cur) || cur < 1) cur = min;
+      if (btn.getAttribute('name') === 'plus') {
+        cur = Math.min(cur + 1, max);
+      } else if (btn.getAttribute('name') === 'minus') {
+        cur = Math.max(cur - 1, min);
+      }
+      input.value = cur;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+{% endjavascript %}
 
 {% stylesheet %}
   .bt-qty { margin-bottom: var(--bt-space-sm); }
