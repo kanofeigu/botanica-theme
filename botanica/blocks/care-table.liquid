@@ -77,6 +77,35 @@
     width: 100%;
     border-collapse: collapse;
   }
+  .bt-care-table__table td {
+    padding: var(--bt-space-2xs) var(--bt-space-sm) var(--bt-space-2xs) 0;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-care-table__table tr:last-child td { border-bottom: none; }
+  .bt-care-table__icon {
+    width: 32px;
+    color: var(--bt-color-secondary);
+  }
+  .bt-care-table__label {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text);
+  }
+  .bt-care-table__value {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-care-table__meter {
+    text-align: right;
+    white-space: nowrap;
+  }
+  /* Dots render as inline <span> here (no .bt-meter wrapper) — without
+     inline-block their width/height are ignored and the meter is invisible */
+  .bt-care-table__meter .bt-meter__dot {
+    display: inline-block;
+    margin-left: 4px;
+  }
 {% endstylesheet %}
 
 {% schema %}

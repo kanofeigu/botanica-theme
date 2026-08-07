@@ -132,6 +132,18 @@ p {
   border: 0;
 }
 
+/* Icons inside flex rows must never squish (snippets/icon-*.liquid) */
+.bt-icon { flex-shrink: 0; }
+
+/* Rich-text wrappers (PDP care guide, guarantee body…) — :where() keeps
+   zero specificity so component styles always win over these defaults */
+:where(.bt-rich-text) > :first-child { margin-top: 0; }
+:where(.bt-rich-text) > :last-child { margin-bottom: 0; }
+:where(.bt-rich-text) p { margin: 0 0 var(--bt-space-xs); }
+:where(.bt-rich-text) a { color: var(--bt-color-primary); text-decoration: underline; text-underline-offset: 0.15em; }
+:where(.bt-rich-text) ul,
+:where(.bt-rich-text) ol { margin: 0 0 var(--bt-space-xs); padding-left: 1.25em; }
+
 /* ── Selection ── */
 ::selection {
   background: var(--bt-color-primary-tint);
@@ -163,6 +175,36 @@ p {
 .bt-btn:hover { transform: translateY(-1px); box-shadow: var(--bt-shadow-sm); }
 .bt-btn:active { transform: scale(0.97); }
 .bt-btn:disabled { opacity: 0.5; transform: none; box-shadow: none; }
+
+/* Small size modifier (e.g. mega-menu promo CTA) */
+.bt-btn--sm {
+  padding: 0.5em 1.2em;
+  min-height: 36px;
+  font-size: var(--bt-fs-body-xs);
+}
+
+/* Loading state — toggled by cart.js on /cart/add submits */
+.bt-btn--loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.bt-btn--loading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  border: 2px solid var(--bt-color-primary-contrast);
+  border-top-color: transparent;
+  animation: bt-spin 0.7s linear infinite;
+}
+@keyframes bt-spin {
+  to { transform: rotate(360deg); }
+}
 
 .bt-btn--primary {
   background: var(--bt-color-primary);
@@ -293,6 +335,19 @@ p {
   background: transparent;
   color: var(--bt-color-text-muted);
   border: 1px solid var(--bt-color-border-medium);
+}
+/* PDP badge contexts (blocks/product-badges) */
+.bt-badge--stock {
+  background: var(--bt-color-primary-tint);
+  color: var(--bt-color-primary);
+}
+.bt-badge--sale {
+  background: var(--bt-color-secondary);
+  color: var(--bt-color-primary-contrast);
+}
+.bt-badge--soldout {
+  background: var(--bt-color-text);
+  color: var(--bt-color-bg);
 }
 
 /* ── Interaction primitives ── */
