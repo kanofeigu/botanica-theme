@@ -22,7 +22,11 @@
       {%- endif -%}
       <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col">
         {%- for product in collection.products limit: products_to_show -%}
-          {%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge -%}
+          {%- if forloop.index <= 4 -%}
+            {%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, loading: 'eager', fetchpriority: 'high' -%}
+          {%- else -%}
+            {%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge -%}
+          {%- endif -%}
         {%- else -%}
           {%- for i in (1..4) -%}
             <div class="bt-card bt-card--placeholder">

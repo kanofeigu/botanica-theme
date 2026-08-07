@@ -364,49 +364,6 @@
   box-shadow: var(--bt-shadow-sm);
 }
 
-/* ── Button press feedback (refined from base.css) ── */
-.bt-btn--press:active {
-  transform: scale(0.96);
-  transition-duration: 80ms;
-}
-
-/* ── Cart bounce (when item added) ── */
-@keyframes bt-cart-bounce {
-  0%   { transform: scale(1); }
-  25%  { transform: scale(1.2); }
-  50%  { transform: scale(0.95); }
-  75%  { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-.bt-cart-bounce {
-  animation: bt-cart-bounce 400ms var(--bt-ease-out);
-}
-
-/* ── Form error shake ── */
-@keyframes bt-shake {
-  0%, 100% { transform: translateX(0); }
-  20%      { transform: translateX(-6px); }
-  40%      { transform: translateX(6px); }
-  60%      { transform: translateX(-4px); }
-  80%      { transform: translateX(4px); }
-}
-
-.bt-shake {
-  animation: bt-shake 400ms var(--bt-ease-out);
-}
-
-/* ── Form success pulse (green check flash) ── */
-@keyframes bt-pulse-success {
-  0%   { box-shadow: 0 0 0 0 rgba(var(--bt-color-primary-rgb), 0.4); }
-  70%  { box-shadow: 0 0 0 8px rgba(var(--bt-color-primary-rgb), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--bt-color-primary-rgb), 0); }
-}
-
-.bt-pulse-success {
-  animation: bt-pulse-success 600ms var(--bt-ease-out);
-}
-
 /* ── Skeleton loading shimmer (for async content) ── */
 @keyframes bt-shimmer {
   0%   { background-position: -200% 0; }
@@ -437,64 +394,6 @@
   border-top-color: var(--bt-color-primary);
   border-radius: 50%;
   animation: bt-spin 600ms linear infinite;
-}
-
-/* ════════════════════════════════════════════
-   STICKY ELEMENTS
-   Enhanced sticky behavior for ATC / panels
-   ════════════════════════════════════════════ */
-
-/* ── Sticky ATC bar (mobile) ── */
-.bt-sticky-atc {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bt-color-bg);
-  border-top: 1px solid var(--bt-color-border-medium);
-  padding: var(--bt-space-sm) var(--bt-space-md);
-  z-index: var(--bt-z-sticky);
-  display: flex;
-  align-items: center;
-  gap: var(--bt-space-sm);
-  transform: translateY(100%);
-  transition: transform var(--bt-duration-base) var(--bt-ease-out);
-  box-shadow: 0 -4px 16px rgba(var(--bt-color-text-rgb), 0.06);
-}
-
-.bt-sticky-atc.is-visible {
-  transform: translateY(0);
-}
-
-.bt-sticky-atc__info {
-  flex: 1;
-  min-width: 0;
-}
-
-.bt-sticky-atc__title {
-  font-family: var(--bt-font-heading);
-  font-size: var(--bt-fs-body-sm);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 2px;
-}
-
-.bt-sticky-atc__price {
-  font-size: var(--bt-fs-body-sm);
-  font-weight: var(--bt-fw-semibold);
-  color: var(--bt-color-text);
-}
-
-.bt-sticky-atc__btn {
-  flex-shrink: 0;
-  padding: 0.6em 1.5em;
-  min-height: 40px;
-}
-
-/* Utility to prevent sticky ATC from covering content */
-.bt-has-sticky-atc {
-  padding-bottom: 80px;
 }
 
 /* ════════════════════════════════════════════
@@ -625,5 +524,4 @@
 
 @media print {
   .bt-texture::after { display: none; }
-  .bt-sticky-atc { display: none; }
 }

@@ -46,9 +46,160 @@
 {%- endif -%}
 
 {% stylesheet %}
+  /* ════════════════════════════════════════════
+     STRUCTURAL STYLES — loaded synchronously with
+     this section. botanical-effects.css is async
+     (media="print" swap), so any rule that affects
+     layout MUST live here or first paint renders
+     the decorative nodes in document flow → CLS.
+     Animation/keyframes stay in the async file.
+     Scoped with .bt-ambience (0,2,0) so these win
+     over the async duplicates regardless of order.
+     ════════════════════════════════════════════ */
+
+  /* Ambience overlay — fully out of document flow */
   .bt-ambience {
-    position: relative;
-    z-index: 0;
+    position: fixed;
+    inset: 0;
+    z-index: 1; /* above content, below sticky header (--bt-z-sticky: 20) */
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* ── Falling leaves ── */
+  .bt-ambience .bt-falling-leaves {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+  }
+  .bt-ambience .bt-leaf {
+    position: absolute;
+    top: -60px;
+    width: var(--bt-leaf-size, 30px);
+    height: auto;
+    opacity: 0; /* revealed only by scroll animation */
+  }
+  .bt-ambience .bt-leaf--1 { left: 8%;  --bt-leaf-size: 36px; }
+  .bt-ambience .bt-leaf--2 { left: 25%; --bt-leaf-size: 30px; }
+  .bt-ambience .bt-leaf--3 { left: 48%; --bt-leaf-size: 22px; }
+  .bt-ambience .bt-leaf--4 { left: 72%; --bt-leaf-size: 34px; }
+  .bt-ambience .bt-leaf--5 { left: 15%; --bt-leaf-size: 28px; }
+  .bt-ambience .bt-leaf--6 { left: 62%; --bt-leaf-size: 20px; }
+  .bt-ambience .bt-leaf--7 { left: 38%; --bt-leaf-size: 32px; }
+  .bt-ambience .bt-leaf--8 { left: 85%; --bt-leaf-size: 24px; }
+  /* Explicit box: width from CSS var, height from img width/height attrs */
+  .bt-ambience .bt-leaf__img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ── Parallax silhouettes ── */
+  .bt-ambience .bt-bg-botanical {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+  .bt-ambience .bt-bg-botanical--left  { left: 0;  width: clamp(150px, 20vw, 300px); }
+  .bt-ambience .bt-bg-botanical--right { right: 0; width: clamp(150px, 20vw, 300px); }
+  .bt-ambience .bt-bg-botanical__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.08;
+  }
+
+  /* ── Spores / pollen ── */
+  .bt-ambience .bt-spores {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .bt-ambience .bt-spore {
+    position: absolute;
+    width: var(--bt-spore-size, 4px);
+    height: var(--bt-spore-size, 4px);
+    border-radius: 50%;
+    opacity: 0; /* revealed only by scroll animation */
+  }
+  .bt-ambience .bt-spore--1  { top: 15%; left: 10%; --bt-spore-size: 5px; }
+  .bt-ambience .bt-spore--2  { top: 30%; left: 25%; --bt-spore-size: 3px; }
+  .bt-ambience .bt-spore--3  { top: 45%; left: 40%; --bt-spore-size: 6px; }
+  .bt-ambience .bt-spore--4  { top: 20%; left: 55%; --bt-spore-size: 4px; }
+  .bt-ambience .bt-spore--5  { top: 55%; left: 70%; --bt-spore-size: 3.5px; }
+  .bt-ambience .bt-spore--6  { top: 35%; left: 85%; --bt-spore-size: 5px; }
+  .bt-ambience .bt-spore--7  { top: 65%; left: 15%; --bt-spore-size: 4.5px; }
+  .bt-ambience .bt-spore--8  { top: 10%; left: 68%; --bt-spore-size: 3px; }
+  .bt-ambience .bt-spore--9  { top: 50%; left: 32%; --bt-spore-size: 5px; }
+  .bt-ambience .bt-spore--10 { top: 75%; left: 50%; --bt-spore-size: 4px; }
+  .bt-ambience .bt-spore--11 { top: 40%; left: 78%; --bt-spore-size: 3.5px; }
+  .bt-ambience .bt-spore--12 { top: 70%; left: 92%; --bt-spore-size: 5px; }
+
+  /* ── Growing vines ── */
+  .bt-ambience .bt-vine {
+    position: absolute;
+    overflow: visible;
+  }
+  .bt-ambience .bt-vine--left {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    transform: translateX(-30px);
+  }
+  .bt-ambience .bt-vine--right {
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    transform: translateX(30px);
+  }
+  .bt-ambience .bt-vine__svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.15;
+  }
+
+  /* ── Hero botanical (when snippet used inside this section) ── */
+  .bt-ambience .bt-hero-botanical {
+    position: absolute;
+    inset: 0;
+  }
+  .bt-ambience .bt-hero-botanical__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.06;
+  }
+
+  /* ── Soil strip — viewport-bottom inside the fixed layer
+        (was in-flow at section bottom; container is now fixed) ── */
+  .bt-ambience .bt-soil-strip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 40px;
+    overflow: hidden;
+  }
+
+  /* ── Mobile reductions (structural — must not arrive late) ── */
+  @media (max-width: 749px) {
+    .bt-ambience .bt-vine--left  { width: 60px; transform: translateX(-20px); }
+    .bt-ambience .bt-vine--right { width: 60px; transform: translateX(20px); }
+    .bt-ambience .bt-bg-botanical--left,
+    .bt-ambience .bt-bg-botanical--right { width: 80px; }
+    .bt-ambience .bt-leaf--5,
+    .bt-ambience .bt-leaf--7,
+    .bt-ambience .bt-leaf--8 { display: none; }
+    .bt-ambience .bt-spore--5,
+    .bt-ambience .bt-spore--7,
+    .bt-ambience .bt-spore--9,
+    .bt-ambience .bt-spore--11,
+    .bt-ambience .bt-spore--12 { display: none; }
   }
 {% endstylesheet %}
 
