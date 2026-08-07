@@ -606,7 +606,7 @@
 - newsletter schema locale 整组缺失：低优先，待补
 - `blocks/button-group.liquid`（block 版）`default:'#'` 未加防护
 - `blocks/quick-view-trigger.liquid`（block 版）样式未同步 snippet 新版
-- color schemes 重构（Theme Store 现行要求）：0 处实现，49 个 section 大重构，破版风险高，是否执行待与 owner 确认（现有 8 个独立 color 设置功能等效）
+- ~~color schemes 重构~~ ✅ 2026-08-07 已完成（试点 `e65d941` + 全量迁移 `4b51d36`，43 个 section 接入）
 - 文档站域名 botanica-theme.com 未注册（NXDOMAIN）+ 缺 support_email：需 owner 自行注册上线
 - 店铺数据：库存全 0（available=true 不影响销售）；tag 体系前 57 旧后 12 新未统一；截图待重截
 
