@@ -568,14 +568,37 @@
 
 ---
 
+### BUG-038：PDP 五处类名未定义导致视觉缺陷（交互态走查批次）
+
+- **发现日期**：2026-08-07
+- **严重程度**：🟡 major（合并记录，含 1 个功能态缺陷 + 4 个视觉缺陷）
+- **现象**：PDP 交互态走查发现 13 个 markup 使用但 CSS 从未定义的类，逐一甄别后 5 处为真实缺陷：
+  1. **Add to cart 点击无加载反馈**：cart.js 会给提交按钮加 `bt-btn--loading` 类，但该类无任何样式（用户点了不知道点了）
+  2. **PDP 徽章颜色语义错误**：`bt-badge--sale/soldout/stock` 三个修饰类未定义，Sale/Sold out/In stock 全部渲染成 base 绿色徽章
+  3. **养护等级计量点不可见**：care-table 的 `.bt-meter__dot` 是 inline `<span>` 且无 `.bt-meter` 容器，width/height 不生效，dots 渲染为零尺寸（核心卖点视觉缺失）
+  4. **care-table 单元格裸奔**：`__icon/__label/__value/__meter` 无样式，表格无对齐无分隔
+  5. **变体选项名/冒号、单价文字、mega menu 小按钮、富文本、图标**等工具类缺失
+- **根因**：与 BUG-037 同类——开发期凭肌肉记忆写类名，未对照主题 CSS 定义；theme check 的 ValidScopedCSSClass 被注释禁用（product-badges 块）
+- **修复方法**：机械扫描（markup 类 ∪ JS 切换类）− CSS 定义类 = 差异清单，逐个甄别修复：
+  - `base.css`：补 3 个徽章修饰、`bt-btn--loading` 转圈动画（@keyframes bt-spin）、`bt-btn--sm`、`bt-icon`、`bt-rich-text`（:where() 零优先级不干扰组件样式）
+  - `care-table.liquid`：单元格 padding/对齐/分隔线 + `.bt-meter__dot { display: inline-block }`
+  - `variant-picker.liquid`：选项名/分隔符样式；`product-price.liquid`：单价样式
+  - 无害冗余（bt-product 根钩子、bt-qty__label 已由 bt-field__label 覆盖、bt-care-story__eyebrow 已由 bt-eyebrow 覆盖、sr-only 内的 bt-product-price__unit）甄别后不动
+- **修改的文件**：`assets/base.css`、`blocks/care-table.liquid`、`blocks/variant-picker.liquid`、`blocks/product-price.liquid`
+- **修复结果**：theme check 0/0；线上 base.css 与编译 CSS 逐项确认 12 条新规则全部生效 ✅（git `00eeefc`）
+- **关联功能**：F11（PDP）、F06（Shop by Care）、F08（Size Guide）、F01（Header）
+- **⚠ 教训**：theme-check-disable 注释是技术债信号——被禁用的检查项应列入走查清单定期人工复核；「JS 切换的类」必须和 CSS 定义成对存在
+
+---
+
 ## Bug 统计
 
 | 严重程度 | 数量 | 已修复 | 未修复 |
 |---------|------|--------|--------|
 | 🔴 blocker | 11 | 11 | 0 |
-| 🟡 major | 16 | 16 | 0 |
+| 🟡 major | 17 | 17 | 0 |
 | 🟢 minor | 7 | 7 | 0 |
-| **合计** | **37** | **37** | **0** |
+| **合计** | **38** | **38** | **0** |
 
 ## 观察项（暂不修复，记录在案）
 
