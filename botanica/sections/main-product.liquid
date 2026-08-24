@@ -15,17 +15,54 @@
 
 <section class="bt-product bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
+    {%- if section.settings.show_breadcrumbs -%}
+      {% render 'breadcrumbs' %}
+    {%- endif -%}
     <div class="bt-product__grid bt-product__grid--{{ section.settings.gallery_layout }}">
 
       <bt-product-gallery class="bt-product__gallery" role="region" aria-label="{{ 'products.product.media.gallery' | t }}">
         <div class="bt-product__main-media" data-gallery-main>
-          {%- if selected_product.featured_media -%}
-            {{ selected_product.featured_media | image_url: width: 1000 | image_tag:
-              loading: 'eager', fetchpriority: 'high',
-              widths: '400, 600, 800, 1000, 1200',
-              sizes: '(min-width: 990px) 50vw, 100vw',
-              alt: selected_product.featured_media.alt | default: selected_product.title
-            }}
+          {%- if selected_product.media.size > 0 -%}
+            {%- for media in selected_product.media -%}
+              {%- liquid
+                assign is_current = false
+                if media.id == selected_product.featured_media.id
+                  assign is_current = true
+                endif
+              -%}
+              <div
+                class="bt-product__slide bt-product__slide--{{ media.media_type }}{% if is_current %} is-active{% endif %}"
+                data-gallery-slide
+                data-media-id="{{ media.id }}"
+                data-media-type="{{ media.media_type }}"
+                {% unless is_current %} hidden{% endunless %}
+              >
+                {%- case media.media_type -%}
+                  {%- when 'image' -%}
+                    {%- if is_current -%}
+                      {{ media | image_url: width: 1000 | image_tag:
+                        loading: 'eager', fetchpriority: 'high',
+                        widths: '400, 600, 800, 1000, 1200',
+                        sizes: '(min-width: 990px) 50vw, 100vw',
+                        alt: media.alt | default: selected_product.title
+                      }}
+                    {%- else -%}
+                      {{ media | image_url: width: 1000 | image_tag:
+                        loading: 'lazy',
+                        widths: '400, 600, 800, 1000, 1200',
+                        sizes: '(min-width: 990px) 50vw, 100vw',
+                        alt: media.alt | default: selected_product.title
+                      }}
+                    {%- endif -%}
+                  {%- when 'video' -%}
+                    {{ media | video_tag: controls: true, image_size: '1000x', class: 'bt-product__video' }}
+                  {%- when 'external_video' -%}
+                    {{ media | external_video_tag: class: 'bt-product__external-video' }}
+                  {%- when 'model' -%}
+                    {{ media | model_viewer_tag: image_size: '1000x', reveal: 'interaction', toggleable: true, class: 'bt-product__model' }}
+                {%- endcase -%}
+              </div>
+            {%- endfor -%}
           {%- else -%}
             {{ 'product-1' | placeholder_svg_tag: 'bt-product__placeholder' }}
           {%- endif -%}
@@ -44,24 +81,36 @@
             {%- for media in selected_product.media -%}
               {%- liquid
                 assign thumb_image = media.preview_image | default: media
-                assign media_src = media | image_url: width: 1000
-                assign media_full = media | image_url: width: 1600
-                assign media_srcset = media | image_url: width: 400 | append: ' 400w, ' | append: media | image_url: width: 600 | append: ' 600w, ' | append: media | image_url: width: 800 | append: ' 800w, ' | append: media | image_url: width: 1000 | append: ' 1000w, ' | append: media | image_url: width: 1200 | append: ' 1200w'
+                assign label_key = 'products.product.media.load_image'
+                if media.media_type == 'video' or media.media_type == 'external_video'
+                  assign label_key = 'products.product.media.load_video'
+                elsif media.media_type == 'model'
+                  assign label_key = 'products.product.media.load_model'
+                endif
               -%}
               <button
                 type="button"
-                class="bt-product__thumb{% if forloop.first %} is-active{% endif %}"
+                class="bt-product__thumb{% if media.id == selected_product.featured_media.id %} is-active{% endif %}"
                 data-media-id="{{ media.id }}"
-                data-media-src="{{ media_src }}"
-                data-media-full="{{ media_full }}"
-                data-media-srcset="{{ media_srcset }}"
-                data-media-sizes="(min-width: 990px) 50vw, 100vw"
+                data-media-type="{{ media.media_type }}"
+                {%- if media.media_type == 'image' %}
+                data-media-full="{{ media | image_url: width: 1600 }}"
                 data-media-alt="{{ media.alt | default: selected_product.title | escape }}"
+                {%- endif %}
                 data-gallery-thumb
                 role="listitem"
-                aria-label="{{ 'products.product.media.image_available' | t: index: forloop.index }}"
+                aria-label="{{ label_key | t: index: forloop.index }}"
               >
                 {{ thumb_image | image_url: width: 120 | image_tag: loading: 'lazy', widths: '80, 120', alt: media.alt | default: selected_product.title }}
+                {%- unless media.media_type == 'image' -%}
+                  <span class="bt-product__thumb-badge" aria-hidden="true">
+                    {%- if media.media_type == 'model' -%}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z"/><path d="M12 11L4 6.5M12 11l8-4.5M12 11v9"/></svg>
+                    {%- else -%}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    {%- endif -%}
+                  </span>
+                {%- endunless -%}
               </button>
             {%- endfor -%}
           </div>
@@ -130,6 +179,33 @@
     cursor: zoom-in;
   }
   .bt-product__main-media img { width: 100%; height: 100%; object-fit: cover; transition: opacity var(--bt-duration-base) var(--bt-ease-out); }
+
+  /* ── Media slides: image / video / external video / 3D model ── */
+  .bt-product__main-media { display: grid; }
+  .bt-product__slide { grid-area: 1 / 1; width: 100%; height: 100%; }
+  .bt-product__slide[hidden] { display: none; }
+  .bt-product__slide video,
+  .bt-product__slide iframe,
+  .bt-product__slide model-viewer {
+    width: 100%; height: 100%; border: 0; display: block;
+  }
+  .bt-product__slide video { object-fit: cover; background: #000; }
+  .bt-product__slide model-viewer { --poster-color: transparent; }
+  /* Zoom affordance only applies to image slides */
+  .bt-product__main-media:has(.bt-product__slide.is-active:not(.bt-product__slide--image)) { cursor: default; }
+  .bt-product__main-media:has(.bt-product__slide.is-active:not(.bt-product__slide--image)) .bt-product__zoom-btn { display: none; }
+  /* Thumbnail badges for non-image media */
+  .bt-product__thumb { position: relative; }
+  .bt-product__thumb-badge {
+    position: absolute;
+    right: 4px; bottom: 4px;
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--bt-radius-pill);
+    background: rgba(var(--bt-color-bg-rgb), 0.88);
+    color: var(--bt-color-text);
+    pointer-events: none;
+  }
   /* Paper texture overlay on gallery */
   .bt-product__main-media::after {
     content: '';
@@ -309,7 +385,8 @@
   { "type": "select", "id": "gallery_layout", "label": "t:sections.main_product.settings.gallery_layout.label", "options": [{"value":"thumb_left","label":"t:sections.main_product.settings.gallery_layout.options__1.label"},{"value":"thumb_below","label":"t:sections.main_product.settings.gallery_layout.options__2.label"},{"value":"stacked","label":"t:sections.main_product.settings.gallery_layout.options__3.label"}], "default": "thumb_below" },
   { "type": "checkbox", "id": "sticky_care", "label": "t:sections.main_product.settings.sticky_care.label", "default": true },
   { "type": "range", "id": "padding_top", "min":0,"max":100,"step":4,"default":40,"unit":"px","label":"t:sections.main_product.settings.padding_top.label" },
-  { "type": "range", "id": "padding_bottom", "min":0,"max":100,"step":4,"default":40,"unit":"px","label":"t:sections.main_product.settings.padding_bottom.label" }
+  { "type": "range", "id": "padding_bottom", "min":0,"max":100,"step":4,"default":40,"unit":"px","label":"t:sections.main_product.settings.padding_bottom.label" },
+  { "type": "checkbox", "id": "show_breadcrumbs", "label": "t:sections.main_product.settings.show_breadcrumbs.label", "default": true }
 ], "presets": [{"name":"t:sections.main_product.name","blocks":[
   {"type":"specimen-eyebrow"},
   {"type":"product-title"},

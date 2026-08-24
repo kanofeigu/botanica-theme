@@ -195,6 +195,33 @@
         "label": "Color scheme"
       }
     },
+    "announcement_bar": {
+      "name": "Announcement bar",
+      "settings": {
+        "autoplay": {
+          "label": "Auto-rotate announcements"
+        },
+        "autoplay_speed": {
+          "label": "Change announcements every"
+        },
+        "show_separator": {
+          "label": "Show separator line"
+        }
+      },
+      "blocks": {
+        "announcement": {
+          "name": "Announcement",
+          "settings": {
+            "text": {
+              "label": "Text"
+            },
+            "link": {
+              "label": "Link"
+            }
+          }
+        }
+      }
+    },
     "header": {
       "name": "Header",
       "settings": {
@@ -366,6 +393,9 @@
         "sticky_care": {
           "label": "Sticky care panel"
         },
+        "show_breadcrumbs": {
+          "label": "Show breadcrumbs"
+        },
         "padding_top": {
           "label": "Top padding"
         },
@@ -465,6 +495,9 @@
         },
         "show_description": {
           "label": "Show collection description"
+        },
+        "show_breadcrumbs": {
+          "label": "Show breadcrumbs"
         }
       }
     },

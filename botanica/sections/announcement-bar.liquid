@@ -1,0 +1,289 @@
+{% comment %}
+  sections/announcement-bar.liquid — Announcement bar (header group).
+  Rotating messages via "announcement" blocks. Autoplay pauses on
+  hover/focus and is disabled under prefers-reduced-motion.
+  All-original. Zero Dawn code.
+{% endcomment %}
+
+{%- liquid
+  assign announcement_count = 0
+  for block in section.blocks
+    if block.type == 'announcement' and block.settings.text != blank
+      assign announcement_count = announcement_count | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if announcement_count > 0 -%}
+  <div
+    class="bt-announcement-bar{% if section.settings.show_separator %} bt-announcement-bar--separator{% endif %} color-{{ section.settings.color_scheme }}"
+    role="region"
+    aria-label="{{ 'sections.announcements.announcement_bar' | t }}"
+    data-announcement-bar
+    data-autoplay="{{ section.settings.autoplay }}"
+    data-autoplay-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
+    {{ section.shopify_attributes }}
+  >
+    <div class="bt-announcement-bar__inner bt-container">
+      {%- if announcement_count > 1 -%}
+        <button
+          type="button"
+          class="bt-announcement-bar__arrow bt-interactive"
+          data-announcement-prev
+          aria-label="{{ 'sections.announcements.previous_announcement' | t }}"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      {%- endif -%}
+
+      <div class="bt-announcement-bar__track"{% unless section.settings.autoplay %} aria-live="polite"{% endunless %}>
+        {%- assign message_index = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'announcement' and block.settings.text != blank -%}
+            {%- assign message_index = message_index | plus: 1 -%}
+            <div
+              class="bt-announcement-bar__message{% if message_index == 1 %} bt-announcement-bar__message--active{% endif %}"
+              data-announcement-message
+              {% unless message_index == 1 %}hidden{% endunless %}
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}" class="bt-announcement-bar__link">{{ block.settings.text }}</a>
+              {%- else -%}
+                <p class="bt-announcement-bar__text">{{ block.settings.text }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if announcement_count > 1 -%}
+        <button
+          type="button"
+          class="bt-announcement-bar__arrow bt-interactive"
+          data-announcement-next
+          aria-label="{{ 'sections.announcements.next_announcement' | t }}"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% javascript %}
+  (function () {
+    document.querySelectorAll('[data-announcement-bar]').forEach(function (bar) {
+      if (bar.dataset.announcementBound) return;
+      bar.dataset.announcementBound = 'true';
+
+      var messages = Array.prototype.slice.call(bar.querySelectorAll('[data-announcement-message]'));
+      if (messages.length <= 1) return;
+
+      var prev = bar.querySelector('[data-announcement-prev]');
+      var next = bar.querySelector('[data-announcement-next]');
+      var autoplay = bar.getAttribute('data-autoplay') === 'true';
+      var speed = parseInt(bar.getAttribute('data-autoplay-speed'), 10) || 5000;
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var index = 0;
+      var timer = null;
+
+      function show(i) {
+        index = (i + messages.length) % messages.length;
+        messages.forEach(function (msg, j) {
+          if (j === index) {
+            msg.hidden = false;
+            void msg.offsetHeight; /* force reflow so the fade-in transition runs */
+            msg.classList.add('bt-announcement-bar__message--active');
+          } else {
+            msg.classList.remove('bt-announcement-bar__message--active');
+            msg.hidden = true;
+          }
+        });
+      }
+
+      function stop() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+
+      function start() {
+        if (!autoplay || reducedMotion || timer) return;
+        timer = setInterval(function () { show(index + 1); }, speed);
+      }
+
+      if (prev) prev.addEventListener('click', function () { show(index - 1); });
+      if (next) next.addEventListener('click', function () { show(index + 1); });
+
+      /* Pause autoplay while the bar is hovered or holds keyboard focus */
+      bar.addEventListener('mouseenter', stop);
+      bar.addEventListener('mouseleave', start);
+      bar.addEventListener('focusin', stop);
+      bar.addEventListener('focusout', function (e) {
+        if (!bar.contains(e.relatedTarget)) start();
+      });
+
+      start();
+    });
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  /* ============================================================
+     ANNOUNCEMENT BAR — Botanica v3. Zero Dawn code.
+     Slim rotating bar for the header group.
+     ============================================================ */
+
+  .bt-announcement-bar {
+    background: var(--bt-color-bg);
+    color: var(--bt-color-text);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+  }
+  .bt-announcement-bar--separator {
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+
+  .bt-announcement-bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bt-space-sm);
+    min-height: 40px;
+    padding-top: var(--bt-space-2xs);
+    padding-bottom: var(--bt-space-2xs);
+  }
+
+  /* ── Message track ── */
+  .bt-announcement-bar__track {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+  .bt-announcement-bar__message {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity var(--bt-duration-base) var(--bt-ease-out),
+                transform var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-announcement-bar__message--active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .bt-announcement-bar__message[hidden] {
+    display: none !important;
+  }
+
+  .bt-announcement-bar__text {
+    margin: 0;
+    font-size: inherit;
+    color: var(--bt-color-text);
+  }
+  .bt-announcement-bar__link {
+    color: var(--bt-color-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-announcement-bar__link:hover,
+  .bt-announcement-bar__link:focus-visible {
+    color: var(--bt-color-primary);
+  }
+  .bt-announcement-bar__link:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+
+  /* ── Prev / next arrows ── */
+  .bt-announcement-bar__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    border-radius: var(--bt-radius-sm);
+    color: var(--bt-color-text);
+    cursor: pointer;
+    transition: color var(--bt-duration-fast) var(--bt-ease-out),
+                background var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-announcement-bar__arrow:hover,
+  .bt-announcement-bar__arrow:focus-visible {
+    color: var(--bt-color-primary);
+    background: var(--bt-color-surface-hover);
+  }
+  .bt-announcement-bar__arrow:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+
+  /* Reduced motion: no fade, JS also skips autoplay */
+  @media (prefers-reduced-motion: reduce) {
+    .bt-announcement-bar__message {
+      transition: none;
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.announcement_bar.name",
+  "tag": "section",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "t:sections.announcement_bar.blocks.announcement.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:sections.announcement_bar.blocks.announcement.settings.text.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.announcement_bar.blocks.announcement.settings.link.label"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:sections.announcement_bar.settings.autoplay.label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "t:sections.announcement_bar.settings.autoplay_speed.label",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separator",
+      "label": "t:sections.announcement_bar.settings.show_separator.label",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.announcement_bar.name",
+      "blocks": [{ "type": "announcement" }]
+    }
+  ]
+}
+{% endschema %}

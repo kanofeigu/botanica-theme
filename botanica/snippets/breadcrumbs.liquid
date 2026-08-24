@@ -1,0 +1,151 @@
+{% comment %}
+  snippets/breadcrumbs.liquid — Breadcrumb trail + BreadcrumbList JSON-LD.
+  Usage: {% render 'breadcrumbs' %}
+  Contexts resolved from request.page_type:
+    product    → Home › Collection (current or first of product.collections) › Product
+    collection → Home › Collections (/collections) › Collection
+    blog       → Home › Blog
+    article    → Home › Blog › Article
+  Current page is non-linked with aria-current="page".
+{% endcomment %}
+
+{%- liquid
+  assign page_type = request.page_type
+  assign supported = false
+  if page_type == 'product' or page_type == 'collection' or page_type == 'blog' or page_type == 'article'
+    assign supported = true
+  endif
+-%}
+
+{%- if supported -%}
+  {%- liquid
+    assign home_label = 'general.breadcrumbs.home' | t
+    assign home_url = routes.root_url
+    assign middle_name = ''
+    assign middle_url = ''
+    assign current_name = ''
+
+    case page_type
+      when 'product'
+        assign current_name = product.title
+        assign crumb_collection = collection
+        if crumb_collection == blank and product.collections.size > 0
+          assign crumb_collection = product.collections.first
+        endif
+        if crumb_collection != blank
+          assign middle_name = crumb_collection.title
+          assign middle_url = crumb_collection.url
+        endif
+      when 'collection'
+        assign middle_name = 'general.breadcrumbs.collections' | t
+        assign middle_url = routes.collections_url
+        assign current_name = collection.title
+      when 'blog'
+        assign current_name = blog.title
+      when 'article'
+        assign middle_name = blog.title
+        assign middle_url = blog.url
+        assign current_name = article.title
+    endcase
+  -%}
+
+  <nav class="bt-breadcrumbs" aria-label="{{ 'general.breadcrumbs.label' | t }}">
+    <ol class="bt-breadcrumbs__list">
+      <li class="bt-breadcrumbs__item">
+        <a href="{{ home_url }}" class="bt-breadcrumbs__link">{{ home_label }}</a>
+      </li>
+      {%- if middle_name != '' -%}
+        <li class="bt-breadcrumbs__item">
+          <a href="{{ middle_url }}" class="bt-breadcrumbs__link">{{ middle_name }}</a>
+        </li>
+      {%- endif -%}
+      <li class="bt-breadcrumbs__item">
+        <span class="bt-breadcrumbs__current" aria-current="page">{{ current_name }}</span>
+      </li>
+    </ol>
+  </nav>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": {{ home_label | json }},
+        "item": {{ shop.url | append: home_url | json }}
+      }
+      {%- if middle_name != '' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ middle_name | json }},
+        "item": {{ shop.url | append: middle_url | json }}
+      }
+      {%- endif -%}
+      ,{
+        "@type": "ListItem",
+        "position": {% if middle_name != '' %}3{% else %}2{% endif %},
+        "name": {{ current_name | json }},
+        "item": {{ shop.url | append: request.path | json }}
+      }
+    ]
+  }
+  </script>
+{%- endif -%}
+
+{% stylesheet %}
+  /* ============================================================
+     BREADCRUMBS — Botanica v3. Zero Dawn code.
+     Small muted trail, "/" separators via pseudo-elements.
+     ============================================================ */
+
+  .bt-breadcrumbs {
+    margin-bottom: var(--bt-space-md);
+  }
+  .bt-breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    line-height: var(--bt-lh-body);
+  }
+  .bt-breadcrumbs__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    color: var(--bt-color-text-muted);
+    min-width: 0;
+  }
+  .bt-breadcrumbs__item + .bt-breadcrumbs__item::before {
+    content: '/';
+    color: var(--bt-color-text-muted);
+    opacity: 0.5;
+  }
+  .bt-breadcrumbs__link {
+    color: var(--bt-color-text-muted);
+    text-decoration: none;
+    border-radius: var(--bt-radius-sm);
+    transition: color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-breadcrumbs__link:hover,
+  .bt-breadcrumbs__link:focus-visible {
+    color: var(--bt-color-primary);
+  }
+  .bt-breadcrumbs__link:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  .bt-breadcrumbs__current {
+    color: var(--bt-color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+{% endstylesheet %}

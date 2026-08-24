@@ -222,25 +222,21 @@
     }
 
     swapMainMedia(media) {
-      const slot = document.querySelector('[data-gallery-main] img, [data-gallery-main] source');
-      if (!slot) return;
-      const url = media.preview_image
-        ? media.preview_image.src
-        : null;
-      if (!url) return;
-      // Image swap on the main <img> + lazy thumbs highlight
+      /* Slide-based gallery (bt-product-gallery) owns stage switching —
+         delegate so video/model slides and zoom state stay consistent. */
+      const gallery = document.querySelector('bt-product-gallery');
+      if (gallery && typeof gallery.activateMedia === 'function') {
+        gallery.activateMedia(media.id);
+        return;
+      }
+      /* Legacy fallback: single-img stage without the custom element */
       const img = document.querySelector('[data-gallery-main] img');
+      const url = media.preview_image ? media.preview_image.src : null;
       if (img && url) {
         img.src = url;
         const widths = [400, 600, 800, 1000];
         img.srcset = widths.map((w) => `${url}&width=${w} ${w}w`).join(', ');
       }
-      // Highlight matching thumbnail
-      const thumbs = document.querySelectorAll('[data-gallery-thumb]');
-      thumbs.forEach((t) => {
-        const match = t.getAttribute('data-media-id') === String(media.id);
-        t.classList.toggle('is-active', match);
-      });
     }
 
     markSiblingAvailability() {

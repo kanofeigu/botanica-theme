@@ -11,6 +11,30 @@
   "name": "Header group",
   "type": "header",
   "sections": {
+    "announcement": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement_a1b2c3": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free shipping on orders over $50"
+          }
+        },
+        "announcement_d4e5f6": {
+          "type": "announcement",
+          "settings": {
+            "text": "New plants added weekly"
+          }
+        }
+      },
+      "block_order": [
+        "announcement_a1b2c3",
+        "announcement_d4e5f6"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1"
+      }
+    },
     "header": {
       "type": "header",
       "blocks": {
@@ -37,6 +61,7 @@
     }
   },
   "order": [
+    "announcement",
     "header"
   ]
 }
