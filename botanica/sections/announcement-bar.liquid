@@ -182,6 +182,11 @@
 
   .bt-announcement-bar__text {
     margin: 0;
+    /* base.css sets p { max-width: var(--bt-content-max) } globally —
+       neutralize it here or the narrowed paragraph hugs left and the
+       message looks off-center */
+    max-width: none;
+    width: 100%;
     font-size: inherit;
     color: var(--bt-color-text);
   }
