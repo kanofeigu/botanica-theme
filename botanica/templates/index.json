@@ -28,7 +28,8 @@
         "heading": "Bring the outside in",
         "text": "Curated indoor plants selected for their beauty, resilience, and ability to transform any space into a living sanctuary.",
         "button_label": "Explore the collection",
-        "button_link": "/collections/all-plants"
+        "button_link": "/collections/all-plants",
+        "mobile_overlay": true
       }
     },
     "rich-text-intro": {
@@ -462,8 +463,9 @@
         "text_close"
       ],
       "settings": {
-        "padding_top": 20,
-        "padding_bottom": 8
+        "padding_top": 64,
+        "padding_bottom": 64,
+        "color_scheme": "scheme-3"
       }
     },
     "newsletter": {

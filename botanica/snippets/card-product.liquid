@@ -61,6 +61,8 @@
 
     {%- if show_sale and product.compare_at_price > product.price -%}
       <span class="bt-badge bt-card__sale-badge">{{ 'products.product.on_sale' | t }}</span>
+    {%- elsif product.available and product.tags contains 'new' -%}
+      <span class="bt-badge bt-badge--new bt-card__sale-badge">{{ 'products.product.new_badge' | t }}</span>
     {%- endif -%}
     {%- if show_sold and product.available == false -%}
       <span class="bt-badge bt-badge--outline bt-card__sale-badge">{{ 'products.product.sold_out' | t }}</span>
@@ -68,8 +70,8 @@
 
     {%- if product.available -%}
       <button type="button" class="bt-card__quick-add" data-variant-id="{{ product.selected_or_first_available_variant.id }}" aria-label="{{ 'products.product.add_to_cart' | t }}">
-        <svg width="18" height="18" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg>
-        <span class="bt-sr-only">{{ 'products.product.add_to_cart' | t }}</span>
+        <svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg>
+        <span class="bt-card__quick-add-label">{{ 'products.product.add_to_cart' | t }}</span>
       </button>
     {%- endif -%}
 
@@ -103,6 +105,11 @@
     <h3 class="bt-card__title bt-product-card__title">
       <a href="{{ product.url }}">{{ product.title }}</a>
     </h3>
+
+    {%- assign latin_name = product.metafields.custom.latin_name.value -%}
+    {%- if show_latin_name != false and latin_name != blank -%}
+      <p class="bt-card__latin">{{ latin_name }}</p>
+    {%- endif -%}
 
     <div class="bt-card__price">
       {%- if product.compare_at_price > product.price -%}
@@ -168,32 +175,41 @@
     z-index: 2;
   }
 
-  /* ── Quick-add button ── */
+  /* ── Quick-add bar (full-width, slides up on hover) ── */
   .bt-card__quick-add {
     position: absolute;
-    bottom: var(--bt-space-sm);
-    left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    width: 44px;
-    height: 44px;
+    left: var(--bt-space-xs);
+    right: var(--bt-space-xs);
+    bottom: var(--bt-space-xs);
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bt-color-bg);
+    gap: var(--bt-space-2xs);
+    padding: 0 var(--bt-space-sm);
+    background: rgba(var(--bt-color-bg-rgb), 0.96);
+    backdrop-filter: blur(6px);
     border: 1px solid var(--bt-color-border-light);
-    border-radius: 50%;
+    border-radius: var(--bt-radius-md);
     cursor: pointer;
     opacity: 0;
+    transform: translateY(8px);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.02em;
+    color: var(--bt-color-text);
     transition: opacity var(--bt-duration-base) var(--bt-ease-out),
                 transform var(--bt-duration-base) var(--bt-ease-out),
-                background var(--bt-duration-fast) var(--bt-ease-out);
+                background var(--bt-duration-fast) var(--bt-ease-out),
+                color var(--bt-duration-fast) var(--bt-ease-out);
     z-index: 2;
     box-shadow: var(--bt-shadow-sm);
-    color: var(--bt-color-text);
   }
-  .bt-card--product:hover .bt-card__quick-add {
+  .bt-card--product:hover .bt-card__quick-add,
+  .bt-card--product:focus-within .bt-card__quick-add {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
   .bt-card__quick-add:hover {
     background: var(--bt-color-primary);
@@ -220,8 +236,25 @@
     .bt-card__quick-add.is-loading svg { animation: none; }
   }
   .bt-card__quick-add svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ── Latin name subtitle ── */
+  .bt-card__latin {
+    font-family: var(--bt-font-heading);
+    font-style: italic;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    margin: calc(var(--bt-space-3xs) * -0.5) 0 0;
+    opacity: 0.85;
+  }
+
+  /* ── New badge ── */
+  .bt-badge--new {
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
   }
 
   /* ── Card body ── */
@@ -352,10 +385,12 @@
     }
     .bt-card__quick-add {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      width: 38px;
-      height: 38px;
-      bottom: var(--bt-space-xs);
+      transform: none;
+      min-height: 40px;
+      font-size: var(--bt-fs-body-xs);
+      left: var(--bt-space-2xs);
+      right: var(--bt-space-2xs);
+      bottom: var(--bt-space-2xs);
     }
     .bt-chip {
       font-size: 0.6rem;
@@ -366,7 +401,7 @@
   @media (hover: none) {
     .bt-card__quick-add {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: none;
     }
   }
 {% endstylesheet %}

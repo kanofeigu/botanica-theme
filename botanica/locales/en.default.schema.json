@@ -852,6 +852,10 @@
           "label": "Show text scrim",
           "info": "Dark gradient behind text for readability on full-bleed layouts"
         },
+        "mobile_overlay": {
+          "label": "Overlay text on mobile",
+          "info": "On phones, shows the image full-bleed with text overlaid on a gradient"
+        },
         "scrim_opacity": {
           "label": "Scrim opacity"
         },

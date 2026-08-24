@@ -447,19 +447,26 @@
      because that snippet's stylesheet is not guaranteed to load on /cart. */
   .bt-cart-recs .bt-card__quick-add {
     position: absolute;
-    bottom: var(--bt-space-sm);
-    left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    width: 44px;
-    height: 44px;
+    left: var(--bt-space-2xs);
+    right: var(--bt-space-2xs);
+    bottom: var(--bt-space-2xs);
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bt-color-bg);
+    gap: var(--bt-space-3xs);
+    padding: 0 var(--bt-space-xs);
+    background: rgba(var(--bt-color-bg-rgb), 0.96);
+    backdrop-filter: blur(6px);
     border: 1px solid var(--bt-color-border-light);
-    border-radius: 50%;
+    border-radius: var(--bt-radius-md);
     cursor: pointer;
     opacity: 0;
+    transform: translateY(8px);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.02em;
     transition: opacity var(--bt-duration-base) var(--bt-ease-out),
                 transform var(--bt-duration-base) var(--bt-ease-out),
                 background var(--bt-duration-fast) var(--bt-ease-out);
@@ -467,14 +474,14 @@
     box-shadow: var(--bt-shadow-sm);
     color: var(--bt-color-text);
   }
-  .bt-cart-recs__card:hover .bt-card__quick-add { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .bt-cart-recs__card:hover .bt-card__quick-add { opacity: 1; transform: translateY(0); }
   .bt-cart-recs .bt-card__quick-add:hover { background: var(--bt-color-primary); color: var(--bt-color-primary-contrast); border-color: var(--bt-color-primary); }
   .bt-cart-recs .bt-card__quick-add.is-loading { opacity: 1; pointer-events: none; background: var(--bt-color-primary); color: var(--bt-color-primary-contrast); }
   .bt-cart-recs .bt-card__quick-add.is-loading svg { animation: bt-cart-recs-spin 0.8s linear infinite; }
   .bt-cart-recs .bt-card__quick-add.is-added { opacity: 1; background: var(--bt-color-primary); color: var(--bt-color-primary-contrast); border-color: var(--bt-color-primary); }
   @keyframes bt-cart-recs-spin { to { transform: rotate(360deg); } }
   @media (hover: none) {
-    .bt-cart-recs .bt-card__quick-add { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .bt-cart-recs .bt-card__quick-add { opacity: 1; transform: none; }
   }
 
   /* ── Empty state ── */
@@ -732,7 +739,7 @@
               var v = p.variants && p.variants[0];
               var quickAdd = v && v.available
                 ? '<button type="button" class="bt-card__quick-add" data-variant-id="' + v.id + '" aria-label="' + esc(addLabel) + '">' +
-                  plusSvg + '<span class="bt-sr-only">' + esc(addLabel) + '</span></button>'
+                  plusSvg + '<span class="bt-card__quick-add-label">' + esc(addLabel) + '</span></button>'
                 : '';
               return '<div class="bt-cart-recs__card">' +
                 '<div class="bt-cart-recs__media-wrap">' +
