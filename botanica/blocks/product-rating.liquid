@@ -55,20 +55,25 @@
   }
   .bt-rating__stars {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
     line-height: 0;
   }
   .bt-rating__stars-row {
-    display: inline-flex;
+    display: flex;
     gap: 2px;
     white-space: nowrap;
+  }
+  .bt-rating__stars-row svg {
+    flex-shrink: 0; /* 禁止压缩：填充层按评分比例裁切而不是压扁星星，否则与背景层逐颗错位 */
   }
   .bt-rating__stars-row--bg {
     color: var(--bt-color-border-medium);
   }
   .bt-rating__stars-row--fill {
     position: absolute;
-    inset: 0 auto 0 0;
+    top: 0;
+    left: 0;
+    height: 100%;
     overflow: hidden;
     color: var(--bt-color-secondary);
   }
