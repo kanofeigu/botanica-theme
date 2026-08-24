@@ -76,6 +76,17 @@
             "accent": "#D99A77",
             "shadow": "#F5F1E8"
           }
+        },
+        "scheme-6": {
+          "settings": {
+            "background": "#C97D5A",
+            "background_gradient": "",
+            "text": "#FFF8F2",
+            "button": "#FFFFFF",
+            "button_label": "#B56A48",
+            "accent": "#2E3D2F",
+            "shadow": "#7A4A30"
+          }
         }
       }
     },
@@ -154,6 +165,17 @@
             "accent": "#D99A77",
             "shadow": "#F5F1E8"
           }
+        },
+        "scheme-6": {
+          "settings": {
+            "background": "#C97D5A",
+            "background_gradient": "",
+            "text": "#FFF8F2",
+            "button": "#FFFFFF",
+            "button_label": "#B56A48",
+            "accent": "#2E3D2F",
+            "shadow": "#7A4A30"
+          }
         }
       }
     },
@@ -231,6 +253,17 @@
             "button_label": "#211D18",
             "accent": "#D99A77",
             "shadow": "#F5F1E8"
+          }
+        },
+        "scheme-6": {
+          "settings": {
+            "background": "#C97D5A",
+            "background_gradient": "",
+            "text": "#FFF8F2",
+            "button": "#FFFFFF",
+            "button_label": "#B56A48",
+            "accent": "#2E3D2F",
+            "shadow": "#7A4A30"
           }
         }
       }
