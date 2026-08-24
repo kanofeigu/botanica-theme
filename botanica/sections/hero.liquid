@@ -76,9 +76,7 @@
     {%- endif -%}
     <div class="bt-hero__content bt-reveal--left">
       {%- if eyebrow != blank -%}
-        <div class="bt-hero__tag">
-          {% render 'specimen-tag', number: '01', label: 'Field guide', value: eyebrow %}
-        </div>
+        <p class="bt-hero__eyebrow">{{ eyebrow | escape }}</p>
       {%- endif -%}
       {%- if heading != blank -%}
         <h1 class="bt-hero__heading">{{ heading | escape }}</h1>
@@ -252,46 +250,15 @@
     padding: var(--bt-space-xl) clamp(var(--bt-page-gutter), 6vw, 5rem);
     border-top: 1px solid var(--bt-color-border-light);
   }
-  .bt-hero__tag {
-    margin-bottom: var(--bt-space-md);
-  }
-  /* Eyebrow in hero reads as a clean editorial kicker, not a pinned label */
-  .bt-hero__tag .bt-specimen-tag {
-    display: inline-flex;
-    flex-direction: row;
-    align-items: baseline;
-    gap: 0.6em;
-    padding: 0;
-    background: transparent;
-    border: none;
-    border-radius: 0;
+  /* Eyebrow in hero reads as a clean editorial kicker */
+  .bt-hero__eyebrow {
+    margin: 0 0 var(--bt-space-md);
+    font-family: var(--bt-font-body);
     font-size: var(--bt-fs-eyebrow);
     font-weight: var(--bt-fw-semibold);
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--bt-color-secondary);
-  }
-  .bt-hero__tag .bt-specimen-tag__number {
-    font-family: var(--bt-font-body);
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    color: inherit;
-  }
-  .bt-hero__tag .bt-specimen-tag__number::after {
-    content: '—';
-    margin-inline-start: 0.6em;
-    opacity: 0.6;
-  }
-  .bt-hero__tag .bt-specimen-tag__label {
-    display: none;
-  }
-  .bt-hero__tag .bt-specimen-tag__value {
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    text-transform: inherit;
-    color: inherit;
   }
   /* ── Hero botanical decoration — structural rules MUST be local:
      the ambience snippet is rendered here directly, and its section
@@ -311,13 +278,13 @@
     object-fit: contain;
     opacity: 0.06;
   }
-  .bt-hero--full_bleed .bt-hero__tag .bt-specimen-tag,
-  .bt-hero--mobile-overlay .bt-hero__tag .bt-specimen-tag {
+  .bt-hero--full_bleed .bt-hero__eyebrow,
+  .bt-hero--mobile-overlay .bt-hero__eyebrow {
     color: rgba(255,255,255,0.92);
     text-shadow: 0 1px 3px rgba(0,0,0,0.25);
   }
   @media (min-width: 750px) {
-    .bt-hero--mobile-overlay .bt-hero__tag .bt-specimen-tag {
+    .bt-hero--mobile-overlay .bt-hero__eyebrow {
       color: var(--bt-color-secondary);
       text-shadow: none;
     }

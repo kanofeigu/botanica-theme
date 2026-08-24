@@ -29,7 +29,8 @@
         "text": "Curated indoor plants selected for their beauty, resilience, and ability to transform any space into a living sanctuary.",
         "button_label": "Explore the collection",
         "button_link": "/collections/all-plants",
-        "mobile_overlay": true
+        "mobile_overlay": true,
+        "image": "shopify://shop_images/botanica-hero-home.png"
       }
     },
     "rich-text-intro": {
