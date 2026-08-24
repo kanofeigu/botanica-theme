@@ -1,0 +1,93 @@
+{% comment %}
+  blocks/product-rating.liquid — Star rating driven by Shopify's standard
+  reviews metafields (product.metafields.reviews.rating / rating_count),
+  same contract review apps write to. Renders nothing on storefront when
+  no rating exists; shows a placeholder in the theme editor.
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign rating_meta = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  assign has_rating = false
+  if rating_meta != blank and rating_meta.rating != blank
+    assign has_rating = true
+    assign rating_value = rating_meta.rating | plus: 0.0
+    assign rating_max = rating_meta.scale_max | plus: 0.0
+    if rating_max == 0
+      assign rating_max = 5.0
+    endif
+    assign rating_pct = rating_value | divided_by: rating_max | times: 100.0
+  endif
+-%}
+{%- if has_rating or request.design_mode -%}
+  <div class="bt-rating" {{ block.shopify_attributes }}
+    {%- if has_rating %} role="img" aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: rating_value, rating_max: rating_max | round }}"{% endif -%}
+  >
+    <span class="bt-rating__stars" aria-hidden="true">
+      <span class="bt-rating__stars-row bt-rating__stars-row--bg">
+        {%- for i in (1..5) -%}
+          <svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 14.9l-5.3 2.7 1-5.8L1.5 7.7l5.9-.9z"/></svg>
+        {%- endfor -%}
+      </span>
+      <span class="bt-rating__stars-row bt-rating__stars-row--fill"{% if has_rating %} style="width: {{ rating_pct }}%"{% endif %}>
+        {%- for i in (1..5) -%}
+          <svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 14.9l-5.3 2.7 1-5.8L1.5 7.7l5.9-.9z"/></svg>
+        {%- endfor -%}
+      </span>
+    </span>
+    {%- if has_rating -%}
+      <span class="bt-rating__value">{{ rating_value | round: 1 }}</span>
+      {%- if block.settings.show_count and rating_count > 0 -%}
+        <span class="bt-rating__count">({{ rating_count }} {{ 'products.product.reviews' | t }})</span>
+      {%- endif -%}
+    {%- else -%}
+      <span class="bt-rating__count">{{ 'products.product.no_reviews' | t }}</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-rating {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    font-size: var(--bt-fs-body-sm);
+  }
+  .bt-rating__stars {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+  }
+  .bt-rating__stars-row {
+    display: inline-flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .bt-rating__stars-row--bg {
+    color: var(--bt-color-border-medium);
+  }
+  .bt-rating__stars-row--fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    overflow: hidden;
+    color: var(--bt-color-secondary);
+  }
+  .bt-rating__value {
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    font-variant-numeric: oldstyle-nums;
+  }
+  .bt-rating__count {
+    color: var(--bt-color-text-muted);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.product_rating.name",
+  "settings": [
+    { "type": "checkbox", "id": "show_count", "label": "t:blocks.product_rating.settings.show_count.label", "default": true }
+  ],
+  "presets": [{ "name": "t:blocks.product_rating.name" }]
+}
+{% endschema %}

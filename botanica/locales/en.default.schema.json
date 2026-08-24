@@ -206,8 +206,12 @@
         },
         "font_style": {
           "label": "Font style",
-          "options__1": { "label": "Body" },
-          "options__2": { "label": "Heading (serif)" }
+          "options__1": {
+            "label": "Body"
+          },
+          "options__2": {
+            "label": "Heading (serif)"
+          }
         },
         "autoplay_speed": {
           "label": "Change announcements every"
@@ -1022,6 +1026,9 @@
         },
         "padding_bottom": {
           "label": "Bottom padding"
+        },
+        "mobile_swipe": {
+          "label": "Swipeable cards on mobile"
         }
       }
     },
@@ -1902,6 +1909,22 @@
         "show_when_unavailable": {
           "label": "Show when unavailable",
           "info": "Show pickup info even when product is not available for pickup"
+        }
+      }
+    },
+    "product_rating": {
+      "name": "Star rating",
+      "settings": {
+        "show_count": {
+          "label": "Show review count"
+        }
+      }
+    },
+    "shipping_note": {
+      "name": "Shipping note",
+      "settings": {
+        "text": {
+          "label": "Text"
         }
       }
     }

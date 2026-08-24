@@ -120,6 +120,18 @@
           "settings": {
             "show_when_unavailable": false
           }
+        },
+        "rating": {
+          "type": "product-rating",
+          "settings": {
+            "show_count": true
+          }
+        },
+        "shipping-note": {
+          "type": "shipping-note",
+          "settings": {
+            "text": "Free shipping on orders over $50"
+          }
         }
       },
       "block_order": [
@@ -127,10 +139,12 @@
         "badges",
         "title",
         "price",
+        "rating",
         "variant_picker",
         "size_guide_link",
         "quantity",
         "buy",
+        "shipping-note",
         "sticky_atc",
         "care_quick",
         "description",

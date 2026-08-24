@@ -19,8 +19,9 @@
 {% stylesheet %}
   .bt-quick-view-trigger {
     position: absolute;
-    bottom: var(--bt-space-sm);
-    right: var(--bt-space-sm);
+    top: var(--bt-space-xs);
+    right: var(--bt-space-xs);
+    bottom: auto;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -67,8 +68,8 @@
   }
   @media (max-width: 749px) {
     .bt-quick-view-trigger {
-      bottom: var(--bt-space-xs);
-      right: var(--bt-space-xs);
+      top: var(--bt-space-2xs);
+      right: var(--bt-space-2xs);
       min-height: 38px;
       padding: 6px 10px;
     }

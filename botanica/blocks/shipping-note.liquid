@@ -1,0 +1,44 @@
+{% comment %}
+  blocks/shipping-note.liquid — Small reassurance line under buy buttons
+  (leaf icon + merchant-editable text). All-original. Zero Dawn code.
+{% endcomment %}
+{%- if block.settings.text != blank -%}
+  <p class="bt-shipping-note" {{ block.shopify_attributes }}>
+    {% render 'icon-leaf' %}
+    <span>{{ block.settings.text }}</span>
+  </p>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-shipping-note {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    margin: 0;
+    /* base.css constrains all p via --bt-content-max; this line is short copy */
+    max-width: none;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-shipping-note svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--bt-color-primary);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.shipping_note.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:blocks.shipping_note.settings.text.label",
+      "default": "Free shipping on orders over $50"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.shipping_note.name" }]
+}
+{% endschema %}

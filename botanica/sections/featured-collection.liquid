@@ -20,7 +20,7 @@
           </a>
         </div>
       {%- endif -%}
-      <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col">
+      <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col{% if section.settings.mobile_swipe %} bt-featured-collection__grid--swipe-mobile{% endif %}">
         {%- for product in collection.products limit: products_to_show -%}
           {%- if forloop.index <= 4 -%}
             {%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, loading: 'eager', fetchpriority: 'high' -%}
@@ -66,6 +66,25 @@
   .bt-featured-collection__grid--4-col { grid-template-columns: repeat(4, 1fr); }
   @media (max-width: 749px) {
     .bt-featured-collection__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+
+    /* Mobile swipe: cards become a snap-scrolling row, second card peeks in */
+    .bt-featured-collection__grid--swipe-mobile {
+      display: flex;
+      grid-template-columns: none;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: var(--bt-space-sm);
+      padding-bottom: var(--bt-space-2xs);
+      scrollbar-width: none;
+    }
+    .bt-featured-collection__grid--swipe-mobile::-webkit-scrollbar {
+      display: none;
+    }
+    .bt-featured-collection__grid--swipe-mobile > * {
+      flex: 0 0 68%;
+      scroll-snap-align: start;
+    }
   }
 {% endstylesheet %}
 
@@ -94,6 +113,12 @@
       "step": 1,
       "default": 4,
       "label": "t:sections.featured_collection.settings.products_to_show.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_swipe",
+      "label": "t:sections.featured_collection.settings.mobile_swipe.label",
+      "default": true
     },
     {
       "type": "select",
