@@ -11,7 +11,6 @@
   assign show_sold = show_sold_out_badge | default: settings.show_sold_out_badge
   assign show_care = show_care_badge | default: settings.show_care_badge | default: false
   assign show_light = show_light_badge | default: settings.show_light_badge | default: false
-  assign show_qv = show_quick_view | default: true
 
   comment
     LCP control: callers pass loading: 'eager', fetchpriority: 'high'
@@ -73,10 +72,6 @@
         <svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="2"/></svg>
         <span class="bt-card__quick-add-label">{{ 'products.product.add_to_cart' | t }}</span>
       </button>
-    {%- endif -%}
-
-    {%- if show_qv -%}
-      {%- render 'quick-view-trigger', product: product -%}
     {%- endif -%}
   </div>
 

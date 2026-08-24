@@ -290,13 +290,9 @@
     window.theme = window.theme || {};
     window.theme.moneyFormat = {{ shop.money_format | json }};
     window.theme.strings = {
-      quickView: {{ 'products.product.quick_view' | t | json }},
-      quickViewLabel: {{ 'products.product.quick_view_label' | t: product_name: '__NAME__' | json }},
       addToCart: {{ 'products.product.add_to_cart' | t | json }},
       viewDetails: {{ 'products.product.view_details' | t | json }},
-      close: {{ 'accessibility.close' | t | json }},
-      closeQuickView: {{ 'products.product.quick_view_close' | t | json }},
-      loadError: {{ 'products.product.quick_view_error' | t | json }}
+      close: {{ 'accessibility.close' | t | json }}
     };
   </script>
 
@@ -304,8 +300,6 @@
   {%- if settings.predictive_search_enabled -%}
     <script src="{{ 'search.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
-  <script src="{{ 'quick-view.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'sticky-atc.js' | asset_url }}" defer="defer"></script>
-  <bt-quick-view hidden></bt-quick-view>
 </body>
 </html>

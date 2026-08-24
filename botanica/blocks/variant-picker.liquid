@@ -4,7 +4,7 @@
   Handles unavailable variants: greyed out, strikethrough, aria-disabled.
   Emits a <script data-selected-variant> JSON blob that assets/variant-selects.js
   keeps in sync as the merchant picks options, exposing the live variant to
-  cart.js / sticky-atc.js / quick-view.js without coupling.
+  cart.js / sticky-atc.js without coupling.
 {% endcomment %}
 {%- unless product.has_only_default_variant -%}
   {%- liquid

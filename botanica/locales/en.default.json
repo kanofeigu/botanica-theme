@@ -210,10 +210,6 @@
       "height": "Height",
       "pot_diameter": "Pot diameter",
       "view_product": "View product",
-      "quick_view": "Quick view",
-      "quick_view_label": "Quick view: {{ product_name }}",
-      "quick_view_close": "Close quick view",
-      "quick_view_error": "Unable to load product. Please try again.",
       "view_details": "View full details",
       "media": {
         "gallery_viewer": "Gallery Viewer",
@@ -725,9 +721,6 @@
           "info": "0 = none, 5 = direct sun"
         }
       }
-    },
-    "quick_view_trigger": {
-      "name": "Quick view trigger"
     },
     "sticky_atc": {
       "name": "Sticky add to cart"
