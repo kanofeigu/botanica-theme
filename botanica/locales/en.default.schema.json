@@ -201,6 +201,14 @@
         "autoplay": {
           "label": "Auto-rotate announcements"
         },
+        "font_size": {
+          "label": "Font size"
+        },
+        "font_style": {
+          "label": "Font style",
+          "options__1": { "label": "Body" },
+          "options__2": { "label": "Heading (serif)" }
+        },
         "autoplay_speed": {
           "label": "Change announcements every"
         },

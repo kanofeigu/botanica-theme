@@ -22,6 +22,7 @@
     data-announcement-bar
     data-autoplay="{{ section.settings.autoplay }}"
     data-autoplay-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
+    style="--bt-ann-fs: {{ section.settings.font_size | default: 14 }}px; --bt-ann-font: {% if section.settings.font_style == 'heading' %}var(--bt-font-heading){% else %}var(--bt-font-body){% endif %};"
     {{ section.shopify_attributes }}
   >
     <div class="bt-announcement-bar__inner bt-container">
@@ -139,18 +140,18 @@
   .bt-announcement-bar {
     background: var(--bt-color-bg);
     color: var(--bt-color-text);
-    font-family: var(--bt-font-body);
-    font-size: var(--bt-fs-body-sm);
+    font-family: var(--bt-ann-font, var(--bt-font-body));
+    font-size: var(--bt-ann-fs, var(--bt-fs-body-sm));
   }
   .bt-announcement-bar--separator {
     border-bottom: 1px solid var(--bt-color-border-light);
   }
 
   .bt-announcement-bar__inner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--bt-space-sm);
     min-height: 40px;
     padding-top: var(--bt-space-2xs);
     padding-bottom: var(--bt-space-2xs);
@@ -158,9 +159,12 @@
 
   /* ── Message track ── */
   .bt-announcement-bar__track {
-    flex: 1;
+    width: 100%;
     min-width: 0;
     text-align: center;
+    /* keep text clear of the absolutely-positioned arrows */
+    padding-inline: calc(28px + var(--bt-space-sm));
+    box-sizing: border-box;
   }
   .bt-announcement-bar__message {
     opacity: 0;
@@ -196,8 +200,11 @@
     outline-offset: var(--bt-focus-ring-offset);
   }
 
-  /* ── Prev / next arrows ── */
+  /* ── Prev / next arrows — pinned to the bar edges, quiet hover ── */
   .bt-announcement-bar__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -208,14 +215,15 @@
     border: none;
     border-radius: var(--bt-radius-sm);
     color: var(--bt-color-text);
+    opacity: 0.65;
     cursor: pointer;
-    transition: color var(--bt-duration-fast) var(--bt-ease-out),
-                background var(--bt-duration-fast) var(--bt-ease-out);
+    transition: opacity var(--bt-duration-fast) var(--bt-ease-out);
   }
+  .bt-announcement-bar__arrow[data-announcement-prev] { left: var(--bt-space-2xs); }
+  .bt-announcement-bar__arrow[data-announcement-next] { right: var(--bt-space-2xs); }
   .bt-announcement-bar__arrow:hover,
   .bt-announcement-bar__arrow:focus-visible {
-    color: var(--bt-color-primary);
-    background: var(--bt-color-surface-hover);
+    opacity: 1;
   }
   .bt-announcement-bar__arrow:focus-visible {
     outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
@@ -255,7 +263,27 @@
     }
   ],
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-6" },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "t:sections.announcement_bar.settings.font_size.label",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "t:sections.announcement_bar.settings.font_style.label",
+      "options": [
+        { "value": "body", "label": "t:sections.announcement_bar.settings.font_style.options__1.label" },
+        { "value": "heading", "label": "t:sections.announcement_bar.settings.font_style.options__2.label" }
+      ],
+      "default": "body"
+    },
     {
       "type": "checkbox",
       "id": "autoplay",
