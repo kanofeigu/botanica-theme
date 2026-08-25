@@ -1,7 +1,7 @@
 {% comment %} main-blog.liquid — Editorial blog listing. Cover images, tag badges. Zero Dawn code. {% endcomment %}
 <div class="bt-section bt-blog color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
-    <h1 class="bt-blog__title bt-h1 bt-text-center">{{ blog.title }}</h1>
+    <h1 class="bt-blog__title bt-h1 bt-sr-only">{{ blog.title }}</h1>
 
     {%- if blog.all_tags.size > 0 -%}
       <div class="bt-blog__tags">
@@ -62,6 +62,12 @@
 {% stylesheet %}
   .bt-blog__title {
     margin-bottom: var(--bt-space-md);
+  }
+  /* Dates are real content, not decoration — use the muted text color for
+     readable contrast instead of the terracotta eyebrow tone. */
+  .bt-blog-card .bt-eyebrow {
+    color: var(--bt-color-text-muted);
+    opacity: 1;
   }
   .bt-blog__tags {
     display: flex;

@@ -181,6 +181,7 @@
       ],
       "settings": {
         "layout": "text_first",
+        "image": "shopify://shop_images/botanica-care-guide.png",
         "image_aspect": "4-5",
         "padding_top": 40,
         "padding_bottom": 40

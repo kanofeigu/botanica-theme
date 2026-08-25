@@ -327,11 +327,14 @@
       content: '';
       position: absolute;
       inset: 0;
+      /* Dual gradient: darken the bottom for the content block AND the top
+         for the eyebrow/kicker — bright foliage was washing both out. */
       background: linear-gradient(
         to top,
         rgba(var(--bt-color-text-rgb), 0.72) 0%,
         rgba(var(--bt-color-text-rgb), 0.25) 45%,
-        rgba(var(--bt-color-text-rgb), 0) 70%
+        rgba(var(--bt-color-text-rgb), 0.15) 70%,
+        rgba(var(--bt-color-text-rgb), 0.38) 100%
       );
     }
     .bt-hero--mobile-overlay .bt-hero__content {

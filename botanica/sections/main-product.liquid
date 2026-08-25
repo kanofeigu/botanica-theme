@@ -72,9 +72,11 @@
           {%- comment -%} Editorial silhouette overlay (only Botanica) {%- endcomment -%}
           <span class="bt-product__silhouette bt-product__silhouette--tl" aria-hidden="true"></span>
           <span class="bt-product__silhouette bt-product__silhouette--br" aria-hidden="true"></span>
-          <span class="bt-product__specimen-tag" aria-hidden="true">
-            <span class="bt-product__specimen-num">{{ first_variant.sku | default: 'No. 0000' }}</span>
-          </span>
+          {%- if first_variant.sku != blank -%}
+            <span class="bt-product__specimen-tag" aria-hidden="true">
+              <span class="bt-product__specimen-num">{{ first_variant.sku }}</span>
+            </span>
+          {%- endif -%}
         </div>
         {%- if selected_product.media.size > 1 -%}
           <div class="bt-product__thumbnails" role="list" aria-label="{{ 'products.product.media.thumbnail_list' | t }}">
@@ -157,6 +159,11 @@
 
 {% stylesheet %}
   .bt-product__grid { display: grid; gap: var(--bt-space-xl); align-items: start; }
+  /* Grid items default to min-width:auto — a scrollable row inside (e.g. the
+     complementary-products rail) would otherwise propagate its full content
+     width up and overflow the whole PDP on mobile. */
+  .bt-product__grid > * { min-width: 0; }
+  .bt-product__info > * { min-width: 0; }
   /* Default: gallery on left (main image on top + thumbnails horizontal strip below), info on right */
   .bt-product__grid--thumb_below { grid-template-columns: 1.1fr 1fr; }
   .bt-product__grid--thumb_below .bt-product__gallery { flex-direction: column; }
