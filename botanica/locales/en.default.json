@@ -22,6 +22,7 @@
     }
   },
   "general": {
+    "meta_description_fallback": "Curated indoor plants with expert care guides — easy-care, pet-safe and statement plants shipped with a happy-plant guarantee.",
     "404": {
       "title": "Page not found",
       "subtext": "We couldn't find the page you were looking for.",

@@ -167,7 +167,7 @@
         "button_iwt": {
           "type": "button-group",
           "settings": {
-            "label": "Learn more",
+            "label": "Explore care guides",
             "link": "/blogs/plant-care-journal-1",
             "style": "outline"
           }

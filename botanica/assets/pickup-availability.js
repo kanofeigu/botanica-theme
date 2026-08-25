@@ -7,7 +7,7 @@ class BtPickupAvailability extends HTMLElement {
   constructor() {
     super();
     this.variantId = this.dataset.variantId;
-    this.rootUrl = this.dataset.rootUrl || '';
+    this.rootUrl = (this.dataset.rootUrl || '').replace(/\/$/, ''); /* strip trailing slash: "/" + "/variants/..." would become protocol-relative "//variants/..." (DNS error) */
     this.showWhenUnavailable = this.dataset.showWhenUnavailable === 'true';
     this.preview = this.querySelector('[data-pickup-preview]');
     this.drawer = this.querySelector('[data-pickup-drawer]');

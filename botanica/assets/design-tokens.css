@@ -17,6 +17,9 @@
   --bt-color-primary: #4A6B4F;
   --bt-color-primary-contrast: #FFFFFF;
   --bt-color-secondary: #C97D5A;
+  /* Darker terracotta reserved for small text (eyebrows, kickers): #C97D5A on
+     cream only hits ~2.4:1, this clears WCAG AA 4.5:1. */
+  --bt-color-secondary-text: #9E5434;
   --bt-color-border: #2E2A24;
 
   /* RGB channels — kept here only as fallback; theme.liquid overrides

@@ -21,9 +21,13 @@
     {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
   </title>
 
-  {% if page_description %}
-    <meta name="description" content="{{ page_description | escape }}">
-  {% endif %}
+  {%- liquid
+    assign meta_description = page_description | default: shop.description
+    if meta_description == blank
+      assign meta_description = 'general.meta_description_fallback' | t
+    endif
+  -%}
+  <meta name="description" content="{{ meta_description | escape }}">
 
   {{ content_for_header }}
 

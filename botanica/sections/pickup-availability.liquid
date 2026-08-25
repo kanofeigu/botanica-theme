@@ -1,0 +1,50 @@
+{% comment %}
+  sections/pickup-availability.liquid — Standalone section rendered through the
+  Section Rendering API: GET /variants/<id>/?section_id=pickup-availability
+  In that context `product_variant` is in scope. The JS in
+  assets/pickup-availability.js extracts [data-pickup-preview] and
+  [data-pickup-locations] from this response and swaps them into the PDP block.
+{% endcomment %}
+{%- assign first_available = product_variant.store_availabilities | where: 'available', true | first -%}
+<pickup-availability class="bt-pickup">
+  <div class="bt-pickup__preview" data-pickup-preview>
+    {%- if first_available -%}
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="bt-pickup__icon bt-pickup__icon--available">
+        <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="m4.5 8 2.5 2.5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="bt-pickup__info">
+        <p class="bt-pickup__location">{{ first_available.location.name | escape }}</p>
+        <p class="bt-pickup__status bt-pickup__status--available">
+          {{ 'products.product.pickup_availability.pick_up_available' | t }}{% if first_available.pick_up_time != blank %} · {{ first_available.pick_up_time }}{% endif %}
+        </p>
+      </div>
+    {%- else -%}
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="bt-pickup__icon bt-pickup__icon--unavailable">
+        <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <div class="bt-pickup__info">
+        <p class="bt-pickup__status bt-pickup__status--unavailable">{{ 'products.product.unavailable' | t }}</p>
+      </div>
+    {%- endif -%}
+  </div>
+  <ul class="bt-pickup__locations" role="list" data-pickup-locations>
+    {%- for availability in product_variant.store_availabilities -%}
+      <li class="bt-pickup__location-item">
+        <p class="bt-pickup__location">{{ availability.location.name | escape }}</p>
+        <p class="bt-pickup__status {% if availability.available %}bt-pickup__status--available{% else %}bt-pickup__status--unavailable{% endif %}">
+          {%- if availability.available -%}
+            {{ 'products.product.pickup_availability.pick_up_available' | t }}{% if availability.pick_up_time != blank %} · {{ availability.pick_up_time }}{% endif %}
+          {%- else -%}
+            {{ 'products.product.unavailable' | t }}
+          {%- endif -%}
+        </p>
+      </li>
+    {%- endfor -%}
+  </ul>
+</pickup-availability>
+
+{% schema %}
+{ "name": "Pickup availability (API)", "settings": [], "enabled_on": { "templates": ["*"] } }
+{% endschema %}

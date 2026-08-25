@@ -116,8 +116,8 @@ p {
   font-weight: var(--bt-fw-semibold);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--bt-color-secondary);
-  opacity: 0.85;
+  color: var(--bt-color-secondary-text);
+  opacity: 1;
 }
 
 .bt-sr-only {

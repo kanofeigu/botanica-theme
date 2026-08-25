@@ -15,7 +15,7 @@
 {%- if has_any -%}
   <div class="bt-care-icons" {{ block.shopify_attributes }}>
     {%- if block.settings.heading != blank -%}
-      <h3 class="bt-care-icons__heading bt-eyebrow">{{ block.settings.heading | escape }}</h3>
+      <h2 class="bt-care-icons__heading bt-eyebrow">{{ block.settings.heading | escape }}</h2>
     {%- endif -%}
     <ul class="bt-care-icons__grid" role="list">
       {%- if block.settings.light_value != blank -%}

@@ -18,7 +18,7 @@
       <div class="bt-collection-list__grid bt-collection-list__grid--{{ columns }}-col">
         {%- for collection in section.settings.collections limit: collections_per_page -%}
           <div class="bt-collection-card">
-            <a href="{{ collection.url }}" class="bt-collection-card__link" aria-label="{{ collection.title }}">
+            <a href="{{ collection.url }}" class="bt-collection-card__link">
               <div class="bt-collection-card__media">
                 {%- if collection.featured_image -%}
                   {{ collection.featured_image | image_url: width: 600 | image_tag:
