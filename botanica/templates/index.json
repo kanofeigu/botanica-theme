@@ -342,7 +342,7 @@
         "col_4"
       ],
       "settings": {
-        "heading": "The Botanica difference",
+        "heading": "The Kano difference",
         "columns_desktop": "4",
         "padding_top": 40,
         "padding_bottom": 40
@@ -456,7 +456,7 @@
         "text_close": {
           "type": "text",
           "settings": {
-            "text": "<p>Join thousands of plant parents who trust Botanica for quality, beauty, and expert guidance.</p>"
+            "text": "<p>Join thousands of plant parents who trust kano for quality, beauty, and expert guidance.</p>"
           }
         }
       },
