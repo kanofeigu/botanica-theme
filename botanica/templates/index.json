@@ -12,12 +12,12 @@
     "botanical-ambience": {
       "type": "botanical-ambience",
       "settings": {
-        "show_leaves": true,
+        "show_leaves": false,
         "show_spores": true,
-        "show_vines": true,
+        "show_vines": false,
         "show_silhouettes": true,
-        "leaf_opacity": 55,
-        "spore_opacity": 45
+        "leaf_opacity": 30,
+        "spore_opacity": 30
       }
     },
     "hero": {
