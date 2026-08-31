@@ -84,10 +84,14 @@
 }
 
 /* ════════════════════════════════════════════
-   2. FALLING LEAVES — SCROLL-DRIVEN CASCADE
-   Leaves fall from top as user scrolls, each
-   at a different speed. Creates mesmerizing
-   botanical atmosphere.
+   2. FALLING LEAVES — CONTINUOUS AMBIENT CASCADE
+   Time-based infinite loop: leaves drift down
+   slowly and continuously regardless of scroll.
+   Lanes hug the viewport EDGES so they never
+   cover the central content column.
+   Layer stays pointer-events:none and below the
+   sticky header; negative delays mean leaves are
+   already mid-fall on first paint (no empty start).
    ════════════════════════════════════════════ */
 
 .bt-falling-leaves {
@@ -108,124 +112,45 @@
   will-change: transform;
 }
 
-/* Leaf 1 — Monstera, left side, slow */
-.bt-leaf--1 {
-  left: 8%;
-  --bt-leaf-size: 36px;
+/* Edge lanes — leaves live in the margins, not over products */
+.bt-leaf--1 { left: 4%;  --bt-leaf-size: 34px; }
+.bt-leaf--2 { left: 90%; --bt-leaf-size: 28px; }
+.bt-leaf--3 { left: 9%;  --bt-leaf-size: 22px; }
+.bt-leaf--4 { left: 95%; --bt-leaf-size: 30px; }
+.bt-leaf--5 { left: 14%; --bt-leaf-size: 26px; }
+.bt-leaf--6 { left: 84%; --bt-leaf-size: 20px; }
+.bt-leaf--7 { left: 20%; --bt-leaf-size: 28px; }
+.bt-leaf--8 { left: 78%; --bt-leaf-size: 24px; }
+
+/* Slow continuous fall — each leaf has its own pace and phase */
+.bt-leaf--1 { animation: bt-leaf-fall-a 22s linear infinite; animation-delay: 0s; }
+.bt-leaf--2 { animation: bt-leaf-fall-b 18s linear infinite; animation-delay: -6s; }
+.bt-leaf--3 { animation: bt-leaf-fall-a 16s linear infinite; animation-delay: -11s; }
+.bt-leaf--4 { animation: bt-leaf-fall-b 24s linear infinite; animation-delay: -3s; }
+.bt-leaf--5 { animation: bt-leaf-fall-a 20s linear infinite; animation-delay: -15s; }
+.bt-leaf--6 { animation: bt-leaf-fall-b 17s linear infinite; animation-delay: -9s; }
+.bt-leaf--7 { animation: bt-leaf-fall-a 26s linear infinite; animation-delay: -19s; }
+.bt-leaf--8 { animation: bt-leaf-fall-b 21s linear infinite; animation-delay: -13s; }
+
+/* Fall + gentle sway + slow tumble — two mirrored variants */
+@keyframes bt-leaf-fall-a {
+  0%   { transform: translate3d(0, -8vh, 0) rotate(0deg); opacity: 0; }
+  7%   { transform: translate3d(-10px, 6vh, 0) rotate(35deg); opacity: var(--bt-leaf-opacity, 0.3); }
+  25%  { transform: translate3d(12px, 26vh, 0) rotate(95deg); opacity: var(--bt-leaf-opacity, 0.3); }
+  50%  { transform: translate3d(-14px, 52vh, 0) rotate(170deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.9); }
+  75%  { transform: translate3d(10px, 78vh, 0) rotate(255deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.65); }
+  93%  { transform: translate3d(-6px, 100vh, 0) rotate(320deg); opacity: 0; }
+  100% { transform: translate3d(-6px, 112vh, 0) rotate(340deg); opacity: 0; }
 }
 
-/* Leaf 2 — Fiddle, mid-right, medium */
-.bt-leaf--2 {
-  left: 25%;
-  --bt-leaf-size: 30px;
-}
-
-/* Leaf 3 — Small, center-right, fast */
-.bt-leaf--3 {
-  left: 48%;
-  --bt-leaf-size: 22px;
-}
-
-/* Leaf 4 — Monstera, right edge, very slow */
-.bt-leaf--4 {
-  left: 72%;
-  --bt-leaf-size: 34px;
-}
-
-/* Leaf 5 — Fiddle, far left, medium */
-.bt-leaf--5 {
-  left: 15%;
-  --bt-leaf-size: 28px;
-}
-
-/* Leaf 6 — Small, near right, fast */
-.bt-leaf--6 {
-  left: 62%;
-  --bt-leaf-size: 20px;
-}
-
-/* Leaf 7 — Monstera, center, slow */
-.bt-leaf--7 {
-  left: 38%;
-  --bt-leaf-size: 32px;
-}
-
-/* Leaf 8 — Small, far right, medium */
-.bt-leaf--8 {
-  left: 85%;
-  --bt-leaf-size: 24px;
-}
-
-@supports (animation-timeline: scroll()) {
-  /* Each leaf has its own animation phase — they cascade */
-  .bt-leaf--1 {
-    animation: bt-leaf-fall-slow linear both;
-    animation-timeline: scroll(root);
-    animation-range: 5% 60%;
-  }
-  .bt-leaf--2 {
-    animation: bt-leaf-fall-medium linear both;
-    animation-timeline: scroll(root);
-    animation-range: 12% 55%;
-  }
-  .bt-leaf--3 {
-    animation: bt-leaf-fall-fast linear both;
-    animation-timeline: scroll(root);
-    animation-range: 8% 50%;
-  }
-  .bt-leaf--4 {
-    animation: bt-leaf-fall-slow linear both;
-    animation-timeline: scroll(root);
-    animation-range: 18% 65%;
-  }
-  .bt-leaf--5 {
-    animation: bt-leaf-fall-medium linear both;
-    animation-timeline: scroll(root);
-    animation-range: 3% 48%;
-  }
-  .bt-leaf--6 {
-    animation: bt-leaf-fall-fast linear both;
-    animation-timeline: scroll(root);
-    animation-range: 15% 52%;
-  }
-  .bt-leaf--7 {
-    animation: bt-leaf-fall-slow linear both;
-    animation-timeline: scroll(root);
-    animation-range: 10% 58%;
-  }
-  .bt-leaf--8 {
-    animation: bt-leaf-fall-medium linear both;
-    animation-timeline: scroll(root);
-    animation-range: 20% 62%;
-  }
-
-  /* Fall + sway + rotate — each leaf has unique path */
-  @keyframes bt-leaf-fall-slow {
-    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-    5%   { opacity: var(--bt-leaf-opacity, 0.7); }
-    20%  { transform: translateY(20vh) translateX(-15px) rotate(60deg); opacity: var(--bt-leaf-opacity, 0.7); }
-    40%  { transform: translateY(45vh) translateX(10px) rotate(140deg); opacity: calc(var(--bt-leaf-opacity, 0.7) * 0.85); }
-    60%  { transform: translateY(70vh) translateX(-20px) rotate(220deg); opacity: calc(var(--bt-leaf-opacity, 0.7) * 0.55); }
-    80%  { transform: translateY(90vh) translateX(5px) rotate(300deg); opacity: calc(var(--bt-leaf-opacity, 0.7) * 0.28); }
-    100% { transform: translateY(105vh) translateX(-10px) rotate(380deg); opacity: 0; }
-  }
-
-  @keyframes bt-leaf-fall-medium {
-    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-    5%   { opacity: var(--bt-leaf-opacity, 0.65); }
-    25%  { transform: translateY(30vh) translateX(20px) rotate(90deg); opacity: var(--bt-leaf-opacity, 0.65); }
-    50%  { transform: translateY(60vh) translateX(-15px) rotate(180deg); opacity: calc(var(--bt-leaf-opacity, 0.65) * 0.75); }
-    75%  { transform: translateY(85vh) translateX(10px) rotate(270deg); opacity: calc(var(--bt-leaf-opacity, 0.65) * 0.45); }
-    100% { transform: translateY(105vh) translateX(-5px) rotate(360deg); opacity: 0; }
-  }
-
-  @keyframes bt-leaf-fall-fast {
-    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-    4%   { opacity: var(--bt-leaf-opacity, 0.6); }
-    30%  { transform: translateY(40vh) translateX(-25px) rotate(120deg); opacity: var(--bt-leaf-opacity, 0.6); }
-    60%  { transform: translateY(75vh) translateX(15px) rotate(240deg); opacity: calc(var(--bt-leaf-opacity, 0.6) * 0.65); }
-    100% { transform: translateY(105vh) translateX(-15px) rotate(360deg); opacity: 0; }
-  }
+@keyframes bt-leaf-fall-b {
+  0%   { transform: translate3d(0, -8vh, 0) rotate(20deg); opacity: 0; }
+  7%   { transform: translate3d(10px, 6vh, 0) rotate(-25deg); opacity: var(--bt-leaf-opacity, 0.3); }
+  25%  { transform: translate3d(-12px, 25vh, 0) rotate(-110deg); opacity: var(--bt-leaf-opacity, 0.3); }
+  50%  { transform: translate3d(14px, 50vh, 0) rotate(-190deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.9); }
+  75%  { transform: translate3d(-10px, 77vh, 0) rotate(-270deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.65); }
+  93%  { transform: translate3d(6px, 100vh, 0) rotate(-335deg); opacity: 0; }
+  100% { transform: translate3d(6px, 112vh, 0) rotate(-350deg); opacity: 0; }
 }
 
 /* ════════════════════════════════════════════
@@ -732,8 +657,8 @@
    ════════════════════════════════════════════ */
 
 @supports not (animation-timeline: scroll()) {
-  /* Hide animated elements that would be broken */
-  .bt-falling-leaves,
+  /* Hide scroll-driven elements that would be broken
+     (leaves are time-based loops and work everywhere) */
   .bt-spores {
     display: none;
   }

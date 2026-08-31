@@ -77,16 +77,18 @@
     top: -60px;
     width: var(--bt-leaf-size, 30px);
     height: auto;
-    opacity: 0; /* revealed only by scroll animation */
+    opacity: 0; /* revealed by the fall animation's keyframes */
   }
-  .bt-ambience .bt-leaf--1 { left: 8%;  --bt-leaf-size: 36px; }
-  .bt-ambience .bt-leaf--2 { left: 25%; --bt-leaf-size: 30px; }
-  .bt-ambience .bt-leaf--3 { left: 48%; --bt-leaf-size: 22px; }
-  .bt-ambience .bt-leaf--4 { left: 72%; --bt-leaf-size: 34px; }
-  .bt-ambience .bt-leaf--5 { left: 15%; --bt-leaf-size: 28px; }
-  .bt-ambience .bt-leaf--6 { left: 62%; --bt-leaf-size: 20px; }
-  .bt-ambience .bt-leaf--7 { left: 38%; --bt-leaf-size: 32px; }
-  .bt-ambience .bt-leaf--8 { left: 85%; --bt-leaf-size: 24px; }
+  /* Edge lanes — leaves drift in the viewport margins,
+     never over the central content column */
+  .bt-ambience .bt-leaf--1 { left: 4%;  --bt-leaf-size: 34px; }
+  .bt-ambience .bt-leaf--2 { left: 90%; --bt-leaf-size: 28px; }
+  .bt-ambience .bt-leaf--3 { left: 9%;  --bt-leaf-size: 22px; }
+  .bt-ambience .bt-leaf--4 { left: 95%; --bt-leaf-size: 30px; }
+  .bt-ambience .bt-leaf--5 { left: 14%; --bt-leaf-size: 26px; }
+  .bt-ambience .bt-leaf--6 { left: 84%; --bt-leaf-size: 20px; }
+  .bt-ambience .bt-leaf--7 { left: 20%; --bt-leaf-size: 28px; }
+  .bt-ambience .bt-leaf--8 { left: 78%; --bt-leaf-size: 24px; }
   /* Explicit box: width from CSS var, height from img width/height attrs */
   .bt-ambience .bt-leaf__img {
     display: block;

@@ -12,7 +12,7 @@
     "botanical-ambience": {
       "type": "botanical-ambience",
       "settings": {
-        "show_leaves": false,
+        "show_leaves": true,
         "show_spores": true,
         "show_vines": false,
         "show_silhouettes": true,
