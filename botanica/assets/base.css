@@ -308,6 +308,13 @@ p {
   font-size: var(--bt-fs-h4);
   line-height: var(--bt-lh-heading);
 }
+/* Card titles are navigation links, not prose links — no underline,
+   consistent with every other card style (e.g. care-blog teaser). */
+.bt-card__title a {
+  color: inherit;
+  text-decoration: none;
+}
+.bt-card__title a:hover { color: var(--bt-color-primary); }
 .bt-card__price {
   font-size: var(--bt-fs-body-sm);
   font-weight: var(--bt-fw-medium);

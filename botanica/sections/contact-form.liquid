@@ -30,6 +30,12 @@
 
 {% stylesheet %}
   .bt-contact__form { margin-top: var(--bt-space-lg); }
+  /* On the contact template the main-page section above already contributes
+     full section padding — drop the duplicate padding on BOTH sides of the
+     boundary to avoid dead space. (Sections render inside .shopify-section
+     wrappers, so match via :has.) */
+  .shopify-section:has(.bt-page):has(+ .shopify-section .bt-contact) .bt-page { padding-bottom: var(--bt-space-md); }
+  .shopify-section:has(.bt-page) + .shopify-section .bt-contact { padding-top: 0; }
 {% endstylesheet %}
 
 {% schema %}
