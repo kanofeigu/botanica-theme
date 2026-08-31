@@ -184,7 +184,9 @@
     margin-top: var(--bt-space-2xs);
     display: block;
   }
-  .bt-care-blog__card .bt-card__body { padding: var(--bt-space-sm) 0; }
+  /* Match the All Articles (main-blog) card body: padding on all sides so
+     text never sits flush against the card edge. */
+  .bt-care-blog__card .bt-card__body { padding: var(--bt-space-sm); }
   @media (max-width: 749px) {
     .bt-care-blog__grid { grid-template-columns: 1fr; }
   }
