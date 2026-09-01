@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--
+════════════════════════════════════════════════════════════════════
+  【站长配置说明 — 上线前必读】
+
+  ① 到 https://formspree.io 用邮箱 1364745992@qq.com 注册账号，
+     新建一个表单（New form），把表单 ID 替换下方 <form> 标签
+     action 里的 YOUR_FORM_ID（保留 https://formspree.io/f/ 前缀）。
+
+  ② 表单包含文件上传（截图附件）。Formspree 免费档如不支持文件
+     上传，请升级付费档，或改用其他支持文件上传的表单服务
+     （替换 action 地址即可，表单字段保持不变）。
+
+  ③ Shopify 主题商店要求支持渠道具备 auto-responder（自动回复）。
+     请在 QQ 邮箱（1364745992@qq.com）设置 → 常规 中开启
+     "自动回复"，内容可写："感谢您的来信，我们会在 2 个工作日内回复。"
+
+  ④ 替换 YOUR_FORM_ID 后无需改动本页其他内容。
+
+  注意：本注释仅供站长查看，不会显示在页面上。
+════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Support — Botanica Theme Documentation</title>
+  <meta name="description" content="Get help with the Botanica Shopify theme. Read our support policy and contact us — we reply within two business days.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 3C10 8 6.5 13 6.5 18.5a9.5 9.5 0 0 0 19 0C25.5 13 22 8 16 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M16 9.5V27" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M16 14.5l-4-2.8M16 14.5l4-2.8M16 19.5l-4.6-3.2M16 19.5l4.6-3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-name">Botanica</span>
+        <span class="brand-docs">Docs</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="sections.html">Sections</a>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html" aria-current="page">Support</a>
+      </nav>
+      <details class="nav-mobile">
+        <summary>Menu</summary>
+        <nav aria-label="Mobile navigation">
+          <a href="index.html">Home</a>
+          <a href="sections.html">Sections</a>
+          <a href="faq.html">FAQ</a>
+          <a href="support.html" aria-current="page">Support</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page-body">
+
+      <span class="eyebrow">We're here to help</span>
+      <h1>Support</h1>
+      <p class="lead">Questions about setting up Botanica, or think you've found a bug? Send us a message below — we read every one.</p>
+
+      <h2>Support policy</h2>
+      <ul class="policy-list">
+        <li><strong>Bug fixes.</strong> If something in the theme doesn't work as documented, we'll fix it and ship an update.</li>
+        <li><strong>Theme setup questions.</strong> Not sure which setting controls what, or how to achieve a look from our demos? Ask away — we're glad to point you in the right direction.</li>
+        <li><strong>Fast replies.</strong> We respond within <strong>two business days</strong> (Monday–Friday).</li>
+        <li><strong>Not included:</strong> custom code changes, design customization, and support for third-party apps fall outside theme support. For larger projects we recommend working with a Shopify Expert.</li>
+      </ul>
+
+      <h2>Contact us</h2>
+      <p>Fill in the form and we'll get back to you by email. The more detail you include — and a screenshot or two — the faster we can help.</p>
+
+      <form class="support-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="support-name">Name <span class="required">*</span></label>
+            <input type="text" id="support-name" name="name" required autocomplete="name">
+          </div>
+          <div class="form-field">
+            <label for="support-email">Email <span class="required">*</span></label>
+            <input type="email" id="support-email" name="email" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="support-store">Store URL <span class="required">*</span></label>
+          <input type="url" id="support-store" name="store_url" placeholder="https://your-store.myshopify.com" required>
+          <span class="hint">If your store is password-protected, mention the password in your message so we can take a look.</span>
+        </div>
+
+        <div class="form-field">
+          <label for="support-subject">Subject <span class="required">*</span></label>
+          <input type="text" id="support-subject" name="subject" required>
+        </div>
+
+        <div class="form-field">
+          <label for="support-message">Issue description <span class="required">*</span></label>
+          <textarea id="support-message" name="message" required placeholder="What were you trying to do, what happened instead, and which page or section is involved?"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="support-attachment">Attach screenshots</label>
+          <input type="file" id="support-attachment" name="attachment" accept="image/png, image/jpeg, image/gif, image/webp" multiple>
+          <span class="hint">PNG, JPG, GIF, or WebP. Screenshots of the issue — and of the relevant theme editor setting — help us solve things faster.</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Send message</button>
+      </form>
+
+      <div class="note">
+        <p>You can also email us directly at <a href="mailto:1364745992@qq.com">1364745992@qq.com</a>.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <p>© 2026 Botanica Theme · Support: <a href="mailto:1364745992@qq.com">1364745992@qq.com</a></p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="sections.html">Sections</a>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

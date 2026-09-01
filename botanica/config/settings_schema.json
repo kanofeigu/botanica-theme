@@ -10,8 +10,8 @@
     "theme_name": "Botanica",
     "theme_version": "3.0.0",
     "theme_author": "Botanica Studio",
-    "theme_documentation_url": "https://github.com/kanofeigu/botanica-theme",
-    "theme_support_url": "https://github.com/kanofeigu/botanica-theme/issues"
+    "theme_documentation_url": "https://kanofeigu.github.io/botanica-theme/",
+    "theme_support_url": "https://kanofeigu.github.io/botanica-theme/support.html"
   },
   {
     "name": "t:settings_schema.logo.name",

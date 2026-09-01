@@ -1,95 +1,6 @@
 {
-  "current": "Botanical",
+  "current": "Botanica",
   "presets": {
-    "Botanical": {
-      "logo_width": 120,
-      "heading_font": "fraunces_n4",
-      "body_font": "inter_n4",
-      "body_scale": 100,
-      "max_width": 1300,
-      "grid_horizontal_spacing": 24,
-      "grid_vertical_spacing": 24,
-      "button_style": "solid",
-      "button_corner_radius": 4,
-      "inputs_corner_radius": 4,
-      "card_corner_radius": 14,
-      "card_image_aspect_ratio": "1-1",
-      "show_sale_badge": true,
-      "show_sold_out_badge": true,
-      "predictive_search_enabled": true,
-      "cart_type": "drawer",
-      "show_free_shipping_bar": true,
-      "free_shipping_threshold": "50",
-      "show_currency_code": true,
-      "color_schemes": {
-        "scheme-1": {
-          "settings": {
-            "background": "#F5F1E8",
-            "background_gradient": "",
-            "text": "#2E2A24",
-            "button": "#4A6B4F",
-            "button_label": "#FFFFFF",
-            "accent": "#C97D5A",
-            "shadow": "#2E2A24"
-          }
-        },
-        "scheme-2": {
-          "settings": {
-            "background": "#FAF7EF",
-            "background_gradient": "",
-            "text": "#2E2A24",
-            "button": "#4A6B4F",
-            "button_label": "#FFFFFF",
-            "accent": "#C97D5A",
-            "shadow": "#2E2A24"
-          }
-        },
-        "scheme-3": {
-          "settings": {
-            "background": "#2E3D2F",
-            "background_gradient": "",
-            "text": "#F5F1E8",
-            "button": "#FFFFFF",
-            "button_label": "#2E3D2F",
-            "accent": "#D99A77",
-            "shadow": "#F5F1E8"
-          }
-        },
-        "scheme-4": {
-          "settings": {
-            "background": "#F6E9E1",
-            "background_gradient": "",
-            "text": "#2E2A24",
-            "button": "#B56A48",
-            "button_label": "#FFFFFF",
-            "accent": "#4A6B4F",
-            "shadow": "#2E2A24"
-          }
-        },
-        "scheme-5": {
-          "settings": {
-            "background": "#211D18",
-            "background_gradient": "",
-            "text": "#F5F1E8",
-            "button": "#FFFFFF",
-            "button_label": "#211D18",
-            "accent": "#D99A77",
-            "shadow": "#F5F1E8"
-          }
-        },
-        "scheme-6": {
-          "settings": {
-            "background": "#9E5434",
-            "background_gradient": "",
-            "text": "#FFF8F2",
-            "button": "#FFFFFF",
-            "button_label": "#8F4A2E",
-            "accent": "#2E3D2F",
-            "shadow": "#7A4A30"
-          }
-        }
-      }
-    },
     "Home & Decor": {
       "logo_width": 120,
       "heading_font": "fraunces_n4",
@@ -220,6 +131,95 @@
             "button_label": "#FFFFFF",
             "accent": "#C97D5A",
             "shadow": "#3D2E2A"
+          }
+        },
+        "scheme-3": {
+          "settings": {
+            "background": "#2E3D2F",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#2E3D2F",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        },
+        "scheme-4": {
+          "settings": {
+            "background": "#F6E9E1",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#B56A48",
+            "button_label": "#FFFFFF",
+            "accent": "#4A6B4F",
+            "shadow": "#2E2A24"
+          }
+        },
+        "scheme-5": {
+          "settings": {
+            "background": "#211D18",
+            "background_gradient": "",
+            "text": "#F5F1E8",
+            "button": "#FFFFFF",
+            "button_label": "#211D18",
+            "accent": "#D99A77",
+            "shadow": "#F5F1E8"
+          }
+        },
+        "scheme-6": {
+          "settings": {
+            "background": "#9E5434",
+            "background_gradient": "",
+            "text": "#FFF8F2",
+            "button": "#FFFFFF",
+            "button_label": "#8F4A2E",
+            "accent": "#2E3D2F",
+            "shadow": "#7A4A30"
+          }
+        }
+      }
+    },
+    "Botanica": {
+      "logo_width": 120,
+      "heading_font": "fraunces_n4",
+      "body_font": "inter_n4",
+      "body_scale": 100,
+      "max_width": 1300,
+      "grid_horizontal_spacing": 24,
+      "grid_vertical_spacing": 24,
+      "button_style": "solid",
+      "button_corner_radius": 4,
+      "inputs_corner_radius": 4,
+      "card_corner_radius": 14,
+      "card_image_aspect_ratio": "1-1",
+      "show_sale_badge": true,
+      "show_sold_out_badge": true,
+      "predictive_search_enabled": true,
+      "cart_type": "drawer",
+      "show_free_shipping_bar": true,
+      "free_shipping_threshold": "50",
+      "show_currency_code": true,
+      "color_schemes": {
+        "scheme-1": {
+          "settings": {
+            "background": "#F5F1E8",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#4A6B4F",
+            "button_label": "#FFFFFF",
+            "accent": "#C97D5A",
+            "shadow": "#2E2A24"
+          }
+        },
+        "scheme-2": {
+          "settings": {
+            "background": "#FAF7EF",
+            "background_gradient": "",
+            "text": "#2E2A24",
+            "button": "#4A6B4F",
+            "button_label": "#FFFFFF",
+            "accent": "#C97D5A",
+            "shadow": "#2E2A24"
           }
         },
         "scheme-3": {

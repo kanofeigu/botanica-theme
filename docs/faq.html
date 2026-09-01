@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frequently Asked Questions — Botanica Theme Documentation</title>
+  <meta name="description" content="Answers to common questions about the Botanica Shopify theme: presets, menus, image sizes, cart drawer, logos, translations, performance, and browser support.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 3C10 8 6.5 13 6.5 18.5a9.5 9.5 0 0 0 19 0C25.5 13 22 8 16 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M16 9.5V27" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M16 14.5l-4-2.8M16 14.5l4-2.8M16 19.5l-4.6-3.2M16 19.5l4.6-3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-name">Botanica</span>
+        <span class="brand-docs">Docs</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="sections.html">Sections</a>
+        <a href="faq.html" aria-current="page">FAQ</a>
+        <a href="support.html">Support</a>
+      </nav>
+      <details class="nav-mobile">
+        <summary>Menu</summary>
+        <nav aria-label="Mobile navigation">
+          <a href="index.html">Home</a>
+          <a href="sections.html">Sections</a>
+          <a href="faq.html" aria-current="page">FAQ</a>
+          <a href="support.html">Support</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page-body">
+
+      <span class="eyebrow">Help center</span>
+      <h1>Frequently asked questions</h1>
+      <p class="lead">Quick answers to the questions we hear most. Can't find yours? <a href="support.html">Contact support</a> — we reply within two business days.</p>
+
+      <div class="faq-list">
+
+        <details>
+          <summary>How do I switch between the Botanica, Home &amp; Decor, and Wellness presets?</summary>
+          <div class="faq-answer">
+            <p>Open the theme editor (<strong>Online Store → Themes → Customize</strong>), click the theme name at the top of the editor sidebar, and choose the preset you want. If you're adding the theme from the Shopify Theme Store, you can also select a preset when you add it to your library.</p>
+            <p>Switching a preset replaces your current theme settings with that preset's defaults, so we recommend duplicating your theme first (<strong>Actions → Duplicate</strong>) as a backup.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I install the theme?</summary>
+          <div class="faq-answer">
+            <p>In your Shopify admin, go to <strong>Online Store → Themes</strong>, then click <strong>Add theme → Upload zip file</strong> in the theme library and select the Botanica ZIP. Once uploaded, click <strong>Customize</strong> to start editing, and <strong>Actions → Publish</strong> when you're ready to make it your live theme. See the <a href="index.html#installation">installation guide</a> for the full walkthrough.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I set up my menus — and the mega menu?</summary>
+          <div class="faq-answer">
+            <p>First create your menus under <strong>Online Store → Navigation</strong> in your Shopify admin. Then, in the theme editor, open the <strong>Header</strong> section and assign your menu with the <strong>Menu</strong> setting.</p>
+            <p>To turn a top-level menu item into a mega menu, add one of the Header section's mega-menu blocks — <strong>Mega menu — Collection list</strong>, <strong>Mega menu — Promo card</strong>, or <strong>Mega menu — Custom links</strong> — and enter the exact name of the menu item it should attach to.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>What image sizes do you recommend?</summary>
+          <div class="faq-answer">
+            <ul>
+              <li><strong>Hero &amp; slideshow:</strong> at least 2400 × 1200 px, landscape. Keep important content away from the edges so it survives cropping on mobile.</li>
+              <li><strong>Product images:</strong> use one consistent ratio across your catalog. The default product-card ratio is 4:5, so 1600 × 2000 px works beautifully. You can change the card ratio under <strong>Theme settings → Product cards</strong>.</li>
+              <li><strong>Collection images:</strong> match your product-card ratio (4:5 by default) for a tidy grid.</li>
+              <li><strong>Logo:</strong> SVG or a transparent PNG at 2× the display size. Favicon: 32 × 32 px PNG.</li>
+            </ul>
+            <p>Use JPG for photographs and PNG or SVG for graphics with transparency, and aim to keep each image under roughly 300 KB for fast loading.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I enable the cart drawer and quick add?</summary>
+          <div class="faq-answer">
+            <p>Go to <strong>Theme settings → Cart</strong> and set <strong>Cart type</strong> to <strong>Drawer</strong>. Shoppers will see their cart slide in from the right without leaving the page; choose <strong>Page</strong> if you prefer the classic cart page.</p>
+            <p>Quick add is built into every product card: hovering a card reveals an add-to-cart bar, and adding an item opens the drawer automatically. The drawer also includes a free-shipping progress bar — set your threshold under <strong>Theme settings → Cart</strong>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I add my logo and favicon?</summary>
+          <div class="faq-answer">
+            <p>In the theme editor, open <strong>Theme settings → Logo</strong>. Upload your logo image, adjust the <strong>Logo width</strong> slider (50–300 px), and upload a favicon — it appears in browser tabs and bookmarks.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Which languages does the theme support?</summary>
+          <div class="faq-answer">
+            <p>Botanica ships with a complete English locale (<code>en.default.json</code>), so every piece of theme text is translatable. To sell in additional languages, add them under <strong>Settings → Languages</strong> in your Shopify admin and translate the theme with Shopify's free <strong>Translate &amp; Adapt</strong> app — no theme code changes needed.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Is Botanica fast? Any performance tips?</summary>
+          <div class="faq-answer">
+            <p>Yes — Botanica is built performance-first: a single lightweight stylesheet, minimal JavaScript, responsive images, and lazy loading throughout. To keep your store fast:</p>
+            <ul>
+              <li>Compress images before uploading and keep them near the recommended sizes.</li>
+              <li>Limit the number of installed apps, and remove ones you no longer use.</li>
+              <li>Prefer image sections over autoplaying video where possible.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Which browsers are supported?</summary>
+          <div class="faq-answer">
+            <p>Botanica supports the latest two versions of Chrome, Safari, Firefox, and Edge, plus current mobile browsers on iOS and Android. Older browsers (such as Internet Explorer) are not supported.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I change colors and fonts?</summary>
+          <div class="faq-answer">
+            <p>Open <strong>Theme settings → Colors</strong> to edit color schemes — background, text, button, and accent — then assign a scheme to any section. Under <strong>Theme settings → Typography</strong> you can pick any heading and body font from Shopify's font library; Botanica pairs Fraunces (headings) with Inter (body) by default.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I show or hide badges on product cards?</summary>
+          <div class="faq-answer">
+            <p>Go to <strong>Theme settings → Badges</strong>. You can independently toggle the <strong>sale</strong>, <strong>sold out</strong>, <strong>care level</strong>, and <strong>light requirement</strong> badges that appear on product cards across your store.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I get support?</summary>
+          <div class="faq-answer">
+            <p>Head to our <a href="support.html">support page</a> and send us a message with your store URL and a description of the issue — screenshots help a lot. We answer bug reports and theme setup questions within two business days.</p>
+          </div>
+        </details>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <p>© 2026 Botanica Theme · Support: <a href="mailto:1364745992@qq.com">1364745992@qq.com</a></p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="sections.html">Sections</a>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

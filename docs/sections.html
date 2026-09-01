@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sections &amp; Theme Settings — Botanica Theme Documentation</title>
+  <meta name="description" content="Complete reference of all 49 sections in the Botanica Shopify theme, plus a summary of the global theme settings.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 3C10 8 6.5 13 6.5 18.5a9.5 9.5 0 0 0 19 0C25.5 13 22 8 16 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M16 9.5V27" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M16 14.5l-4-2.8M16 14.5l4-2.8M16 19.5l-4.6-3.2M16 19.5l4.6-3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-name">Botanica</span>
+        <span class="brand-docs">Docs</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="sections.html" aria-current="page">Sections</a>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+      </nav>
+      <details class="nav-mobile">
+        <summary>Menu</summary>
+        <nav aria-label="Mobile navigation">
+          <a href="index.html">Home</a>
+          <a href="sections.html" aria-current="page">Sections</a>
+          <a href="faq.html">FAQ</a>
+          <a href="support.html">Support</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page-body">
+
+      <span class="eyebrow">Reference</span>
+      <h1>Sections &amp; theme settings</h1>
+      <p class="lead">Botanica ships with <strong>49 sections</strong>. Some power a specific template (product, collection, cart, blog…), others can be added to any page in the theme editor, and two — the header and footer groups — appear on every page of your store.</p>
+
+      <nav class="toc" aria-label="On this page">
+        <a href="#header-nav">Header &amp; navigation</a>
+        <a href="#footer">Footer</a>
+        <a href="#product">Product</a>
+        <a href="#collection">Collection</a>
+        <a href="#cart">Cart</a>
+        <a href="#blog">Blog &amp; articles</a>
+        <a href="#system">Search &amp; system pages</a>
+        <a href="#account">Customer account</a>
+        <a href="#password">Password page</a>
+        <a href="#content">Content &amp; merchandising</a>
+        <a href="#theme-settings">Theme settings</a>
+      </nav>
+
+      <div class="note">
+        <p><strong>Section groups:</strong> Botanica uses Online Store 2.0 section groups for the parts of your store that appear everywhere. The <strong>Header group</strong> contains the Announcement bar and Header sections; the <strong>Footer group</strong> contains the Footer section. Edit them once in the theme editor and they update on every page.</p>
+      </div>
+
+      <div class="group-head" id="header-nav">
+        <h2>Header &amp; navigation</h2>
+        <span class="count-chip">2 sections</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Announcement bar</strong></td>
+              <td><span class="file-name">announcement-bar.liquid</span></td>
+              <td>A slim bar above the header for store-wide messages — shipping offers, launches, or promotions. Supports multiple announcements that rotate. Part of the header group, shown on every page.</td>
+            </tr>
+            <tr>
+              <td><strong>Header</strong></td>
+              <td><span class="file-name">header.liquid</span></td>
+              <td>Your store's main header: logo, navigation, search, account, and cart. Menus support mega-menu blocks (collection list, promo card, or custom links), and the header can stick to the top of the screen while scrolling.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="footer">
+        <h2>Footer</h2>
+        <span class="count-chip">1 section</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Footer</strong></td>
+              <td><span class="file-name">footer.liquid</span></td>
+              <td>The site-wide footer, built from Brand, Menu, and Newsletter blocks — add your tagline, footer navigation, social links, and an email signup. Part of the footer group, shown on every page.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="product">
+        <h2>Product</h2>
+        <span class="count-chip">6 sections</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Product information</strong></td>
+              <td><span class="file-name">main-product.liquid</span></td>
+              <td>The heart of the product template: media gallery with multiple layouts, variant picker, price, quantity, buy buttons, breadcrumbs, and product details.</td>
+            </tr>
+            <tr>
+              <td><strong>Care guide</strong></td>
+              <td><span class="file-name">product-care-guide.liquid</span></td>
+              <td>Presents care instructions on the product page — ideal for light, water, and difficulty guidance for plants. Can stay sticky beside the product gallery while scrolling.</td>
+            </tr>
+            <tr>
+              <td><strong>Risk-Free Guarantee</strong></td>
+              <td><span class="file-name">risk-free-guarantee.liquid</span></td>
+              <td>A reassurance banner that communicates your guarantee or returns promise, helping hesitant shoppers buy with confidence.</td>
+            </tr>
+            <tr>
+              <td><strong>Size guide</strong></td>
+              <td><span class="file-name">size-guide.liquid</span></td>
+              <td>An add-on section for the product template that displays sizing or dimension information for your products.</td>
+            </tr>
+            <tr>
+              <td><strong>Pickup availability (API)</strong></td>
+              <td><span class="file-name">pickup-availability.liquid</span></td>
+              <td>Shows whether the selected variant is available for local pickup. Rendered dynamically via Shopify's pickup availability API on the product page — you don't add it manually in the editor.</td>
+            </tr>
+            <tr>
+              <td><strong>Product recommendations</strong></td>
+              <td><span class="file-name">product-recommendations.liquid</span></td>
+              <td>Automatically suggests related products at the bottom of the product page, powered by Shopify's recommendation engine.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="collection">
+        <h2>Collection</h2>
+        <span class="count-chip">3 sections</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Collection banner</strong></td>
+              <td><span class="file-name">main-collection-banner.liquid</span></td>
+              <td>The header of the collection template: collection title, description, and optional image.</td>
+            </tr>
+            <tr>
+              <td><strong>Product grid</strong></td>
+              <td><span class="file-name">main-collection-product-grid.liquid</span></td>
+              <td>The collection template's product listing, with pagination, adjustable desktop columns, optional filtering and sorting, vendor display, and a secondary image on hover.</td>
+            </tr>
+            <tr>
+              <td><strong>Collections list</strong></td>
+              <td><span class="file-name">main-list-collections.liquid</span></td>
+              <td>Used on the "all collections" page — displays every collection in your store as a card grid.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="cart">
+        <h2>Cart</h2>
+        <span class="count-chip">1 section</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Items</strong></td>
+              <td><span class="file-name">main-cart-items.liquid</span></td>
+              <td>The cart template's line-item list, with quantity steppers, an order note field, a free-shipping progress bar, and optional in-cart product recommendations with quick add.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="blog">
+        <h2>Blog &amp; articles</h2>
+        <span class="count-chip">2 sections</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Blog posts</strong></td>
+              <td><span class="file-name">main-blog.liquid</span></td>
+              <td>Lists a blog's articles as cards on blog templates — perfect for a plant-care journal or brand stories.</td>
+            </tr>
+            <tr>
+              <td><strong>Blog post</strong></td>
+              <td><span class="file-name">main-article.liquid</span></td>
+              <td>Renders a single article on article templates: title, featured image, content, and publishing details.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="system">
+        <h2>Search &amp; system pages</h2>
+        <span class="count-chip">3 sections</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Search results</strong></td>
+              <td><span class="file-name">main-search.liquid</span></td>
+              <td>Displays storefront search results on the search template. Control what shoppers can find (products, articles, pages) under Theme settings → Search behavior.</td>
+            </tr>
+            <tr>
+              <td><strong>404</strong></td>
+              <td><span class="file-name">main-404.liquid</span></td>
+              <td>The content of the "page not found" template, shown when a visitor hits a broken link.</td>
+            </tr>
+            <tr>
+              <td><strong>Page</strong></td>
+              <td><span class="file-name">main-page.liquid</span></td>
+              <td>Renders the content of standard pages (About, Contact, policies) on page templates.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="account">
+        <h2>Customer account</h2>
+        <span class="count-chip">7 sections</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Account</strong></td>
+              <td><span class="file-name">main-account.liquid</span></td>
+              <td>The customer account overview: order history and account details for signed-in customers.</td>
+            </tr>
+            <tr>
+              <td><strong>Account activation</strong></td>
+              <td><span class="file-name">main-activate-account.liquid</span></td>
+              <td>The form customers see when they activate their account from an invitation email.</td>
+            </tr>
+            <tr>
+              <td><strong>Addresses</strong></td>
+              <td><span class="file-name">main-addresses.liquid</span></td>
+              <td>Lets customers add, edit, and remove saved addresses in their account.</td>
+            </tr>
+            <tr>
+              <td><strong>Login</strong></td>
+              <td><span class="file-name">main-login.liquid</span></td>
+              <td>The customer login form, including the password-recovery flow.</td>
+            </tr>
+            <tr>
+              <td><strong>Order</strong></td>
+              <td><span class="file-name">main-order.liquid</span></td>
+              <td>The detailed view of a single past order inside the customer account.</td>
+            </tr>
+            <tr>
+              <td><strong>Registration</strong></td>
+              <td><span class="file-name">main-register.liquid</span></td>
+              <td>The new-customer registration form.</td>
+            </tr>
+            <tr>
+              <td><strong>Password reset</strong></td>
+              <td><span class="file-name">main-reset-password.liquid</span></td>
+              <td>The form customers use to set a new password after following a reset link from their email.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="password">
+        <h2>Password page</h2>
+        <span class="count-chip">3 sections</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Password header</strong></td>
+              <td><span class="file-name">main-password-header.liquid</span></td>
+              <td>The compact header of the password (coming soon) page that protects your store before launch.</td>
+            </tr>
+            <tr>
+              <td><strong>Password content</strong></td>
+              <td><span class="file-name">main-password-content.liquid</span></td>
+              <td>The main content of the password page: your message, a newsletter signup to collect early interest, and the password entry form.</td>
+            </tr>
+            <tr>
+              <td><strong>Password footer</strong></td>
+              <td><span class="file-name">main-password-footer.liquid</span></td>
+              <td>The footer of the password page.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="content">
+        <h2>Content &amp; merchandising</h2>
+        <span class="count-chip">21 sections</span>
+      </div>
+      <p>These sections can be added to any template that supports sections — the homepage, product and collection templates, pages, and more — from the theme editor's <strong>Add section</strong> menu.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Section</th><th>File</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Hero</strong></td>
+              <td><span class="file-name">hero.liquid</span></td>
+              <td>A full-width banner with image or video, eyebrow text, heading, copy, and buttons, with flexible height, fit, and overlay controls. The natural first section of a homepage.</td>
+            </tr>
+            <tr>
+              <td><strong>Slideshow</strong></td>
+              <td><span class="file-name">slideshow.liquid</span></td>
+              <td>Rotating image slides, each with its own eyebrow, title, text, and link — useful for campaigns and seasonal promotions.</td>
+            </tr>
+            <tr>
+              <td><strong>Image with text</strong></td>
+              <td><span class="file-name">image-with-text.liquid</span></td>
+              <td>A classic two-column split of imagery and copy with an optional button. Great for your brand story or feature highlights.</td>
+            </tr>
+            <tr>
+              <td><strong>Featured collection</strong></td>
+              <td><span class="file-name">featured-collection.liquid</span></td>
+              <td>Shows products from a collection you choose, with control over product count, desktop columns, and mobile swipe browsing.</td>
+            </tr>
+            <tr>
+              <td><strong>Featured product</strong></td>
+              <td><span class="file-name">featured-product.liquid</span></td>
+              <td>Spotlights a single product — media, price, and purchase form — on any page, away from its product template.</td>
+            </tr>
+            <tr>
+              <td><strong>Collection list</strong></td>
+              <td><span class="file-name">collection-list.liquid</span></td>
+              <td>A row or grid of cards linking to selected collections, helping shoppers navigate your catalog.</td>
+            </tr>
+            <tr>
+              <td><strong>Shop by care level</strong></td>
+              <td><span class="file-name">shop-by-care.liquid</span></td>
+              <td>A signature Botanica section that lets shoppers browse by plant-care difficulty, so beginners and experts both find the right plants.</td>
+            </tr>
+            <tr>
+              <td><strong>Plant spotlight</strong></td>
+              <td><span class="file-name">plant-spotlight.liquid</span></td>
+              <td>An editorial feature that highlights a single plant or product with large imagery and storytelling copy.</td>
+            </tr>
+            <tr>
+              <td><strong>Botanical atmosphere</strong></td>
+              <td><span class="file-name">botanical-ambience.liquid</span></td>
+              <td>An image-led section that sets the mood — large atmospheric visuals paired with short copy for brand feel.</td>
+            </tr>
+            <tr>
+              <td><strong>Care blog teaser</strong></td>
+              <td><span class="file-name">care-blog-teaser.liquid</span></td>
+              <td>Promotes your plant-care articles with automatic or manually curated article cards, driving readers to your blog.</td>
+            </tr>
+            <tr>
+              <td><strong>Multi-column</strong></td>
+              <td><span class="file-name">multicolumn.liquid</span></td>
+              <td>A row of small columns, each with optional image, heading, and text — ideal for value propositions or how-it-works steps.</td>
+            </tr>
+            <tr>
+              <td><strong>Collage</strong></td>
+              <td><span class="file-name">collage.liquid</span></td>
+              <td>An editorial mosaic of image blocks for a magazine-style look.</td>
+            </tr>
+            <tr>
+              <td><strong>Gallery</strong></td>
+              <td><span class="file-name">gallery.liquid</span></td>
+              <td>A simple image gallery grid — great for inspiration, lookbooks, or customer photos.</td>
+            </tr>
+            <tr>
+              <td><strong>Logo list</strong></td>
+              <td><span class="file-name">logo-list.liquid</span></td>
+              <td>A row of press or partner logos that builds instant social proof.</td>
+            </tr>
+            <tr>
+              <td><strong>Testimonials</strong></td>
+              <td><span class="file-name">testimonials.liquid</span></td>
+              <td>Customer quotes and reviews that show new visitors why people love your store.</td>
+            </tr>
+            <tr>
+              <td><strong>FAQ accordion</strong></td>
+              <td><span class="file-name">faq-accordion.liquid</span></td>
+              <td>Expandable question-and-answer rows — add an FAQ to any page without code.</td>
+            </tr>
+            <tr>
+              <td><strong>Rich text</strong></td>
+              <td><span class="file-name">rich-text.liquid</span></td>
+              <td>A free-form rich text block with heading and button options for announcements, policies, or storytelling.</td>
+            </tr>
+            <tr>
+              <td><strong>Newsletter</strong></td>
+              <td><span class="file-name">newsletter.liquid</span></td>
+              <td>An email signup section connected to Shopify's customer marketing, so subscribers land straight in your customer list.</td>
+            </tr>
+            <tr>
+              <td><strong>Contact Form</strong></td>
+              <td><span class="file-name">contact-form.liquid</span></td>
+              <td>A storefront contact form that emails messages to the store owner — typically used on a Contact page.</td>
+            </tr>
+            <tr>
+              <td><strong>Custom Liquid</strong></td>
+              <td><span class="file-name">custom-liquid.liquid</span></td>
+              <td>Add your own Liquid or HTML for custom content, embeds, and third-party snippets.</td>
+            </tr>
+            <tr>
+              <td><strong>Apps</strong></td>
+              <td><span class="file-name">apps.liquid</span></td>
+              <td>A host section for app blocks from installed Shopify apps — add app functionality exactly where you want it on a page.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="group-head" id="theme-settings">
+        <h2>Theme settings</h2>
+        <span class="count-chip">12 groups</span>
+      </div>
+      <p>Global settings live under <strong>Theme settings</strong> in the theme editor and apply across your whole store:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Setting group</th><th>What it controls</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Logo</strong></td><td>Your store logo, logo width, and favicon.</td></tr>
+            <tr><td><strong>Colors</strong></td><td>Color schemes — background, text, button, and accent colors you can assign to sections throughout the theme.</td></tr>
+            <tr><td><strong>Typography</strong></td><td>Heading and body fonts (Fraunces and Inter by default — choose any font from Shopify's library) plus overall text scale.</td></tr>
+            <tr><td><strong>Layout</strong></td><td>Maximum page width and horizontal/vertical grid spacing.</td></tr>
+            <tr><td><strong>Buttons</strong></td><td>Button style (solid or outline) and corner radius.</td></tr>
+            <tr><td><strong>Inputs</strong></td><td>Corner radius for form inputs.</td></tr>
+            <tr><td><strong>Product cards</strong></td><td>Card image aspect ratio (1:1, 4:5, or 3:4) and card corner radius.</td></tr>
+            <tr><td><strong>Badges</strong></td><td>Toggle sale, sold-out, care-level, and light-requirement badges on product cards.</td></tr>
+            <tr><td><strong>Social media</strong></td><td>Links to your Facebook, Instagram, Pinterest, TikTok, X (Twitter), and YouTube profiles.</td></tr>
+            <tr><td><strong>Search behavior</strong></td><td>Predictive search, and whether results include products, articles, and pages.</td></tr>
+            <tr><td><strong>Cart</strong></td><td>Cart type (drawer or page) and the free-shipping progress bar threshold.</td></tr>
+            <tr><td><strong>Currency format</strong></td><td>Show or hide the currency code next to prices.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <p><strong>Looking for something specific?</strong> Check the <a href="faq.html">FAQ</a> for common how-tos, or <a href="support.html">contact support</a> — we're happy to point you to the right setting.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <p>© 2026 Botanica Theme · Support: <a href="mailto:1364745992@qq.com">1364745992@qq.com</a></p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="sections.html">Sections</a>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
