@@ -50,6 +50,22 @@
                     <p class="bt-cart__item-variant">{{ item.variant.title }}</p>
                   {%- endif -%}
 
+                  {%- if item.selling_plan_allocation != null -%}
+                    <p class="bt-cart__item-plan">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+                  {%- endif -%}
+
+                  {%- comment %} Line-item discounts — mirrored client-side by the
+                    cart AJAX handler (data-line-discounts). {%- endcomment %}
+                  <ul class="bt-cart__item-discounts" role="list" data-line-discounts{% if item.line_level_discount_allocations.size == 0 %} hidden{% endif %}>
+                    {%- for allocation in item.line_level_discount_allocations -%}
+                      <li class="bt-cart__item-discount">
+                        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>
+                        {{ allocation.discount_application.title | escape_once }}
+                        <span class="bt-cart__item-discount-amount">−{{ allocation.amount | money }}</span>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+
                   {%- if item.product.tags contains 'care-easy' or item.product.tags contains 'care-medium' or item.product.tags contains 'care-expert' -%}
                     <div class="bt-cart__item-chips">
                       {%- if item.product.tags contains 'care-easy' -%}
@@ -125,6 +141,20 @@
               </div>
             {%- endif -%}
 
+            {%- comment %} Cart-level discounts — listed above the subtotal;
+              subtotal stays cart.total_price (already discount-adjusted). {%- endcomment %}
+            <ul class="bt-cart__discounts" role="list" data-cart-discounts{% if cart.cart_level_discount_applications.size == 0 %} hidden{% endif %}>
+              {%- for discount in cart.cart_level_discount_applications -%}
+                <li class="bt-cart__discount">
+                  <span class="bt-cart__discount-label">
+                    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>
+                    {{ discount.title | escape_once }}
+                  </span>
+                  <span class="bt-cart__discount-amount">−{{ discount.total_allocated_amount | money }}</span>
+                </li>
+              {%- endfor -%}
+            </ul>
+
             <p class="bt-cart__subtotal">
               <span>{{ 'sections.cart.subtotal' | t }}</span>
               <strong data-cart-subtotal>{{ cart.total_price | money }}</strong>
@@ -151,6 +181,11 @@
               <button type="submit" name="checkout" class="bt-btn bt-btn--primary bt-btn--lg bt-btn--block">
                 {{ 'sections.cart.checkout' | t }}
               </button>
+              {%- comment %} Accelerated checkout buttons (Shop Pay, PayPal, Apple Pay…)
+                — rendered by Shopify, brand colors untouched. {%- endcomment %}
+              <div class="bt-cart__additional-checkout">
+                {{ content_for_additional_checkout_buttons }}
+              </div>
             </form>
 
             <p class="bt-cart__taxes">{{ 'sections.cart.taxes_note' | t }}</p>
@@ -256,6 +291,47 @@
   }
   .bt-cart__item-title:hover { color: var(--bt-color-primary); text-decoration: underline; text-underline-offset: 0.12em; }
   .bt-cart__item-variant { margin: var(--bt-space-3xs) 0 0; font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); }
+  .bt-cart__item-plan { margin: var(--bt-space-3xs) 0 0; font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); }
+
+  .bt-cart__item-discounts {
+    list-style: none;
+    margin: var(--bt-space-2xs) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .bt-cart__item-discount {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bt-space-3xs);
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-cart__item-discount svg { flex-shrink: 0; color: var(--bt-color-primary); }
+  .bt-cart__item-discount-amount { font-variant-numeric: oldstyle-nums; }
+
+  .bt-cart__discounts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-cart__discount {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--bt-space-sm);
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-cart__discount-label { display: inline-flex; align-items: center; gap: var(--bt-space-3xs); }
+  .bt-cart__discount-label svg { flex-shrink: 0; color: var(--bt-color-primary); }
+  .bt-cart__discount-amount { font-variant-numeric: oldstyle-nums; }
+
+  .bt-cart__additional-checkout { margin-top: var(--bt-space-2xs); }
 
   .bt-cart__item-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--bt-space-2xs); }
   /* Care chips — mirrors snippets/card-product.liquid (its stylesheet only
@@ -610,6 +686,19 @@
         if (qtyEl) qtyEl.textContent = item.quantity;
         var priceEl = row.querySelector('[data-line-price]');
         if (priceEl) priceEl.textContent = money(item.final_line_price);
+        var discEl = row.querySelector('[data-line-discounts]');
+        if (discEl) {
+          var allocs = item.line_level_discount_allocations || [];
+          discEl.innerHTML = allocs.map(function (alloc) {
+            var title = alloc.discount_application ? alloc.discount_application.title : '';
+            return '<li class="bt-cart__item-discount">' +
+              '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>' +
+              esc(title) +
+              '<span class="bt-cart__item-discount-amount">−' + money(alloc.amount) + '</span>' +
+            '</li>';
+          }).join('');
+          discEl.hidden = allocs.length === 0;
+        }
       });
       /* A line exists server-side that this page cannot render
          (e.g. quick-added from recommendations) — reload for truth. */
@@ -623,6 +712,20 @@
 
       var subtotalEl = root.querySelector('[data-cart-subtotal]');
       if (subtotalEl) subtotalEl.textContent = money(cart.total_price);
+      var cartDiscEl = root.querySelector('[data-cart-discounts]');
+      if (cartDiscEl) {
+        var cartDiscounts = cart.cart_level_discount_applications || [];
+        cartDiscEl.innerHTML = cartDiscounts.map(function (d) {
+          return '<li class="bt-cart__discount">' +
+            '<span class="bt-cart__discount-label">' +
+              '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>' +
+              esc(d.title) +
+            '</span>' +
+            '<span class="bt-cart__discount-amount">−' + money(d.total_allocated_amount) + '</span>' +
+          '</li>';
+        }).join('');
+        cartDiscEl.hidden = cartDiscounts.length === 0;
+      }
       updateShipping(cart);
       updateBadge(cart);
       announce(cart);

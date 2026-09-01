@@ -37,28 +37,110 @@
   {% endstyle %}
   <meta name="description" content="{{ 'gift_cards.issued.subtext' | t }}">
   {{ content_for_header }}
+  {%- comment -%} QR rendering uses Shopify's hosted QRCode library (official gift card
+    template approach) against gift_card.qr_identifier. {%- endcomment -%}
+  <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:system-ui,-apple-system,sans-serif;background:var(--bt-color-bg);color:var(--bt-color-text);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center}
-    .bt-gift{max-width:480px;padding:32px;background:var(--bt-color-surface);border-radius:14px;box-shadow:0 4px 16px rgba(46,42,36,.08)}
+    .bt-gift{max-width:480px;width:100%;padding:32px;background:var(--bt-color-surface);border-radius:14px;box-shadow:0 4px 16px rgba(46,42,36,.08)}
+    .bt-gift__logo{max-width:140px;height:auto;margin:0 auto 12px}
     .bt-gift h1{font-family:Georgia,serif;font-size:clamp(1.4rem,2.5vw,2rem);margin-bottom:12px}
-    .bt-gift__amount{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;color:var(--bt-color-primary);margin-bottom:16px}
-    .bt-gift p{margin-bottom:8px;font-size:.875rem;opacity:.75}
-    .bt-gift img{max-width:200px;margin:16px auto}
-    .bt-gift__qr{margin-top:16px}
-    @media print{body{background:white}.bt-gift{box-shadow:none}}
+    .bt-gift__amount{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;color:var(--bt-color-primary);margin-bottom:4px}
+    .bt-gift__sub{margin-bottom:8px;font-size:.875rem;opacity:.75}
+    .bt-gift__code-wrap{margin:16px auto 4px;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1.5px dashed var(--bt-color-primary);border-radius:10px;background:var(--bt-color-bg)}
+    .bt-gift__code-label{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:4px}
+    .bt-gift__code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;font-weight:600;letter-spacing:.06em}
+    .bt-gift__copy{border:none;background:transparent;color:var(--bt-color-primary);font-size:.75rem;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px}
+    .bt-gift__qr{width:140px;height:140px;min-width:120px;min-height:120px;margin:16px auto 0;display:flex;align-items:center;justify-content:center}
+    .bt-gift__qr img,.bt-gift__qr canvas{width:140px;height:140px}
+    .bt-gift__wallet{display:inline-block;margin-top:16px}
+    .bt-gift__hint{font-size:.8rem;opacity:.65;margin-top:16px}
+    .bt-gift__expiry{color:#9A5B3C;font-weight:600}
+    .bt-gift__shop{display:inline-block;margin-top:16px;color:var(--bt-color-primary);font-weight:600;font-size:.875rem}
+    @media print{body{background:white}.bt-gift{box-shadow:none}.bt-gift__copy{display:none}}
   </style>
 </head>
 <body>
   <div class="bt-gift">
-    <h1>{{ shop.name }}</h1>
-    <p class="bt-gift__amount">{{ gift_card.balance | money }}</p>
-    <p>{{ 'gift_cards.issued.subtext' | t }}</p>
-    {%- if gift_card.expired -%}
-      <p>{{ 'gift_cards.issued.expired' | t: expiry: gift_card.expires_on | date: '%B %d, %Y' }}</p>
+    {%- if settings.logo != blank -%}
+      <a href="{{ shop.url }}">{{ settings.logo | image_url: width: 280 | image_tag: class: 'bt-gift__logo', alt: shop.name, widths: '140, 280' }}</a>
+    {%- else -%}
+      <h1>{{ shop.name }}</h1>
     {%- endif -%}
-    <div class="bt-gift__qr">{{ gift_card.qr_code }}</div>
-    <a href="{{ shop.url }}" style="display:inline-block;margin-top:16px;color:var(--bt-color-primary);font-weight:600;font-size:.875rem">{{ shop.name }}</a>
+    <p class="bt-gift__amount">{{ gift_card.balance | money }}</p>
+    <p class="bt-gift__sub">{{ 'gift_cards.issued.subtext' | t }}</p>
+    {%- if gift_card.expired -%}
+      <p class="bt-gift__expiry">{{ 'gift_cards.issued.expired' | t }} — {{ gift_card.expires_on | date: '%B %d, %Y' }}</p>
+    {%- elsif gift_card.expires_on -%}
+      <p class="bt-gift__sub">{{ 'gift_cards.issued.expiration_date' | t: expires_on: gift_card.expires_on | date: '%B %d, %Y' }}</p>
+    {%- endif -%}
+
+    <span class="bt-gift__code-label">{{ 'gift_cards.issued.gift_card_code' | t }}</span>
+    <div class="bt-gift__code-wrap">
+      <span class="bt-gift__code" data-gift-card-code>{{ gift_card.code | format_code }}</span>
+      <button type="button" class="bt-gift__copy" data-copy-code data-copy-label="{{ 'gift_cards.issued.copy_code' | t | escape }}" data-copied-label="{{ 'gift_cards.issued.copy_code_success' | t | escape }}">
+        {{ 'gift_cards.issued.copy_code' | t }}
+      </button>
+    </div>
+
+    <div class="bt-gift__qr" data-gift-card-qr data-qr-identifier="{{ gift_card.qr_identifier | escape }}" role="img" aria-label="{{ 'gift_cards.issued.qr_image_alt' | t | escape }}"></div>
+
+    {%- if gift_card.pass_url -%}
+      <a href="{{ gift_card.pass_url }}" class="bt-gift__wallet" aria-label="{{ 'gift_cards.issued.add_to_apple_wallet' | t | escape }}">
+        <img src="{{ 'gift-card/add-to-apple-wallet.svg' | shopify_asset_url }}" alt="{{ 'gift_cards.issued.add_to_apple_wallet' | t | escape }}" width="120" height="40" loading="lazy">
+      </a>
+    {%- endif -%}
+
+    <p class="bt-gift__hint">{{ 'gift_cards.issued.how_to_use_gift_card' | t }}</p>
+    <a href="{{ shop.url }}" class="bt-gift__shop">{{ 'gift_cards.issued.shop_link' | t }} — {{ shop.name }}</a>
   </div>
+
+  <script>
+    /* qrcode.js is deferred → init after it executes (before DOMContentLoaded). */
+    function btGiftCardInit() {
+      /* QR code — Shopify-hosted QRCode lib + qr_identifier, 140×140 (≥120px). */
+      var qrEl = document.querySelector('[data-gift-card-qr]');
+      if (qrEl && typeof QRCode === 'function') {
+        new QRCode(qrEl, {
+          text: qrEl.getAttribute('data-qr-identifier') || '',
+          width: 140,
+          height: 140
+        });
+        var qrImg = qrEl.querySelector('img');
+        if (qrImg) qrImg.alt = qrEl.getAttribute('aria-label') || '';
+      }
+
+      /* Copy code to clipboard. */
+      var copyBtn = document.querySelector('[data-copy-code]');
+      var codeEl = document.querySelector('[data-gift-card-code]');
+      if (copyBtn && codeEl) {
+        copyBtn.addEventListener('click', function () {
+          var text = codeEl.textContent.replace(/\s+/g, '');
+          function done() {
+            copyBtn.textContent = copyBtn.getAttribute('data-copied-label');
+            setTimeout(function () { copyBtn.textContent = copyBtn.getAttribute('data-copy-label'); }, 2000);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, done);
+          } else {
+            var range = document.createRange();
+            range.selectNodeContents(codeEl);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            try { document.execCommand('copy'); } catch (e) {}
+            sel.removeAllRanges();
+            done();
+          }
+        });
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', btGiftCardInit);
+    } else {
+      btGiftCardInit();
+    }
+  </script>
 </body>
 </html>

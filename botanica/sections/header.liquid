@@ -249,6 +249,14 @@
         {% render 'icon-search' %}
       </a>
 
+      {% comment %} Account — official Shopify account component. Falls back to a plain
+           link when customer accounts are not enabled. {% endcomment %}
+      <shopify-account menu="{{ routes.account_url }}" class="bt-header__account">
+        <a href="{{ routes.account_url }}" class="bt-header__icon-btn bt-interactive" aria-label="{{ 'customer.account.title' | t }}">
+          {% render 'icon-account' %}
+        </a>
+      </shopify-account>
+
       <button type="button" data-cart-toggle class="bt-header__icon-btn bt-interactive bt-header__cart" aria-label="{{ 'sections.cart.title' | t }}">
         {% render 'icon-cart' %}
         <span class="bt-header__cart-dot" aria-hidden="true" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
@@ -272,7 +280,7 @@
 
       <form action="{{ routes.search_url }}" method="get" role="search" class="bt-header__drawer-search">
         <input type="search" name="q" class="bt-input" placeholder="{{ 'general.search.placeholder' | t }}" aria-label="{{ 'general.search.search' | t }}" required>
-        <input type="hidden" name="type" value="product">
+        <input type="hidden" name="type" value="{{ settings.search_types | default: 'product' }}">
       </form>
 
       <nav aria-label="{{ 'accessibility.mobile_navigation' | t }}">
@@ -855,6 +863,11 @@
   /* Cart count dot */
   .bt-header__cart {
     position: relative;
+  }
+  /* Account component wrapper — inline so the icon button keeps its hit area */
+  .bt-header__account {
+    display: inline-flex;
+    align-items: center;
   }
   .bt-header__cart-dot {
     position: absolute;

@@ -153,6 +153,7 @@ if (!customElements.get('bt-cart-drawer')) {
       this.emptyEl = this.querySelector('[data-cart-empty]');
       this.footerEl = this.querySelector('[data-cart-drawer-footer]');
       this.subtotalEl = this.querySelector('[data-cart-subtotal]');
+      this.discountsEl = this.querySelector('[data-cart-discounts]');
       this.upsellEl = this.querySelector('[data-cart-upsell]');
 
       this.toggleBtn?.addEventListener('click', () => this.open());
@@ -264,6 +265,20 @@ if (!customElements.get('bt-cart-drawer')) {
         this.itemsEl.hidden = false;
         if (this.footerEl) this.footerEl.hidden = false;
         if (this.subtotalEl) this.subtotalEl.textContent = Shopify.formatMoney(cart.total_price, window.theme.moneyFormat);
+        // Cart-level discounts (subtotal already reflects them)
+        if (this.discountsEl) {
+          const cartDiscounts = cart.cart_level_discount_applications || [];
+          this.discountsEl.innerHTML = cartDiscounts.map(function (d) {
+            return '<li class="bt-cart-drawer__discount">' +
+              '<span class="bt-cart-drawer__discount-label">' +
+                '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>' +
+                btEsc(d.title) +
+              '</span>' +
+              '<span>−' + Shopify.formatMoney(d.total_allocated_amount, window.theme.moneyFormat) + '</span>' +
+            '</li>';
+          }).join('');
+          this.discountsEl.hidden = cartDiscounts.length === 0;
+        }
         var viewBtn = this.querySelector('[data-cart-view-btn]');
         var checkoutForm = this.querySelector('[data-cart-checkout-form]');
         if (viewBtn) viewBtn.hidden = false;
@@ -274,6 +289,7 @@ if (!customElements.get('bt-cart-drawer')) {
         this.itemsEl.hidden = true;
         if (this.footerEl) this.footerEl.hidden = true;
         if (this.upsellEl) this.upsellEl.innerHTML = '';
+        if (this.discountsEl) { this.discountsEl.innerHTML = ''; this.discountsEl.hidden = true; }
         var viewBtn = this.querySelector('[data-cart-view-btn]');
         var checkoutForm = this.querySelector('[data-cart-checkout-form]');
         if (viewBtn) viewBtn.hidden = true;
@@ -303,6 +319,20 @@ if (!customElements.get('bt-cart-drawer')) {
       var variant = item.variant_title && item.variant_title !== 'Default Title'
         ? '<p class="bt-cart-drawer__item-variant">' + btEsc(item.variant_title) + '</p>'
         : '';
+      var sellingPlan = item.selling_plan_allocation && item.selling_plan_allocation.selling_plan
+        ? '<p class="bt-cart-drawer__item-plan">' + btEsc(item.selling_plan_allocation.selling_plan.name) + '</p>'
+        : '';
+      var lineDiscounts = '';
+      if (item.line_level_discount_allocations && item.line_level_discount_allocations.length) {
+        lineDiscounts = '<ul class="bt-cart-drawer__item-discounts" role="list">' +
+          item.line_level_discount_allocations.map(function (alloc) {
+            var title = alloc.discount_application ? alloc.discount_application.title : '';
+            return '<li class="bt-cart-drawer__item-discount">' +
+              '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>' +
+              btEsc(title) + '<span>−' + Shopify.formatMoney(alloc.amount, window.theme.moneyFormat) + '</span>' +
+            '</li>';
+          }).join('') + '</ul>';
+      }
       var compareAt = item.variant_compare_at_price && item.variant_compare_at_price > item.final_price
         ? '<span class="bt-cart-drawer__item-compare">' + Shopify.formatMoney(item.variant_compare_at_price, window.theme.moneyFormat) + '</span>'
         : '';
@@ -312,6 +342,8 @@ if (!customElements.get('bt-cart-drawer')) {
         '<div class="bt-cart-drawer__item-info">' +
           '<a href="' + item.url + '" class="bt-cart-drawer__item-title">' + btEsc(item.product_title) + '</a>' +
           variant +
+          sellingPlan +
+          lineDiscounts +
           '<div class="bt-cart-drawer__item-qty-row">' +
             '<div class="bt-qty-stepper" data-qty-stepper>' +
               '<button type="button" class="bt-qty-stepper__btn" data-action="qty-minus" data-key="' + item.key + '" aria-label="Decrease">\u2212</button>' +

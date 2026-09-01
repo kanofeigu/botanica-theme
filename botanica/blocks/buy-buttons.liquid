@@ -29,6 +29,114 @@
     </div>
   {%- endif -%}
 
+  {%- comment %} Selling plans — purchase options (one-time + subscriptions).
+    Only rendered for products attached to a selling plan group; variant
+    switches are rebuilt client-side from theme:variantChange. {%- endcomment %}
+  {%- if product.selling_plan_groups.size > 0 -%}
+    {%- assign plan_variant = product.selected_or_first_available_variant -%}
+    <fieldset class="bt-buy-panel__plans" data-selling-plan-picker data-one-time-label="{{ 'products.product.one_time_purchase' | t | escape }}">
+      <legend class="bt-buy-panel__plans-legend">{{ 'products.product.purchase_options' | t }}</legend>
+      {%- unless plan_variant.requires_selling_plan -%}
+        <label class="bt-buy-panel__plan">
+          <input type="radio" name="selling_plan" value="" data-purchase-option checked>
+          <span class="bt-buy-panel__plan-text">
+            <span class="bt-buy-panel__plan-name">{{ 'products.product.one_time_purchase' | t }}</span>
+            <span class="bt-buy-panel__plan-price">{{ plan_variant.price | money }}</span>
+          </span>
+        </label>
+      {%- endunless -%}
+      {%- for allocation in plan_variant.selling_plan_allocations -%}
+        <label class="bt-buy-panel__plan">
+          <input
+            type="radio"
+            name="selling_plan"
+            value="{{ allocation.selling_plan.id }}"
+            data-purchase-option
+            {% if plan_variant.requires_selling_plan and forloop.first %}checked{% endif %}
+          >
+          <span class="bt-buy-panel__plan-text">
+            <span class="bt-buy-panel__plan-name">{{ allocation.selling_plan.name }}</span>
+            <span class="bt-buy-panel__plan-price">{{ allocation.price | money }}</span>
+          </span>
+        </label>
+      {%- endfor -%}
+    </fieldset>
+  {%- endif -%}
+
+  {%- comment %} Gift card recipient form — official property naming convention:
+    properties[Recipient email] / [Recipient name] / [Message] / [Send on] plus the
+    __shopify_send_gift_card_to_recipient control flag. Rendered inside the product
+    form only for gift card products; cart.js submits via FormData so properties
+    flow through both AJAX and native add-to-cart. {%- endcomment %}
+  {%- if product.gift_card? and block.settings.show_gift_card_recipient_form -%}
+    <fieldset class="bt-buy-panel__recipient" data-recipient-form>
+      <label class="bt-buy-panel__recipient-toggle" for="RecipientToggle-{{ block.id }}">
+        <input
+          type="checkbox"
+          id="RecipientToggle-{{ block.id }}"
+          name="properties[__shopify_send_gift_card_to_recipient]"
+          value="on"
+          data-recipient-toggle
+        >
+        <span>{{ 'recipient.form.checkbox' | t }}</span>
+      </label>
+      {%- comment %} No-JS fallback: "if_present" delivers to the recipient whenever an
+        email was entered. JS disables this once the toggle takes over so only one
+        control flag is submitted. {%- endcomment %}
+      <input type="hidden" name="properties[__shopify_send_gift_card_to_recipient]" value="if_present" data-recipient-fallback>
+      <input type="hidden" name="properties[__shopify_offset]" value="" disabled data-recipient-offset>
+      <div class="bt-buy-panel__recipient-fields" data-recipient-fields>
+        <div class="bt-buy-panel__recipient-field">
+          <label class="bt-label" for="RecipientEmail-{{ block.id }}">{{ 'recipient.form.email_label' | t }}</label>
+          <input
+            class="bt-input"
+            type="email"
+            id="RecipientEmail-{{ block.id }}"
+            name="properties[Recipient email]"
+            autocomplete="email"
+            placeholder="{{ 'recipient.form.email' | t }}"
+            data-recipient-email
+          >
+        </div>
+        <div class="bt-buy-panel__recipient-field">
+          <label class="bt-label" for="RecipientName-{{ block.id }}">{{ 'recipient.form.name_label' | t }}</label>
+          <input
+            class="bt-input"
+            type="text"
+            id="RecipientName-{{ block.id }}"
+            name="properties[Recipient name]"
+            autocomplete="off"
+            placeholder="{{ 'recipient.form.name' | t }}"
+            maxlength="100"
+          >
+        </div>
+        <div class="bt-buy-panel__recipient-field">
+          <label class="bt-label" for="RecipientMessage-{{ block.id }}">{{ 'recipient.form.message_label' | t }}</label>
+          <textarea
+            class="bt-textarea"
+            id="RecipientMessage-{{ block.id }}"
+            name="properties[Message]"
+            rows="3"
+            maxlength="200"
+            placeholder="{{ 'recipient.form.message' | t }}"
+          ></textarea>
+          <span class="bt-buy-panel__recipient-hint">{{ 'recipient.form.max_characters' | t: max_chars: 200 }}</span>
+        </div>
+        <div class="bt-buy-panel__recipient-field">
+          <label class="bt-label" for="RecipientSendOn-{{ block.id }}">{{ 'recipient.form.send_on_label' | t }}</label>
+          <input
+            class="bt-input"
+            type="date"
+            id="RecipientSendOn-{{ block.id }}"
+            name="properties[Send on]"
+            min="{{ 'now' | date: '%Y-%m-%d' }}"
+            placeholder="{{ 'recipient.form.send_on' | t }}"
+          >
+        </div>
+      </div>
+    </fieldset>
+  {%- endif -%}
+
   <div class="bt-buy-panel__actions">
     <button
       type="submit"
@@ -66,6 +174,16 @@
     {%- endif -%}
   </div>
 
+  {%- comment %} Shop Pay Installments banner — renders nothing when the
+    product/cart is not eligible. Must stay inside the product form. {%- endcomment %}
+  {%- if block.settings.show_payment_terms -%}
+    <div class="bt-buy-panel__payment-terms">
+      {% comment %}theme-check-disable UndefinedObject{% endcomment %}
+      {{ form | payment_terms }}
+      {% comment %}theme-check-enable UndefinedObject{% endcomment %}
+    </div>
+  {%- endif -%}
+
   {%- if block.settings.show_trust_badges -%}
     <div class="bt-buy-panel__trust">
       <span class="bt-buy-panel__trust-item">
@@ -78,6 +196,101 @@
 
 {% comment %} Quantity +/- logic lives in blocks/quantity-selector.liquid
   (one globally-guarded delegated listener) — not duplicated here. {% endcomment %}
+
+{% javascript %}
+  /* Selling plans: rebuild purchase options when the variant changes.
+     variant-selects.js broadcasts theme:variantChange with the full variant
+     object (incl. selling_plan_allocations) — listen and re-render. */
+  (function () {
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function money(cents) {
+      if (window.Shopify && typeof window.Shopify.formatMoney === 'function') {
+        return window.Shopify.formatMoney(cents, (window.theme && window.theme.moneyFormat) || ('$' + '{amount}'));
+      }
+      return '$' + (cents / 100).toFixed(2);
+    }
+    function optionHTML(value, name, price, checked) {
+      return '<label class="bt-buy-panel__plan">' +
+        '<input type="radio" name="selling_plan" value="' + esc(value) + '" data-purchase-option' + (checked ? ' checked' : '') + '>' +
+        '<span class="bt-buy-panel__plan-text">' +
+          '<span class="bt-buy-panel__plan-name">' + esc(name) + '</span>' +
+          '<span class="bt-buy-panel__plan-price">' + esc(price) + '</span>' +
+        '</span>' +
+      '</label>';
+    }
+    function rebuild(picker, variant) {
+      var legend = picker.querySelector('.bt-buy-panel__plans-legend');
+      var oneTimeLabel = picker.getAttribute('data-one-time-label') || 'One-time purchase';
+      var previous = picker.querySelector('[data-purchase-option]:checked');
+      var previousValue = previous ? previous.value : '';
+      var allocations = (variant && variant.selling_plan_allocations) || [];
+      var requiresPlan = !!(variant && variant.requires_selling_plan);
+
+      var html = '';
+      var matched = false;
+      if (!requiresPlan) {
+        html += optionHTML('', oneTimeLabel, money(variant ? variant.price : 0), previousValue === '');
+        matched = previousValue === '';
+      }
+      allocations.forEach(function (alloc) {
+        var plan = alloc.selling_plan || {};
+        var id = String(alloc.selling_plan_id || plan.id || '');
+        var keep = !matched && previousValue !== '' && previousValue === id;
+        if (keep) matched = true;
+        html += optionHTML(id, plan.name || '', money(alloc.price), keep);
+      });
+      /* Previous selection no longer exists on this variant — fall back to
+         one-time, or the first plan when the variant requires a plan. */
+      picker.innerHTML = (legend ? legend.outerHTML : '') + html;
+      if (!matched) {
+        var first = picker.querySelector('[data-purchase-option]');
+        if (first) first.checked = true;
+      }
+    }
+    if (!window._btSellingPlanPicker) {
+      window._btSellingPlanPicker = true;
+      document.addEventListener('theme:variantChange', function (e) {
+        var variant = e.detail && e.detail.variant;
+        if (!variant) return;
+        document.querySelectorAll('[data-selling-plan-picker]').forEach(function (picker) {
+          rebuild(picker, variant);
+        });
+      });
+    }
+  })();
+
+  /* Gift card recipient form: no-JS renders all fields visible with the
+     "if_present" fallback flag active. With JS, fields collapse behind the
+     checkbox — when checked, the fallback flag is disabled (only "on" is
+     submitted), fields + timezone offset enable, and email becomes required. */
+  (function () {
+    document.querySelectorAll('[data-recipient-form]').forEach(function (form) {
+      var toggle = form.querySelector('[data-recipient-toggle]');
+      var fallback = form.querySelector('[data-recipient-fallback]');
+      var offset = form.querySelector('[data-recipient-offset]');
+      var fields = form.querySelector('[data-recipient-fields]');
+      var email = form.querySelector('[data-recipient-email]');
+      if (!toggle || !fields) return;
+
+      if (offset) offset.value = String(new Date().getTimezoneOffset());
+
+      function sync() {
+        var on = toggle.checked;
+        fields.hidden = !on;
+        if (fallback) fallback.disabled = on;
+        if (offset) offset.disabled = !on;
+        if (email) email.required = on;
+        fields.querySelectorAll('input, textarea').forEach(function (el) { el.disabled = !on; });
+      }
+      toggle.addEventListener('change', sync);
+      sync();
+    });
+  })();
+{% endjavascript %}
 
 {% stylesheet %}
   /* ── Buy panel — cream surface background matching Hey Rooted pattern ── */
@@ -144,12 +357,97 @@
     gap: var(--bt-space-2xs);
   }
   .bt-buy-panel__dynamic { min-height: 0; }
+
+  /* ── Selling plans — purchase options (one-time + subscription) ── */
+  .bt-buy-panel__plans {
+    margin: 0;
+    padding: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-buy-panel__plans-legend {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text-muted);
+    margin-bottom: var(--bt-space-3xs);
+  }
+  .bt-buy-panel__plan {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--bt-space-2xs);
+    padding: var(--bt-space-2xs) var(--bt-space-xs);
+    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    border-radius: var(--bt-radius-input);
+    background: var(--bt-color-bg);
+    cursor: pointer;
+    transition: border-color var(--bt-duration-fast);
+  }
+  .bt-buy-panel__plan:has([data-purchase-option]:checked) {
+    border-color: var(--bt-color-primary);
+    background: var(--bt-color-primary-tint);
+  }
+  .bt-buy-panel__plan input { margin-top: 3px; accent-color: var(--bt-color-primary); }
+  .bt-buy-panel__plan-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .bt-buy-panel__plan-name { font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-medium); }
+  .bt-buy-panel__plan-price {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    font-variant-numeric: oldstyle-nums;
+  }
+
+  /* ── Shop Pay Installments banner ── */
+  .bt-buy-panel__payment-terms {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    text-align: center;
+  }
+  .bt-buy-panel__payment-terms:empty { display: none; }
   .bt-buy-panel__spinner { display: none; }
   .bt-buy-panel__atc-label { transition: opacity var(--bt-duration-fast); }
   .bt-buy-panel__actions [disabled] .bt-buy-panel__atc-label { opacity: 0.7; }
   @keyframes bt-buy-spin { to { transform: rotate(360deg); } }
   .bt-buy-panel__spinner svg { animation: bt-buy-spin 0.9s linear infinite; }
   @media (prefers-reduced-motion: reduce) { .bt-buy-panel__spinner svg { animation: none; } }
+
+  /* ── Gift card recipient form ── */
+  .bt-buy-panel__recipient {
+    margin: 0;
+    padding: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-2xs);
+  }
+  .bt-buy-panel__recipient-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-text);
+    cursor: pointer;
+  }
+  .bt-buy-panel__recipient-toggle input { accent-color: var(--bt-color-primary); }
+  .bt-buy-panel__recipient-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-xs);
+    padding-top: var(--bt-space-2xs);
+  }
+  .bt-buy-panel__recipient-fields[hidden] { display: none; }
+  .bt-buy-panel__recipient-field { display: flex; flex-direction: column; }
+  .bt-buy-panel__recipient-hint {
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    margin-top: var(--bt-space-3xs);
+  }
 
   /* ── Trust badges ── */
   .bt-buy-panel__trust {
@@ -188,14 +486,28 @@
       "type": "checkbox",
       "id": "show_dynamic_checkout",
       "label": "t:blocks.buy_buttons.settings.dynamic_checkout.label",
-      "default": false,
+      "default": true,
       "info": "t:blocks.buy_buttons.settings.dynamic_checkout.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_terms",
+      "label": "t:blocks.buy_buttons.settings.payment_terms.label",
+      "default": true,
+      "info": "t:blocks.buy_buttons.settings.payment_terms.info"
     },
     {
       "type": "checkbox",
       "id": "show_trust_badges",
       "label": "t:blocks.buy_buttons.settings.trust_badges.label",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gift_card_recipient_form",
+      "label": "t:blocks.buy_buttons.settings.gift_card_recipient.label",
+      "default": true,
+      "info": "t:blocks.buy_buttons.settings.gift_card_recipient.info"
     }
   ],
   "presets": [{ "name": "t:blocks.buy_buttons.name" }]

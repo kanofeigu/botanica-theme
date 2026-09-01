@@ -156,6 +156,19 @@
         },
         "show_price": {
           "label": "Product price"
+        },
+        "search_types": {
+          "label": "Search scope",
+          "info": "Controls which content types header and predictive search forms return. Visitors can refine the scope on the search results page.",
+          "options__1": {
+            "label": "Products only"
+          },
+          "options__2": {
+            "label": "Products and articles"
+          },
+          "options__3": {
+            "label": "Everything"
+          }
         }
       }
     },
@@ -343,6 +356,18 @@
       "settings": {
         "columns": {
           "label": "Columns"
+        },
+        "enable_country_selector": {
+          "label": "Country/region selector",
+          "info": "Hidden automatically when your store sells in a single market."
+        },
+        "enable_language_selector": {
+          "label": "Language selector",
+          "info": "Hidden automatically when your store has only one language."
+        },
+        "enable_follow_on_shop": {
+          "label": "Follow on Shop button",
+          "info": "Lets customers follow your store on the Shop app. Brand styling is provided by Shop."
         }
       },
       "blocks": {
@@ -541,6 +566,9 @@
       "settings": {
         "columns_desktop": {
           "label": "Columns"
+        },
+        "enable_filtering": {
+          "label": "Enable product filters"
         }
       }
     },
@@ -1504,8 +1532,16 @@
           "label": "Dynamic checkout buttons",
           "info": "Customers see their preferred payment option"
         },
+        "payment_terms": {
+          "label": "Shop Pay Installments banner",
+          "info": "Shows installment messaging for eligible products"
+        },
         "trust_badges": {
           "label": "Show trust badges"
+        },
+        "gift_card_recipient": {
+          "label": "Gift card recipient form",
+          "info": "Only shown on gift card products. Lets buyers add recipient email, name, message, and send date."
         }
       }
     },
@@ -1813,6 +1849,15 @@
         },
         "promo_link_label": {
           "label": "Promo link label"
+        }
+      }
+    },
+    "custom_liquid": {
+      "name": "Custom Liquid",
+      "settings": {
+        "custom_liquid": {
+          "label": "Custom Liquid",
+          "info": "Add app snippets, custom markup, or other Liquid code. Renders wherever this block is placed."
         }
       }
     },

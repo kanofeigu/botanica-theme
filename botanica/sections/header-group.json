@@ -37,23 +37,6 @@
     },
     "header": {
       "type": "header",
-      "blocks": {
-        "mega_promo_DPTRma": {
-          "type": "mega-promo",
-          "settings": {
-            "menu_item": "Shop Plants",
-            "flyout_item": "By Care Level",
-            "promo_image": "shopify://shop_images/golden-pothos.png",
-            "promo_heading": "Golden Pothos",
-            "promo_text": "The unkillable classic — trails beautifully and thrives on neglect. Our easiest plant to love.",
-            "promo_link": "/products/golden-pothos",
-            "promo_label": "Shop now"
-          }
-        }
-      },
-      "block_order": [
-        "mega_promo_DPTRma"
-      ],
       "settings": {
         "menu": "main-menu-1",
         "sticky_header": true

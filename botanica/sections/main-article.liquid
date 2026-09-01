@@ -111,6 +111,71 @@
       {%- endif -%}
     </footer>
 
+    {% comment %} ═══════ Comments ═══════ {% endcomment %}
+    {%- if blog.comments_enabled? -%}
+      <section class="bt-article__comments" id="comments" aria-label="{{ 'blogs.article.comments' | t: count: article.comments_count }}">
+        {%- if article.comments_count > 0 -%}
+          <h2 class="bt-article__comments-title">{{ 'blogs.article.comments' | t: count: article.comments_count }}</h2>
+          {%- paginate article.comments by 5 -%}
+            <ol class="bt-comment-list">
+              {%- for comment in article.comments -%}
+                <li class="bt-comment" id="comment-{{ comment.id }}">
+                  <p class="bt-comment__content">{{ comment.content }}</p>
+                  <footer class="bt-comment__meta">
+                    <span class="bt-comment__author">{{ comment.author }}</span>
+                    <time class="bt-comment__date" datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">{{ comment.created_at | date: '%B %d, %Y' }}</time>
+                  </footer>
+                </li>
+              {%- endfor -%}
+            </ol>
+            {% render 'pagination', paginate: paginate %}
+          {%- endpaginate -%}
+        {%- endif -%}
+
+        {%- form 'new_comment', article, class: 'bt-comment-form' -%}
+          <h2 class="bt-article__comments-title">{{ 'blogs.article.comment_form_title' | t }}</h2>
+
+          {%- if form.posted_successfully? -%}
+            <p class="bt-form-success" role="alert">
+              {%- if blog.moderated? -%}
+                {{ 'blogs.article.success_moderated' | t }}
+              {%- else -%}
+                {{ 'blogs.article.success' | t }}
+              {%- endif -%}
+            </p>
+          {%- endif -%}
+          {%- if form.errors -%}
+            <div class="bt-form-error" role="alert">
+              <ul class="bt-comment-form__errors">
+                {%- for field in form.errors -%}
+                  <li>{{ form.errors.translated_fields[field] }} {{ form.errors.messages[field] }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+
+          <div class="bt-comment-form__row">
+            <div class="bt-comment-form__field">
+              <label class="bt-label" for="CommentAuthor-{{ section.id }}">{{ 'blogs.article.name' | t }}</label>
+              <input type="text" id="CommentAuthor-{{ section.id }}" name="comment[author]" class="bt-input" value="{{ form.author }}" required autocomplete="name">
+            </div>
+            <div class="bt-comment-form__field">
+              <label class="bt-label" for="CommentEmail-{{ section.id }}">{{ 'blogs.article.email' | t }}</label>
+              <input type="email" id="CommentEmail-{{ section.id }}" name="comment[email]" class="bt-input" value="{{ form.email }}" required autocomplete="email">
+            </div>
+          </div>
+          <div class="bt-comment-form__field">
+            <label class="bt-label" for="CommentBody-{{ section.id }}">{{ 'blogs.article.message' | t }}</label>
+            <textarea id="CommentBody-{{ section.id }}" name="comment[body]" class="bt-textarea" rows="5" required>{{ form.body }}</textarea>
+          </div>
+          {%- if blog.moderated? -%}
+            <p class="bt-comment-form__moderated">{{ 'blogs.article.moderated' | t }}</p>
+          {%- endif -%}
+          <button type="submit" class="bt-btn bt-btn--primary">{{ 'blogs.article.post' | t }}</button>
+        {%- endform -%}
+      </section>
+    {%- endif -%}
+
     {% comment %} ═══════ SIDEBAR: Close main column ═══════ {% endcomment %}
     {%- if layout == 'sidebar' -%}
       </div>
@@ -297,6 +362,24 @@
   .bt-article__progress { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 1000; background: var(--bt-color-border-light); }
   .bt-article__progress-fill { height: 100%; background: var(--bt-color-primary); width: 0%; transition: width 100ms linear; }
 
+  /* Comments */
+  .bt-article__comments { margin-top: var(--bt-space-xl); padding-top: var(--bt-space-md); border-top: 1px solid var(--bt-color-border-light); }
+  .bt-article__comments-title {
+    font-family: var(--bt-font-heading); font-size: var(--bt-fs-h3); font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text); margin: 0 0 var(--bt-space-md);
+  }
+  .bt-comment-list { list-style: none; margin: 0 0 var(--bt-space-lg); padding: 0; display: flex; flex-direction: column; gap: var(--bt-space-md); }
+  .bt-comment { padding: var(--bt-space-sm); background: var(--bt-color-surface); border: 1px solid var(--bt-color-border-light); border-radius: var(--bt-radius-card); }
+  .bt-comment__content { margin: 0 0 var(--bt-space-2xs); font-size: var(--bt-fs-body); line-height: var(--bt-lh-relaxed); color: var(--bt-color-text); }
+  .bt-comment__meta { display: flex; align-items: baseline; gap: var(--bt-space-2xs); font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); }
+  .bt-comment__author { font-weight: var(--bt-fw-semibold); color: var(--bt-color-text); }
+  .bt-article__comments .bt-pagination { margin-bottom: var(--bt-space-lg); }
+  .bt-comment-form { display: flex; flex-direction: column; gap: var(--bt-space-sm); }
+  .bt-comment-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-space-sm); }
+  .bt-comment-form__errors { margin: 0; padding-inline-start: 1.25em; }
+  .bt-comment-form__moderated { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); margin: 0; }
+  .bt-comment-form .bt-btn { align-self: flex-start; }
+
   /* Siblings */
   .bt-article__siblings { background: var(--bt-color-surface); border-top: 1px solid var(--bt-color-border-light); }
   .bt-article__siblings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-space-lg); }
@@ -392,6 +475,7 @@
     .bt-article--magazine .bt-article__body blockquote { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; padding: var(--bt-space-md) var(--bt-space-sm); font-size: var(--bt-fs-h4); }
     .bt-article--magazine .bt-article__body img { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; }
     .bt-article__siblings-grid { grid-template-columns: 1fr; gap: 0; }
+    .bt-comment-form__row { grid-template-columns: 1fr; }
   }
 {% endstylesheet %}
 

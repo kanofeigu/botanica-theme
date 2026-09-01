@@ -80,7 +80,17 @@
         "one": "{{ count }} result for \"{{ terms }}\"",
         "other": "{{ count }} results for \"{{ terms }}\""
       },
-      "results": "Search results"
+      "results": "Search results",
+      "scope_label": "Search in",
+      "scope_product": "Products",
+      "scope_article": "Articles",
+      "scope_page": "Pages",
+      "scope_all": "Everything",
+      "object_types": {
+        "product": "Product",
+        "article": "Article",
+        "page": "Page"
+      }
     },
     "cart": {
       "view": "View cart ({{ count }})",
@@ -195,6 +205,8 @@
       "title": "Product title",
       "unit_price_separator": "per",
       "add_to_cart": "Add to cart",
+      "purchase_options": "Purchase options",
+      "one_time_purchase": "One-time purchase",
       "choose_options": "Choose options",
       "choose_product_options": "Choose options for {{ product_name }}",
       "description": "Description",
@@ -428,6 +440,7 @@
   "localization": {
     "country_label": "Country/region",
     "language_label": "Language",
+    "update": "Update",
     "update_language": "Update language",
     "update_country": "Update country/region",
     "search": "Search",

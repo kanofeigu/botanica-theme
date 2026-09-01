@@ -218,6 +218,20 @@
                   {%- if item.variant.title != 'Default Title' -%}
                     <p class="bt-cart-drawer__item-variant">{{ item.variant.title }}</p>
                   {%- endif -%}
+                  {%- if item.selling_plan_allocation != null -%}
+                    <p class="bt-cart-drawer__item-plan">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+                  {%- endif -%}
+                  {%- if item.line_level_discount_allocations.size > 0 -%}
+                    <ul class="bt-cart-drawer__item-discounts" role="list">
+                      {%- for allocation in item.line_level_discount_allocations -%}
+                        <li class="bt-cart-drawer__item-discount">
+                          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>
+                          {{ allocation.discount_application.title | escape_once }}
+                          <span>−{{ allocation.amount | money }}</span>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
                   <div class="bt-cart-drawer__item-qty-row">
                     {% render 'qty-stepper', item_key: item.key, quantity: item.quantity, product_title: item.product.title %}
                     <span class="bt-cart-drawer__item-price">
@@ -247,6 +261,19 @@
             <textarea id="CartDrawerNote" class="bt-input bt-cart-drawer__note-input" name="note" data-cart-gift-note rows="2" placeholder="{{ 'sections.cart.note_placeholder' | t | default: 'Special instructions…' }}">{{ cart.note }}</textarea>
           </div>
 
+          {% comment %} Cart-level discounts — subtotal stays cart.total_price {% endcomment %}
+          <ul class="bt-cart-drawer__discounts" role="list" data-cart-discounts{% if cart.cart_level_discount_applications.size == 0 %} hidden{% endif %}>
+            {%- for discount in cart.cart_level_discount_applications -%}
+              <li class="bt-cart-drawer__discount">
+                <span class="bt-cart-drawer__discount-label">
+                  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1h4l6 6-4 4-6-6V1Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/></svg>
+                  {{ discount.title | escape_once }}
+                </span>
+                <span>−{{ discount.total_allocated_amount | money }}</span>
+              </li>
+            {%- endfor -%}
+          </ul>
+
           <div class="bt-cart-drawer__total">
             <span>{{ cart_subtotal }}</span>
             <strong data-cart-subtotal>{{ cart.total_price | money }}</strong>
@@ -255,6 +282,11 @@
           <a href="{{ routes.cart_url }}" class="bt-btn bt-btn--secondary bt-btn--block bt-btn--sm" data-cart-view-btn{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart_view }}</a>
           <form action="{{ routes.cart_url }}" method="post" data-cart-checkout-form{% if cart.item_count == 0 %} hidden{% endif %}>
             <button type="submit" name="checkout" class="bt-btn bt-btn--primary bt-btn--block bt-btn--lg">{{ cart_checkout }}</button>
+            {% comment %} Accelerated checkout buttons — rendered by Shopify,
+              brand colors untouched. Hidden/shown with the form via JS. {% endcomment %}
+            <div class="bt-cart-drawer__additional-checkout">
+              {{ content_for_additional_checkout_buttons }}
+            </div>
           </form>
         </div>
       </div>
@@ -275,7 +307,7 @@
           autocapitalize="off"
           spellcheck="false"
         >
-        <input type="hidden" name="type" value="product">
+        <input type="hidden" name="type" value="{{ settings.search_types | default: 'product' }}">
         <button type="button" class="bt-header__icon-btn bt-predictive__close" data-predictive-close aria-label="{{ 'accessibility.close' | t }}">
           {% render 'icon-close' %}
         </button>

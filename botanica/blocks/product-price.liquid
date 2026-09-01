@@ -38,6 +38,20 @@
     </span>
     <span data-unit-price>{{ variant.unit_price | money }}</span>
   </span>
+  {%- if cart.taxes_included or cart.duties_included or shop.shipping_policy.body != blank -%}
+    <span class="bt-product-price__tax-caption">
+      {%- if cart.duties_included and cart.taxes_included -%}
+        {{ 'products.product.duties_and_taxes_included' | t }}
+      {%- elsif cart.duties_included -%}
+        {{ 'products.product.duties_included' | t }}
+      {%- elsif cart.taxes_included -%}
+        {{ 'products.product.taxes_included' | t }}
+      {%- endif -%}
+      {%- if shop.shipping_policy.body != blank -%}
+        {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+      {%- endif -%}
+    </span>
+  {%- endif -%}
 </div>
 
 <div aria-live="polite" class="bt-sr-only" data-price-live></div>
@@ -63,6 +77,16 @@
   .bt-product-price__unit-wrap {
     font-size: var(--bt-fs-body-xs);
     color: var(--bt-color-text-muted);
+  }
+  .bt-product-price__tax-caption {
+    flex-basis: 100%;
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-product-price__tax-caption a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 {% endstylesheet %}
 

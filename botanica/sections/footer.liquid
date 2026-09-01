@@ -42,7 +42,68 @@
         {%- endcase -%}
       {%- endfor -%}
     </div>
+
+    {% comment %} Country/region + language selectors. Hidden gracefully when the store
+         has a single market (available_countries.size <= 1) or a single language. {% endcomment %}
+    {%- liquid
+      assign show_country_selector = false
+      assign show_language_selector = false
+      if section.settings.enable_country_selector and localization.available_countries.size > 1
+        assign show_country_selector = true
+      endif
+      if section.settings.enable_language_selector and localization.available_languages.size > 1
+        assign show_language_selector = true
+      endif
+    -%}
+    {%- if show_country_selector or show_language_selector -%}
+      <div class="bt-footer__localization">
+        {%- form 'localization', id: 'FooterLocalizationForm', class: 'bt-localization' -%}
+          {%- if show_country_selector -%}
+            <div class="bt-localization__field">
+              <label class="bt-label" for="FooterCountrySelector">{{ 'localization.country_label' | t }}</label>
+              <select id="FooterCountrySelector" class="bt-select" name="country_code" data-localization-select>
+                {%- for country in localization.available_countries -%}
+                  <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+                    {{- country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endif -%}
+          {%- if show_language_selector -%}
+            <div class="bt-localization__field">
+              <label class="bt-label" for="FooterLanguageSelector">{{ 'localization.language_label' | t }}</label>
+              <select id="FooterLanguageSelector" class="bt-select" name="locale_code" data-localization-select>
+                {%- for language in localization.available_languages -%}
+                  <option value="{{ language.iso_code }}" lang="{{ language.iso_code }}"{% if language.iso_code == localization.language.iso_code %} selected{% endif %}>
+                    {{- language.endonym_name | capitalize -}}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endif -%}
+          <noscript>
+            <button type="submit" class="bt-btn bt-btn--outline bt-btn--sm">{{ 'localization.update' | t }}</button>
+          </noscript>
+        {%- endform -%}
+      </div>
+      <script>
+        (function () {
+          document.querySelectorAll('[data-localization-select]').forEach(function (select) {
+            select.addEventListener('change', function () {
+              if (select.form) select.form.submit();
+            });
+          });
+        })();
+      </script>
+    {%- endif -%}
+
     <div class="bt-footer__bottom">
+      {%- if section.settings.enable_follow_on_shop -%}
+        <div class="bt-footer__shop-follow">
+          {{ shop | login_button }}
+        </div>
+      {%- endif -%}
       <div class="bt-footer__social">
         {%- if settings.social_instagram_link != blank -%}
           <a href="{{ settings.social_instagram_link }}" class="bt-footer__social-link" target="_blank" rel="noopener" aria-label="{{ 'general.social.links.instagram' | t }}">{% render 'icon-instagram' %}</a>
@@ -91,6 +152,10 @@
   .bt-footer__form-row { display: flex; gap: var(--bt-space-2xs); }
   .bt-footer__input { min-width: 0; }
   .bt-footer__submit { flex-shrink: 0; }
+  .bt-footer__localization { margin-bottom: var(--bt-space-lg); }
+  .bt-localization { display: flex; flex-wrap: wrap; gap: var(--bt-space-sm); }
+  .bt-localization__field { flex: 0 1 260px; min-width: 200px; }
+  .bt-footer__shop-follow { display: flex; align-items: center; }
   .bt-footer__bottom { display: flex; flex-direction: column; align-items: center; gap: var(--bt-space-sm); padding-top: var(--bt-space-md); border-top: 1px solid var(--bt-color-border-light); }
   .bt-footer__social { display: flex; gap: var(--bt-space-xs); }
   .bt-footer__social-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: var(--bt-color-text-muted); border-radius: var(--bt-radius-sm); transition: color var(--bt-duration-fast), background var(--bt-duration-fast); }
@@ -106,7 +171,10 @@
 {% schema %}
 { "name": "t:sections.footer.name", "class": "section-footer", "settings": [
   { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
-  { "type": "select", "id": "column_count", "label": "t:sections.footer.settings.columns.label", "options": [{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"}], "default": "3" }
+  { "type": "select", "id": "column_count", "label": "t:sections.footer.settings.columns.label", "options": [{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"}], "default": "3" },
+  { "type": "checkbox", "id": "enable_country_selector", "label": "t:sections.footer.settings.enable_country_selector.label", "info": "t:sections.footer.settings.enable_country_selector.info", "default": true },
+  { "type": "checkbox", "id": "enable_language_selector", "label": "t:sections.footer.settings.enable_language_selector.label", "info": "t:sections.footer.settings.enable_language_selector.info", "default": true },
+  { "type": "checkbox", "id": "enable_follow_on_shop", "label": "t:sections.footer.settings.enable_follow_on_shop.label", "info": "t:sections.footer.settings.enable_follow_on_shop.info", "default": false }
 ], "blocks": [
   { "type": "brand", "name": "t:sections.footer.blocks.brand.name", "settings": [
     { "type": "text", "id": "tagline", "label": "t:sections.footer.blocks.brand.settings.tagline.label", "default": "Plants for real interiors" }

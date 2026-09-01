@@ -1,26 +1,27 @@
 {% comment %}
-  sections/featured-product.liquid — Featured single product section
-  Shows one product with image, title, price, and buy buttons.
+  sections/featured-product.liquid — Featured single product section.
+  Theme blocks + app blocks: the info column renders section blocks via
+  content_for "blocks" (same architecture as main-product). Blocks receive
+  the section product because `product` is assigned before rendering.
   All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
-  assign product_ref = section.settings.product
-  assign show_vendor = section.settings.show_vendor
-  assign show_price = section.settings.show_price
-  assign show_buy = section.settings.show_buy_button
+  assign product = section.settings.product
+  assign first_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
 -%}
-{%- if product_ref != blank -%}
+{%- if product != blank -%}
   <section class="bt-section bt-featured-product color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
     <div class="bt-container">
       <div class="bt-featured-product__grid">
         <div class="bt-featured-product__media">
-          {%- if product_ref.featured_media -%}
-            <a href="{{ product_ref.url }}" aria-label="{{ product_ref.title }}">
-              {{ product_ref.featured_media | image_url: width: 800 | image_tag:
+          {%- if product.featured_media -%}
+            <a href="{{ product.url }}" aria-label="{{ product.title }}">
+              {{ product.featured_media | image_url: width: 800 | image_tag:
                 loading: 'lazy',
                 widths: '400, 600, 800',
                 sizes: '(min-width: 990px) 50vw, 100vw',
-                alt: product_ref.featured_media.alt | default: product_ref.title
+                alt: product.featured_media.alt | default: product.title
               }}
             </a>
           {%- else -%}
@@ -28,41 +29,26 @@
           {%- endif -%}
         </div>
         <div class="bt-featured-product__info">
-          {%- if show_vendor -%}
-            <p class="bt-eyebrow">{{ product_ref.vendor }}</p>
-          {%- endif -%}
-          <h2 class="bt-featured-product__title">
-            <a href="{{ product_ref.url }}">{{ product_ref.title }}</a>
-          </h2>
-          {%- if show_price -%}
-            <div class="bt-featured-product__price">
-              {%- if product_ref.compare_at_price > product_ref.price -%}
-                <s>{{ product_ref.compare_at_price | money }}</s>
-                <span style="color:var(--bt-color-secondary)">{{ product_ref.price | money }}</span>
-              {%- else -%}
-                {{ product_ref.price | money }}
-              {%- endif -%}
-              {%- if product_ref.selected_or_first_available_variant.unit_price -%}
-                <small>{{ product_ref.selected_or_first_available_variant.unit_price | money }} / {{ 'products.product.unit_price_separator' | t }}</small>
-              {%- endif -%}
-            </div>
-          {%- endif -%}
-          {%- if section.settings.show_description and product_ref.description != blank -%}
-            <div class="bt-featured-product__desc">
-              {{ product_ref.description | strip_html | truncate: 200 }}
-            </div>
-          {%- endif -%}
-          <div class="bt-featured-product__actions">
-            {%- if show_buy -%}
-              <a href="{{ product_ref.url }}" class="bt-btn bt-btn--primary">
-                {{ 'products.product.view_product' | t }}
-              </a>
-            {%- endif -%}
-          </div>
+          {%- form 'product', product, id: product_form_id, class: 'bt-featured-product__form' -%}
+            <input type="hidden" name="id" value="{{ first_variant.id }}" data-variant-id>
+            <div class="bt-product__aria-live" aria-live="polite" role="status" data-aria-live></div>
+            {% content_for "blocks" %}
+          {%- endform -%}
         </div>
       </div>
     </div>
   </section>
+
+  <script src="{{ 'variant-selects.js' | asset_url }}" defer="defer"></script>
+  <script>
+    window.theme = window.theme || {};
+    window.theme.variantI18n = {
+      inStock: {{ 'products.product.inventory_in_stock' | t | json }},
+      soldOut: {{ 'products.product.sold_out' | t | json }},
+      unavailable: {{ 'products.product.unavailable' | t | json }},
+      addToCart: {{ 'products.product.add_to_cart' | t | json }}
+    };
+  </script>
 {%- endif -%}
 
 {% stylesheet %}
@@ -91,45 +77,24 @@
   .bt-featured-product__info {
     display: flex;
     flex-direction: column;
-    gap: var(--bt-space-sm);
+    gap: var(--bt-space-md);
     padding: var(--bt-space-md);
+    min-width: 0;
   }
-  .bt-featured-product__title {
-    font-family: var(--bt-font-heading);
-    font-size: var(--bt-fs-h2);
-    font-weight: var(--bt-fw-normal);
-    color: var(--bt-color-text);
-    margin: 0;
-  }
-  .bt-featured-product__title a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .bt-featured-product__title a:hover { color: var(--bt-color-primary); }
-  .bt-featured-product__price {
-    font-size: var(--bt-fs-h4);
-    font-weight: var(--bt-fw-semibold);
-    color: var(--bt-color-text);
+  .bt-featured-product__form {
     display: flex;
-    align-items: center;
-    gap: var(--bt-space-2xs);
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: var(--bt-space-md);
   }
-  .bt-featured-product__price s {
-    font-weight: var(--bt-fw-normal);
-    color: var(--bt-color-text-muted);
-    text-decoration-thickness: 1px;
-  }
-  .bt-featured-product__desc {
-    font-size: var(--bt-fs-body-sm);
-    color: var(--bt-color-text-muted);
-    max-width: 55ch;
-  }
-  .bt-featured-product__actions {
-    display: flex;
-    gap: var(--bt-space-sm);
-    align-items: center;
-    margin-top: var(--bt-space-sm);
+  .bt-featured-product__form > * { margin: 0; }
+  /* Let each block own its surface; neutralize the shopify-block wrapper */
+  .bt-featured-product__form .shopify-block { margin: 0; padding: 0; background: transparent; border: none; }
+  /* Screen-reader-only live region for variant/price announcements
+     (self-contained: main-product's stylesheet is not present here) */
+  .bt-featured-product .bt-product__aria-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  /* Blocks designed for the PDP info column run full-width here too */
+  .bt-featured-product__form .shopify-block .bt-product-price__current {
+    font-size: var(--bt-fs-h3);
   }
   @media (max-width: 749px) {
     .bt-featured-product__grid {
@@ -142,36 +107,27 @@
 {
   "name": "t:sections.featured_product.name",
   "tag": "section",
+  "blocks": [
+    { "type": "specimen-eyebrow" },
+    { "type": "product-title" },
+    { "type": "product-badges" },
+    { "type": "product-price" },
+    { "type": "product-rating" },
+    { "type": "variant-picker" },
+    { "type": "quantity-selector" },
+    { "type": "buy-buttons" },
+    { "type": "description" },
+    { "type": "product-description" },
+    { "type": "share" },
+    { "type": "custom-liquid" },
+    { "type": "@app" }
+  ],
   "settings": [
     { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     {
       "type": "product",
       "id": "product",
       "label": "t:sections.featured_product.settings.product.label"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_description",
-      "label": "t:sections.featured_product.settings.show_description.label",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_vendor",
-      "label": "t:sections.featured_product.settings.show_vendor.label",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_price",
-      "label": "t:sections.featured_product.settings.show_price.label",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_buy_button",
-      "label": "t:sections.featured_product.settings.show_buy_button.label",
-      "default": true
     },
     {
       "type": "range",
@@ -186,6 +142,17 @@
       "label": "t:sections.featured_product.settings.padding_bottom.label"
     }
   ],
-  "presets": [{ "name": "t:sections.featured_product.name" }]
+  "presets": [
+    {
+      "name": "t:sections.featured_product.name",
+      "blocks": [
+        { "type": "specimen-eyebrow" },
+        { "type": "product-title" },
+        { "type": "product-price" },
+        { "type": "variant-picker", "settings": { "picker_type": "swatch", "swatch_option_index": "1" } },
+        { "type": "buy-buttons", "settings": { "show_dynamic_checkout": true, "show_quantity": false, "show_cart_icon": false, "show_trust_badges": false } }
+      ]
+    }
+  ]
 }
 {% endschema %}

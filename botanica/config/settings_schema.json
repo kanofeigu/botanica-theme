@@ -330,6 +330,18 @@
         "id": "predictive_search_show_price",
         "label": "t:settings_schema.search.settings.show_price.label",
         "default": true
+      },
+      {
+        "type": "select",
+        "id": "search_types",
+        "label": "t:settings_schema.search.settings.search_types.label",
+        "info": "t:settings_schema.search.settings.search_types.info",
+        "options": [
+          { "value": "product", "label": "t:settings_schema.search.settings.search_types.options__1.label" },
+          { "value": "product,article", "label": "t:settings_schema.search.settings.search_types.options__2.label" },
+          { "value": "product,article,page", "label": "t:settings_schema.search.settings.search_types.options__3.label" }
+        ],
+        "default": "product"
       }
     ]
   },

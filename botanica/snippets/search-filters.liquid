@@ -1,0 +1,96 @@
+{% comment %}
+  snippets/search-filters.liquid — Native storefront filters for search results.
+  search.filters exposes the same filter drop API as collection.filters
+  (boolean / list → checkbox links, price_range → from/to inputs), so this
+  mirrors the sidebar groups in main-collection-product-grid.liquid.
+  Accepts:
+    filters   — array of filter drops (search.filters)
+    id_suffix — unique suffix for price input ids
+  Styles live in main-search.liquid's {% stylesheet %} (same class names as
+  the collection sidebar, scoped under .bt-search).
+  Zero Dawn code.
+{% endcomment %}
+{%- for filter in filters -%}
+  <details class="bt-filter-group" {% if filter.active_values.size > 0 or filter.type == 'price_range' %}open{% endif %} data-filter-group>
+    <summary class="bt-filter-group__summary bt-interactive">
+      <span>{{ filter.label }}</span>
+      <span class="bt-filter-group__summary-right">
+        {%- if filter.active_values.size > 0 -%}<span class="bt-filter-group__badge">{{ filter.active_values.size }}</span>{%- endif -%}
+        <svg class="bt-filter-group__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+    </summary>
+    <div class="bt-filter-group__content" data-filter-content>
+      <div class="bt-filter-group__values">
+        {%- case filter.type -%}
+          {%- when 'boolean' or 'list' -%}
+            {%- for value in filter.values -%}
+              <label class="bt-filter-checkbox bt-interactive{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                <input
+                  type="checkbox"
+                  name="{{ value.param_name }}"
+                  value="{{ value.value }}"
+                  {% if value.active %}checked{% endif %}
+                  {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                  data-url-to-add="{{ value.url_to_add | escape }}"
+                  data-url-to-remove="{{ value.url_to_remove | escape }}"
+                >
+                <span class="bt-filter-checkbox__indicator">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="bt-filter-checkbox__label">{{ value.label }}</span>
+                <span class="bt-filter-checkbox__count">{{ value.count }}</span>
+              </label>
+            {%- endfor -%}
+          {%- when 'price_range' -%}
+            {%- liquid
+              assign max_price = filter.range_max | divided_by: 100.0 | ceil
+              assign min_value = filter.min_value.value | default: 0 | divided_by: 100.0
+              assign max_value = filter.max_value.value | default: filter.range_max | divided_by: 100.0
+              if min_value < 0
+                assign min_value = 0
+              endif
+            -%}
+            <div class="bt-price-range">
+              <div class="bt-price-range__field">
+                <label class="bt-price-range__label" for="Filter-Price-GTE-{{ id_suffix }}">{{ 'collections.filters.from' | t }}</label>
+                <div class="bt-price-range__input-wrap">
+                  <span class="bt-price-range__currency">{{ cart.currency.symbol }}</span>
+                  <input
+                    class="bt-price-range__input"
+                    name="{{ filter.min_value.param_name }}"
+                    id="Filter-Price-GTE-{{ id_suffix }}"
+                    value="{% if min_value > 0 %}{{ min_value | round }}{% endif %}"
+                    type="number"
+                    inputmode="decimal"
+                    placeholder="0"
+                    min="0"
+                    max="{{ max_price }}"
+                    data-price-min
+                  >
+                </div>
+              </div>
+              <span class="bt-price-range__sep" aria-hidden="true">—</span>
+              <div class="bt-price-range__field">
+                <label class="bt-price-range__label" for="Filter-Price-LTE-{{ id_suffix }}">{{ 'collections.filters.to' | t }}</label>
+                <div class="bt-price-range__input-wrap">
+                  <span class="bt-price-range__currency">{{ cart.currency.symbol }}</span>
+                  <input
+                    class="bt-price-range__input"
+                    name="{{ filter.max_value.param_name }}"
+                    id="Filter-Price-LTE-{{ id_suffix }}"
+                    value="{% if max_value < filter.range_max %}{{ max_value | round }}{% endif %}"
+                    type="number"
+                    inputmode="decimal"
+                    placeholder="{{ max_price }}"
+                    min="0"
+                    max="{{ max_price }}"
+                    data-price-max
+                  >
+                </div>
+              </div>
+            </div>
+        {%- endcase -%}
+      </div>
+    </div>
+  </details>
+{%- endfor -%}

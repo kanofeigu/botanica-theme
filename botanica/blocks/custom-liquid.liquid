@@ -1,0 +1,33 @@
+{% comment %}
+  blocks/custom-liquid.liquid — Custom Liquid theme block.
+  Lets merchants drop arbitrary Liquid/HTML into any block-supporting
+  section (product main section, featured-product, etc.). Mirrors the
+  sections/custom-liquid.liquid section, at block level.
+  All-original. Zero Dawn code.
+{% endcomment %}
+{%- if block.settings.custom_liquid != blank -%}
+  <div class="bt-custom-liquid-block" {{ block.shopify_attributes }}>
+    {{ block.settings.custom_liquid }}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-custom-liquid-block { min-width: 0; }
+  .bt-custom-liquid-block > :first-child { margin-top: 0; }
+  .bt-custom-liquid-block > :last-child { margin-bottom: 0; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.custom_liquid.name",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:blocks.custom_liquid.settings.custom_liquid.label",
+      "info": "t:blocks.custom_liquid.settings.custom_liquid.info"
+    }
+  ],
+  "presets": [{ "name": "t:blocks.custom_liquid.name" }]
+}
+{% endschema %}

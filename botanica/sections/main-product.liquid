@@ -145,6 +145,56 @@
   </div>
 </section>
 
+{%- comment %} Product structured data (schema.org/Product) for rich results.
+  Lives alongside — not inside — the BreadcrumbList JSON-LD from
+  snippets/breadcrumbs.liquid. Offers array covers all variants. {% endcomment %}
+{%- if selected_product != blank -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": {{ selected_product.title | json }},
+      "url": {{ shop.url | append: selected_product.url | json }},
+      {%- if selected_product.images.size > 0 -%}
+        "image": [
+          {%- for image in selected_product.images limit: 5 -%}
+            {{ image | image_url: width: 1200 | json }}{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ],
+      {%- endif -%}
+      {%- if selected_product.description != blank -%}
+        "description": {{ selected_product.description | strip_html | strip_newlines | truncate: 500 | json }},
+      {%- endif -%}
+      {%- if first_variant.sku != blank -%}
+        "sku": {{ first_variant.sku | json }},
+      {%- endif -%}
+      {%- if selected_product.vendor != blank -%}
+        "brand": {
+          "@type": "Brand",
+          "name": {{ selected_product.vendor | json }}
+        },
+      {%- endif -%}
+      "offers": [
+        {%- for variant in selected_product.variants -%}
+          {
+            "@type": "Offer",
+            {%- if variant.sku != blank -%}
+              "sku": {{ variant.sku | json }},
+            {%- endif -%}
+            {%- unless variant.title == 'Default Title' -%}
+              "name": {{ variant.title | json }},
+            {%- endunless -%}
+            "url": {{ shop.url | append: selected_product.url | append: '?variant=' | append: variant.id | json }},
+            "priceCurrency": {{ cart.currency.iso_code | json }},
+            "price": {{ variant.price | divided_by: 100.0 | json }},
+            "availability": "{% if variant.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ]
+    }
+  </script>
+{%- endif -%}
+
 <script src="{{ 'gallery.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'variant-selects.js' | asset_url }}" defer="defer"></script>
 <script>
@@ -401,7 +451,7 @@
   {"type":"variant-picker","settings":{"picker_type":"swatch","swatch_option_index":"1"}},
   {"type":"size-guide-link"},
   {"type":"quantity-selector"},
-  {"type":"buy-buttons","settings":{"show_dynamic_checkout":false,"show_quantity":false,"show_cart_icon":false,"show_trust_badges":false}},
+  {"type":"buy-buttons","settings":{"show_dynamic_checkout":true,"show_quantity":false,"show_cart_icon":false,"show_trust_badges":false}},
   {"type":"care-icons"},
   {"type":"pickup-availability"},
   {"type":"editorial-quote"},

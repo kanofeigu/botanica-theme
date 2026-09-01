@@ -1,52 +1,453 @@
-{% comment %} main-search.liquid — Original search with predictive results and theme blocks. Zero Dawn code. {% endcomment %}
+{% comment %}
+  main-search.liquid — Search results with object-type scope tabs
+  (products / articles / pages / everything), native product filters
+  (search.filters, same filter drop API as collection.filters), and
+  object-type labels on non-product result cards. Zero Dawn code.
+{% endcomment %}
+{%- liquid
+  assign current_scope = 'product'
+  if search.performed and search.types.size > 0
+    assign current_scope = search.types | join: ','
+    if search.types.size == 3
+      assign current_scope = 'product,article,page'
+    endif
+  endif
+  assign searching_products = false
+  if current_scope contains 'product'
+    assign searching_products = true
+  endif
+
+  assign show_filters = false
+  if search.performed and section.settings.enable_filtering and searching_products and search.filters.size > 0
+    assign show_filters = true
+  endif
+
+  assign has_active_filters = false
+  assign active_filter_count = 0
+  if search.performed
+    for filter in search.filters
+      assign active_filter_count = active_filter_count | plus: filter.active_values.size
+      if filter.active_values.size > 0
+        assign has_active_filters = true
+      endif
+      if filter.type == 'price_range'
+        if filter.min_value.value > 0 or filter.max_value.value < filter.range_max
+          assign has_active_filters = true
+        endif
+      endif
+    endfor
+  endif
+-%}
 <div class="bt-search bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-h1 bt-text-center">{{ 'general.search.search' | t }}</h1>
     <form action="{{ routes.search_url }}" method="get" class="bt-search__form" role="search">
       <div class="bt-search__input-row">
         <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}" class="bt-input bt-search__input" aria-label="{{ 'general.search.search' | t }}" autocomplete="off" required>
-        <input type="hidden" name="type" value="product">
         <button type="submit" class="bt-btn bt-btn--primary">{% render 'icon-search' %}<span>{{ 'general.search.search' | t }}</span></button>
       </div>
+      <fieldset class="bt-search__scope">
+        <legend class="bt-sr-only">{{ 'general.search.scope_label' | t }}</legend>
+        {%- assign scope_keys = 'product|article|page|all' | split: '|' -%}
+        {%- for scope_key in scope_keys -%}
+          {%- liquid
+            assign scope_value = scope_key
+            if scope_key == 'all'
+              assign scope_value = 'product,article,page'
+            endif
+            assign scope_label_key = 'general.search.scope_' | append: scope_key
+          -%}
+          <label class="bt-search__scope-option">
+            <input type="radio" name="type" value="{{ scope_value }}" {% if current_scope == scope_value %}checked{% endif %}>
+            <span class="bt-search__scope-pill">{{ scope_label_key | t }}</span>
+          </label>
+        {%- endfor -%}
+      </fieldset>
     </form>
     {%- if search.performed -%}
       {%- paginate search.results by 24 -%}
-      <div class="bt-search__results">
-        <p class="bt-search__count" role="status">{{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}</p>
-        {%- if search.results.size > 0 -%}
-          <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
-            {%- for item in search.results -%}
-              {%- if item.object_type == 'product' -%}
-                {% render 'card-product', product: item, show_secondary_image: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
-              {%- else -%}
-                <div class="bt-card"><div class="bt-card__body"><h3 class="bt-card__title"><a href="{{ item.url }}">{{ item.title }}</a></h3><p class="bt-card__price">{{ item.content | strip_html | truncate: 120 }}</p></div></div>
+      <div class="bt-search__layout{% if show_filters %} bt-search__layout--filters{% endif %}">
+        {%- if show_filters -%}
+          <aside class="bt-search__sidebar" aria-label="{{ 'accessibility.filter' | t }}" data-sidebar data-search-filters>
+            <div class="bt-search__sidebar-header">
+              <h2 class="bt-search__sidebar-title">{{ 'collections.filters.title' | t }}</h2>
+              {%- if has_active_filters -%}
+                <a href="{{ routes.search_url }}?q={{ search.terms | url_encode }}&type={{ current_scope }}" class="bt-search__sidebar-clear bt-interactive">
+                  {{ 'collections.filters.clear_all' | t }}
+                </a>
               {%- endif -%}
-            {%- endfor -%}
-          </div>
-          {%- if paginate.pages > 1 -%}
-            <div class="bt-search__pagination">{% render 'pagination', paginate: paginate %}</div>
-          {%- endif -%}
-        {%- else -%}
-          <p class="bt-text-center">{{ 'general.search.no_results' | t }}</p>
+            </div>
+            {%- render 'search-filters', filters: search.filters, id_suffix: 'search' -%}
+          </aside>
         {%- endif -%}
+
+        <div class="bt-search__results">
+          <div class="bt-search__results-head">
+            <p class="bt-search__count" role="status">{{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}</p>
+            {%- if show_filters -%}
+              <button type="button" class="bt-search__filter-trigger bt-btn bt-btn--outline bt-btn--sm" data-filter-toggle aria-label="{{ 'collections.filters.title' | t }}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+                <span>{{ 'collections.filters.title' | t }}</span>
+                {%- if has_active_filters -%}<span class="bt-search__filter-count">{{ active_filter_count }}</span>{%- endif -%}
+              </button>
+            {%- endif -%}
+          </div>
+          {%- if search.results.size > 0 -%}
+            <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
+              {%- for item in search.results -%}
+                {%- if item.object_type == 'product' -%}
+                  {% render 'card-product', product: item, show_secondary_image: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
+                {%- else -%}
+                  {%- assign type_label_key = 'general.search.object_types.' | append: item.object_type -%}
+                  <div class="bt-card">
+                    <div class="bt-card__body">
+                      <span class="bt-search__type-badge">{{ type_label_key | t }}</span>
+                      <h3 class="bt-card__title"><a href="{{ item.url }}">{{ item.title }}</a></h3>
+                      <p class="bt-card__price">
+                        {%- if item.object_type == 'article' and item.excerpt != blank -%}
+                          {{ item.excerpt | strip_html | truncate: 120 }}
+                        {%- else -%}
+                          {{ item.content | strip_html | truncate: 120 }}
+                        {%- endif -%}
+                      </p>
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            {%- if paginate.pages > 1 -%}
+              <div class="bt-search__pagination">{% render 'pagination', paginate: paginate %}</div>
+            {%- endif -%}
+          {%- else -%}
+            <p class="bt-text-center">{{ 'general.search.no_results' | t }}</p>
+          {%- endif -%}
+        </div>
       </div>
       {%- endpaginate -%}
     {%- endif -%}
   </div>
 </div>
 
+{% javascript %}
+  (function () {
+    var root = document.querySelector('.bt-search');
+    if (!root || root._btSearchInit) return;
+    root._btSearchInit = true;
+
+    /* Mobile filter drawer */
+    var toggle = root.querySelector('[data-filter-toggle]');
+    var sidebar = root.querySelector('[data-sidebar]');
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', function () {
+        sidebar.classList.toggle('is-open');
+        document.body.classList.toggle('bt-filter-open');
+      });
+      document.addEventListener('click', function (e) {
+        if (!document.body.classList.contains('bt-filter-open')) return;
+        if (sidebar.contains(e.target) || toggle.contains(e.target)) return;
+        sidebar.classList.remove('is-open');
+        document.body.classList.remove('bt-filter-open');
+      });
+    }
+
+    /* Filter checkboxes → follow the URL Shopify computed for each value */
+    root.addEventListener('change', function (e) {
+      var input = e.target;
+      if (input.tagName !== 'INPUT' || input.type !== 'checkbox') return;
+      if (!input.closest('[data-search-filters]')) return;
+      var url = input.checked ? input.getAttribute('data-url-to-add') : input.getAttribute('data-url-to-remove');
+      if (url) window.location.href = url;
+    });
+
+    /* Price range → debounced navigation */
+    var priceTimer = null;
+    root.addEventListener('input', function (e) {
+      var inp = e.target;
+      if (!inp.hasAttribute('data-price-min') && !inp.hasAttribute('data-price-max')) return;
+      clearTimeout(priceTimer);
+      priceTimer = setTimeout(applyPriceRange, 500);
+    });
+    function applyPriceRange() {
+      var minInp = root.querySelector('[data-price-min]');
+      var maxInp = root.querySelector('[data-price-max]');
+      var minVal = minInp ? parseFloat(minInp.value) || 0 : 0;
+      var maxVal = maxInp ? parseFloat(maxInp.value) || 0 : 0;
+      var maxLimit = maxInp ? parseFloat(maxInp.getAttribute('max')) || 0 : 0;
+      var baseUrl = window.location.pathname + window.location.search;
+      baseUrl = baseUrl.replace(/[?&]filter\.v\.price\.gte=[^&]*/g, '').replace(/[?&]filter\.v\.price\.lte=[^&]*/g, '').replace(/&&/g, '&').replace(/\?&/, '?').replace(/[?&]$/, '');
+      var sep = baseUrl.indexOf('?') === -1 ? '?' : '&';
+      var url = baseUrl;
+      if (minVal > 0) { url += sep + 'filter.v.price.gte=' + minVal; sep = '&'; }
+      if (maxVal > 0 && maxVal < maxLimit) { url += sep + 'filter.v.price.lte=' + maxVal; }
+      if (url !== window.location.pathname + window.location.search) {
+        window.location.href = url;
+      }
+    }
+  })();
+{% endjavascript %}
+
 {% stylesheet %}
   .bt-search__form { max-width: 600px; margin-inline: auto; margin-bottom: var(--bt-space-xl); }
   .bt-search__input-row { display: flex; gap: var(--bt-space-xs); }
-  .bt-search__input { flex: 1; }
-  .bt-search__results { margin-top: var(--bt-space-lg); }
-  .bt-search__count { text-align: center; font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); margin-bottom: var(--bt-space-md); }
+
+  /* ── Object-type scope tabs (products / articles / pages / all) ── */
+  .bt-search__scope {
+    border: none;
+    padding: 0;
+    margin: var(--bt-space-xs) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--bt-space-3xs);
+  }
+  .bt-search__scope-option { position: relative; }
+  .bt-search__scope-option input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+  }
+  .bt-search__scope-pill {
+    display: block;
+    padding: 0.35em 1em;
+    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    border-radius: var(--bt-radius-pill);
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    cursor: pointer;
+    transition: all var(--bt-duration-fast);
+  }
+  .bt-search__scope-option:hover .bt-search__scope-pill { border-color: var(--bt-color-primary); color: var(--bt-color-primary); }
+  .bt-search__scope-option input:checked + .bt-search__scope-pill {
+    border-color: var(--bt-color-text);
+    color: var(--bt-color-text);
+    font-weight: var(--bt-fw-semibold);
+  }
+  .bt-search__scope-option input:focus-visible + .bt-search__scope-pill {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+
+  /* ── Layout with optional filter sidebar ── */
+  .bt-search__layout--filters {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: var(--bt-space-xl);
+    align-items: start;
+  }
+  .bt-search__results { min-width: 0; }
+  .bt-search__results-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-space-sm);
+    margin-bottom: var(--bt-space-md);
+  }
+  .bt-search__count { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); margin: 0; }
+  .bt-search__filter-trigger { display: none; }
+  .bt-search__filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+    border-radius: var(--bt-radius-pill);
+    font-size: 0.65rem;
+    font-weight: var(--bt-fw-bold);
+  }
+
+  /* ── Sidebar (mirrors collection sidebar pattern) ── */
+  .bt-search__sidebar { position: sticky; top: calc(var(--bt-space-md) + 80px); }
+  .bt-search__sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--bt-space-sm);
+    padding-bottom: var(--bt-space-xs);
+    border-bottom: 1px solid var(--bt-color-border-light);
+  }
+  .bt-search__sidebar-title {
+    margin: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body);
+    font-weight: var(--bt-fw-normal);
+  }
+  .bt-search__sidebar-clear {
+    font-size: 0.7rem;
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bt-color-text-muted);
+    text-decoration: none;
+    padding: 2px 8px;
+    border-radius: var(--bt-radius-pill);
+    transition: all var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-search__sidebar-clear:hover { color: var(--bt-color-secondary); background: var(--bt-color-secondary-tint); }
+
+  /* ── Filter groups (same class names as collection sidebar, scoped here) ── */
+  .bt-search .bt-filter-group { border-bottom: 1px solid var(--bt-color-border-light); padding-block: var(--bt-space-xs); }
+  .bt-search .bt-filter-group__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    list-style: none;
+    user-select: none;
+    padding-block: 4px;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-search .bt-filter-group__summary:hover { color: var(--bt-color-primary); }
+  .bt-search .bt-filter-group__summary::-webkit-details-marker { display: none; }
+  .bt-search .bt-filter-group__summary::-moz-list-marker { display: none; }
+  .bt-search .bt-filter-group__summary-right { display: inline-flex; align-items: center; gap: var(--bt-space-2xs); }
+  .bt-search .bt-filter-group__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+    border-radius: var(--bt-radius-pill);
+    font-size: 0.65rem;
+    font-weight: var(--bt-fw-bold);
+  }
+  .bt-search .bt-filter-group__chevron { transition: transform var(--bt-duration-base) var(--bt-ease-out); flex-shrink: 0; opacity: 0.5; }
+  .bt-search details[open] > .bt-filter-group__summary .bt-filter-group__chevron { transform: rotate(180deg); }
+  .bt-search .bt-filter-group__values {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: var(--bt-space-xs);
+    padding-bottom: var(--bt-space-3xs);
+  }
+  .bt-search .bt-filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    cursor: pointer;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text);
+    padding: 3px 0;
+    user-select: none;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-search .bt-filter-checkbox:hover { color: var(--bt-color-primary); }
+  .bt-search .bt-filter-checkbox.is-disabled { cursor: not-allowed; opacity: 0.45; }
+  .bt-search .bt-filter-checkbox.is-disabled:hover { color: var(--bt-color-text); }
+  .bt-search .bt-filter-checkbox input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .bt-search .bt-filter-checkbox__indicator {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--bt-color-border-medium);
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: var(--bt-color-bg);
+    transition: all var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-search .bt-filter-checkbox:hover .bt-filter-checkbox__indicator { border-color: var(--bt-color-primary); }
+  .bt-search .bt-filter-checkbox__indicator svg {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity var(--bt-duration-fast), transform var(--bt-duration-base) var(--bt-ease-out);
+    color: var(--bt-color-primary-contrast);
+  }
+  .bt-search .bt-filter-checkbox input:checked + .bt-filter-checkbox__indicator { background: var(--bt-color-primary); border-color: var(--bt-color-primary); }
+  .bt-search .bt-filter-checkbox input:checked + .bt-filter-checkbox__indicator svg { opacity: 1; transform: scale(1); }
+  .bt-search .bt-filter-checkbox input:focus-visible + .bt-filter-checkbox__indicator {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: 2px;
+  }
+  .bt-search .bt-filter-checkbox__label { flex: 1; }
+  .bt-search .bt-filter-checkbox__count { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); flex-shrink: 0; font-variant-numeric: oldstyle-nums; }
+  .bt-search .bt-price-range { display: flex; align-items: flex-end; gap: var(--bt-space-xs); margin-top: var(--bt-space-xs); }
+  .bt-search .bt-price-range__field { flex: 1; min-width: 0; }
+  .bt-search .bt-price-range__label { display: block; font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); margin-bottom: 4px; }
+  .bt-search .bt-price-range__input-wrap {
+    display: flex;
+    align-items: center;
+    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border);
+    border-radius: var(--bt-radius-sm);
+    overflow: hidden;
+  }
+  .bt-search .bt-price-range__currency {
+    padding: 0 8px;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    background: var(--bt-color-surface);
+    border-right: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border);
+    user-select: none;
+  }
+  .bt-search .bt-price-range__input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    outline: none;
+    background: var(--bt-color-bg);
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text);
+    -moz-appearance: textfield;
+  }
+  .bt-search .bt-price-range__input:focus,
+  .bt-search .bt-price-range__input:focus-visible { outline: none; }
+  .bt-search .bt-price-range__input::-webkit-inner-spin-button,
+  .bt-search .bt-price-range__input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .bt-search .bt-price-range__sep { padding-bottom: 8px; font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); flex-shrink: 0; }
+
+  /* ── Object-type badge on non-product result cards ── */
+  .bt-search__type-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    margin-bottom: var(--bt-space-2xs);
+    background: var(--bt-color-primary-tint);
+    color: var(--bt-color-primary);
+    border-radius: var(--bt-radius-pill);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
   .bt-search__pagination { margin-top: var(--bt-space-xl); display: flex; justify-content: center; }
+
+  @media (max-width: 989px) {
+    .bt-search__layout--filters { grid-template-columns: 1fr; }
+    .bt-search__filter-trigger { display: inline-flex; }
+    .bt-search__sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: var(--bt-z-overlay, 60);
+      width: min(320px, 85vw);
+      padding: var(--bt-space-md);
+      background: var(--bt-color-bg);
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform var(--bt-duration-base) var(--bt-ease-out);
+      box-shadow: var(--bt-shadow-lg);
+    }
+    .bt-search__sidebar.is-open { transform: translateX(0); }
+  }
 {% endstylesheet %}
 
 {% schema %}
 { "name": "t:sections.main_search.name", "settings": [
   { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+  { "type": "checkbox", "id": "enable_filtering", "label": "t:sections.main_search.settings.enable_filtering.label", "default": true },
   { "type": "range", "id": "columns_desktop", "min":2,"max":4,"step":1,"default":3,"label":"t:sections.main_search.settings.columns_desktop.label" }
 ] }
 {% endschema %}
