@@ -38,7 +38,7 @@
     "header": {
       "type": "header",
       "settings": {
-        "menu": "main-menu-1",
+        "menu": "main-menu",
         "sticky_header": true
       }
     }

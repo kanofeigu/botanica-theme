@@ -1,0 +1,17 @@
+# ─────────────────────────────────────────────────────────────
+# .shopifyignore — files excluded from `shopify theme push`
+# (does NOT affect ZIP packaging for Theme Store submission)
+# ─────────────────────────────────────────────────────────────
+
+# Demo-store seeding scripts / GraphQL — not part of the shipped theme
+demo/
+
+# Marketing/store-listing assets — only needed for the submission ZIP
+screenshots/
+listings/
+SUBMISSION.md
+release-notes.md
+
+# Demo-store settings: never overwrite the merchant's live settings on push.
+# (ZIP submission still includes this file; only theme push skips it.)
+config/settings_data.json

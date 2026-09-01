@@ -1,11 +1,17 @@
+/*
+ * NOTE: theme_documentation_url / theme_support_url currently point at the
+ * public GitHub repository as a placeholder. BEFORE launching on the Theme
+ * Store, replace both with the official documentation site and support
+ * channel (e.g. a dedicated help center / support email portal).
+ */
 [
   {
     "name": "theme_info",
     "theme_name": "Botanica",
     "theme_version": "3.0.0",
     "theme_author": "Botanica Studio",
-    "theme_documentation_url": "https://botanica-theme.com/docs",
-    "theme_support_url": "https://botanica-theme.com/support"
+    "theme_documentation_url": "https://github.com/kanofeigu/botanica-theme",
+    "theme_support_url": "https://github.com/kanofeigu/botanica-theme/issues"
   },
   {
     "name": "t:settings_schema.logo.name",

@@ -111,7 +111,6 @@
           "type": "complementary-products",
           "settings": {
             "heading": "Pairs well with…",
-            "collection": "all-plants",
             "max_products": 4
           }
         },

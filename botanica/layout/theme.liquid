@@ -258,7 +258,7 @@
           {% comment %} Gift note {% endcomment %}
           <div class="bt-cart-drawer__note">
             <label for="CartDrawerNote" class="bt-cart-drawer__note-label">{{ gift_note_label }}</label>
-            <textarea id="CartDrawerNote" class="bt-input bt-cart-drawer__note-input" name="note" data-cart-gift-note rows="2" placeholder="{{ 'sections.cart.note_placeholder' | t | default: 'Special instructions…' }}">{{ cart.note }}</textarea>
+            <textarea id="CartDrawerNote" class="bt-input bt-cart-drawer__note-input" name="note" data-cart-gift-note rows="2" placeholder="{{ 'sections.cart.note_placeholder' | t | default: 'Special instructions…' }}">{{ cart.note | escape }}</textarea>
           </div>
 
           {% comment %} Cart-level discounts — subtotal stays cart.total_price {% endcomment %}

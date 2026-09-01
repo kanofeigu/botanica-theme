@@ -169,7 +169,7 @@
                   rows="3"
                   placeholder="{{ 'sections.cart.note_placeholder' | t }}"
                   data-cart-note
-                >{{ cart.note }}</textarea>
+                >{{ cart.note | escape }}</textarea>
                 <div class="bt-cart__note-actions">
                   <button type="button" class="bt-btn bt-btn--outline bt-cart__note-save" data-note-save>{{ 'sections.cart.note_save' | t }}</button>
                   <span class="bt-cart__note-status" role="status" data-note-status hidden>{{ 'sections.cart.note_saved' | t }}</span>

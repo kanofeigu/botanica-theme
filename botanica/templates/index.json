@@ -28,9 +28,8 @@
         "heading": "Bring the outside in",
         "text": "Curated indoor plants selected for their beauty, resilience, and ability to transform any space into a living sanctuary.",
         "button_label": "Explore the collection",
-        "button_link": "/collections/all-plants",
-        "mobile_overlay": true,
-        "image": "shopify://shop_images/botanica-hero-home.png"
+        "button_link": "/collections/all",
+        "mobile_overlay": true
       }
     },
     "rich-text-intro": {
@@ -138,7 +137,6 @@
       "type": "featured-collection",
       "settings": {
         "heading": "Shop the collection",
-        "collection": "all-plants",
         "products_to_show": 8,
         "columns_desktop": "4"
       }
@@ -168,7 +166,7 @@
           "type": "button-group",
           "settings": {
             "label": "Explore care guides",
-            "link": "/blogs/plant-care-journal-1",
+            "link": "",
             "style": "outline"
           }
         }
@@ -181,7 +179,6 @@
       ],
       "settings": {
         "layout": "text_first",
-        "image": "shopify://shop_images/botanica-care-guide.png",
         "image_aspect": "4-5",
         "padding_top": 40,
         "padding_bottom": 40
@@ -282,7 +279,7 @@
           "type": "button-group",
           "settings": {
             "label": "View Monstera collection",
-            "link": "/collections/all-plants",
+            "link": "/collections/all",
             "style": "primary"
           }
         }
@@ -408,7 +405,7 @@
             "tag": "Photosynthesis",
             "title": "The secret life of chlorophyll: how plants turn sunlight into energy",
             "excerpt": "Photosynthesis is not just a chapter from your high school textbook — it is the engine driving every leaf in your home. Here is how it actually works.",
-            "link": "/blogs/plant-care-journal-1"
+            "link": ""
           }
         },
         "card_02": {
@@ -417,7 +414,7 @@
             "tag": "Mycology",
             "title": "Mycorrhizal networks: the hidden fungal internet beneath your potting mix",
             "excerpt": "Your plant's roots are not working alone. Trillions of fungi form a symbiotic web that delivers water and nutrients across the soil ecosystem.",
-            "link": "/blogs/plant-care-journal-1"
+            "link": ""
           }
         },
         "card_03": {
@@ -426,7 +423,7 @@
             "tag": "Evolution",
             "title": "The evolutionary arms race: how houseplants developed toxicity to survive",
             "excerpt": "Calcium oxalate crystals, latex sap, and alkaloids — the chemical weapons your peaceful-looking houseplants have been quietly perfecting for millions of years.",
-            "link": "/blogs/plant-care-journal-1"
+            "link": ""
           }
         }
       },
@@ -437,7 +434,6 @@
       ],
       "settings": {
         "heading": "The Field Journal",
-        "blog": "plant-care-journal-1",
         "use_manual": false,
         "show_excerpt": true,
         "show_date": true,

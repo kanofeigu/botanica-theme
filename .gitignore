@@ -24,3 +24,8 @@ Thumbs.db
 
 # Shopify
 shopify.app.toml
+# non-theme dev assets (kept locally, not tracked)
+botanica/demo/
+botanica/screenshots/
+botanica/listings/
+botanica/SUBMISSION.md
