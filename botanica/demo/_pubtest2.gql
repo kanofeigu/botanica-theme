@@ -1,5 +1,0 @@
-mutation {
-  publishablePublish(id: "gid://shopify/Product/8479298748607", input: {}) {
-    userErrors { field message }
-  }
-}
