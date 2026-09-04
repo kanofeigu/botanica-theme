@@ -3,19 +3,22 @@
 ════════════════════════════════════════════════════════════════════
   【站长配置说明 — 上线前必读】
 
-  ① 到 https://formspree.io 用邮箱 1364745992@qq.com 注册账号，
-     新建一个表单（New form），把表单 ID 替换下方 <form> 标签
-     action 里的 YOUR_FORM_ID（保留 https://formspree.io/f/ 前缀）。
+  本页表单使用 FormSubmit（https://formsubmit.co，免注册），
+  提交内容会转发到邮箱 1364745992@qq.com。
 
-  ② 表单包含文件上传（截图附件）。Formspree 免费档如不支持文件
-     上传，请升级付费档，或改用其他支持文件上传的表单服务
-     （替换 action 地址即可，表单字段保持不变）。
+  ① 首次激活（必做）：表单上线后，在页面上随便提交一条测试
+     信息 → QQ 邮箱会收到 FormSubmit 的激活邮件（可能在垃圾
+     邮件里）→ 点邮件里的 Activate 按钮，表单即永久生效。
+     未激活前提交的内容不会送达。
+
+  ② 表单已含文件上传（附件 ≤10MB）与蜜罐反垃圾，无需改动。
 
   ③ Shopify 主题商店要求支持渠道具备 auto-responder（自动回复）。
      请在 QQ 邮箱（1364745992@qq.com）设置 → 常规 中开启
      "自动回复"，内容可写："感谢您的来信，我们会在 2 个工作日内回复。"
 
-  ④ 替换 YOUR_FORM_ID 后无需改动本页其他内容。
+  ④ 可选：激活邮件里会附赠一个随机字符串别名，用它替换下方
+     action 里的邮箱地址可避免邮箱被爬虫收集（非必须）。
 
   注意：本注释仅供站长查看，不会显示在页面上。
 ════════════════════════════════════════════════════════════════════
@@ -80,7 +83,12 @@
       <h2>Contact us</h2>
       <p>Fill in the form and we'll get back to you by email. The more detail you include — and a screenshot or two — the faster we can help.</p>
 
-      <form class="support-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" enctype="multipart/form-data">
+      <form class="support-form" action="https://formsubmit.co/1364745992@qq.com" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Botanica theme support request">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://kanofeigu.github.io/botanica-theme/thanks.html">
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
         <div class="form-row">
           <div class="form-field">
             <label for="support-name">Name <span class="required">*</span></label>
