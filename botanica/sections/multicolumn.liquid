@@ -1,13 +1,18 @@
 {% comment %}
   sections/multicolumn.liquid — Multi-column section
+  Two styles:
+    'editorial' (default) — specimen-index columns: oversized serif ordinal
+      (01 / 02 / 03) over a hairline top rule, left-aligned, wide gutters.
+    'classic' — the original centered column look.
   Configurable 2-4 column grid. Each column = one block.
   All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
   assign heading = section.settings.heading
   assign columns = section.settings.columns_desktop | default: 3
+  assign column_style = section.settings.style | default: 'editorial'
 -%}
-<section class="bt-section bt-multicolumn color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-section bt-multicolumn bt-multicolumn--{{ column_style }} color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     {%- if heading != blank -%}
       <h2 class="bt-multicolumn__heading">{{ heading | escape }}</h2>
@@ -15,6 +20,9 @@
     <div class="bt-multicolumn__grid bt-multicolumn__grid--{{ columns }}-col"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
       {%- for block in section.blocks -%}
         <div class="bt-multicolumn__item" {{ block.shopify_attributes }}{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>
+          {%- if column_style == 'editorial' -%}
+            <span class="bt-multicolumn__num" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+          {%- endif -%}
           {%- if block.settings.image != blank -%}
             <div class="bt-multicolumn__media">
               {{ block.settings.image | image_url: width: 400 | image_tag:
@@ -94,6 +102,43 @@
     margin: 0;
     max-width: 35ch;
   }
+
+  /* ── Editorial style (default): specimen-index columns ──
+     Oversized serif ordinal above a hairline top rule, left-aligned,
+     generous gutters. */
+  .bt-multicolumn--editorial .bt-multicolumn__heading {
+    text-align: left;
+    margin-bottom: var(--bt-space-xl);
+  }
+  .bt-multicolumn--editorial .bt-multicolumn__grid {
+    column-gap: var(--bt-space-xl);
+    row-gap: var(--bt-space-2xl);
+  }
+  .bt-multicolumn--editorial .bt-multicolumn__item {
+    align-items: flex-start;
+    text-align: left;
+    gap: var(--bt-space-xs);
+    padding-top: var(--bt-space-md);
+    border-top: 1px solid var(--bt-hairline);
+  }
+  .bt-multicolumn__num {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-display-md);
+    line-height: 1;
+    letter-spacing: var(--bt-ls-display);
+    color: var(--bt-color-text-muted);
+    font-variant-numeric: oldstyle-nums;
+  }
+  .bt-multicolumn--editorial .bt-multicolumn__media {
+    margin-top: var(--bt-space-2xs);
+  }
+  .bt-multicolumn--editorial .bt-multicolumn__title {
+    font-size: var(--bt-fs-h3);
+  }
+  .bt-multicolumn--editorial .bt-multicolumn__text {
+    max-width: none;
+  }
+
   @media (max-width: 749px) {
     .bt-multicolumn__grid--3-col, .bt-multicolumn__grid--4-col {
       grid-template-columns: repeat(2, 1fr);
@@ -147,6 +192,16 @@
   ],
   "settings": [
     { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:sections.multicolumn.settings.style.label",
+      "options": [
+        { "value": "editorial", "label": "t:sections.multicolumn.settings.style.options__1.label" },
+        { "value": "classic", "label": "t:sections.multicolumn.settings.style.options__2.label" }
+      ],
+      "default": "editorial"
+    },
     {
       "type": "text",
       "id": "heading",

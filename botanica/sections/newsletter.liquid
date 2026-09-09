@@ -1,9 +1,16 @@
 {% comment %}
   sections/newsletter.liquid — Email newsletter signup section
+  Two layouts:
+    'statement' (default) — full-width dark band (scheme-3 by default):
+      oversized centered serif headline, underline-style input row.
+    'card' — the original centered card on the section surface.
   Native Shopify form with customizable heading/description.
   All-original. Zero Dawn code.
 {% endcomment %}
-<section class="bt-section bt-newsletter color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+{%- liquid
+  assign layout = section.settings.layout | default: 'statement'
+-%}
+<section class="bt-section bt-newsletter bt-newsletter--{{ layout }} color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     <div class="bt-newsletter__inner">
       {%- if section.settings.heading != blank -%}
@@ -61,14 +68,6 @@
 </section>
 
 {% stylesheet %}
-  .bt-newsletter__inner {
-    max-width: 560px;
-    margin: 0 auto;
-    text-align: center;
-    padding: var(--bt-space-xl) var(--bt-space-md);
-    background: var(--bt-color-surface);
-    border-radius: var(--bt-radius-card);
-  }
   .bt-newsletter__heading {
     font-family: var(--bt-font-heading);
     font-size: var(--bt-fs-h2);
@@ -100,8 +99,65 @@
     color: var(--bt-color-primary);
     font-weight: var(--bt-fw-medium);
   }
+
+  /* ── Card layout (original): centered card on the section surface ── */
+  .bt-newsletter--card .bt-newsletter__inner {
+    max-width: 560px;
+    margin: 0 auto;
+    text-align: center;
+    padding: var(--bt-space-xl) var(--bt-space-md);
+    background: var(--bt-color-surface);
+    border-radius: var(--bt-radius-card);
+  }
+
+  /* ── Statement layout (default): full-width band, oversized centered
+     serif headline, underline input. Colors come entirely from the
+     section's color scheme (deep green scheme-3 by default). ── */
+  .bt-newsletter--statement .bt-newsletter__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+    padding: var(--bt-space-xl) 0;
+  }
+  .bt-newsletter--statement .bt-newsletter__heading {
+    font-size: var(--bt-fs-display-lg);
+    line-height: var(--bt-lh-display-lg);
+    letter-spacing: var(--bt-ls-display);
+    max-width: 16ch;
+    margin: 0 auto var(--bt-space-sm);
+    text-wrap: balance;
+  }
+  .bt-newsletter--statement .bt-newsletter__desc {
+    font-size: var(--bt-fs-body);
+    max-width: 46ch;
+    margin: 0 auto var(--bt-space-lg);
+  }
+  .bt-newsletter--statement .bt-newsletter__fields {
+    max-width: 520px;
+    margin: 0 auto;
+    gap: var(--bt-space-sm);
+    align-items: flex-end;
+  }
+  .bt-newsletter--statement .bt-newsletter__input {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--bt-color-border-medium);
+    border-radius: 0;
+    padding-inline: 0.25em;
+  }
+  .bt-newsletter--statement .bt-newsletter__input:focus {
+    border-color: transparent;
+    border-bottom-color: var(--bt-color-text);
+    box-shadow: none;
+  }
+  .bt-newsletter--statement .bt-newsletter__input::placeholder {
+    color: var(--bt-color-text-muted);
+    opacity: 0.8;
+  }
+
   @media (max-width: 479px) {
     .bt-newsletter__fields { flex-direction: column; }
+    .bt-newsletter--statement .bt-newsletter__fields { align-items: stretch; }
   }
 {% endstylesheet %}
 
@@ -110,7 +166,17 @@
   "name": "t:sections.newsletter.name",
   "tag": "section",
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-3" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.newsletter.settings.layout.label",
+      "options": [
+        { "value": "statement", "label": "t:sections.newsletter.settings.layout.options__1.label" },
+        { "value": "card", "label": "t:sections.newsletter.settings.layout.options__2.label" }
+      ],
+      "default": "statement"
+    },
     {
       "type": "text",
       "id": "heading",

@@ -8,6 +8,7 @@
   assign heading = section.settings.heading
   assign products_to_show = section.settings.products_to_show | default: 4
   assign columns = section.settings.columns_desktop | default: 3
+  assign layout = section.settings.layout | default: 'editorial'
 -%}
 {%- if collection != blank -%}
   <section class="bt-section bt-featured-collection bt-dappled-light color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
@@ -20,16 +21,16 @@
           </a>
         </div>
       {%- endif -%}
-      <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col{% if section.settings.mobile_swipe %} bt-featured-collection__grid--swipe-mobile{% endif %}"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
+      <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col bt-featured-collection__grid--{{ layout }}{% if section.settings.mobile_swipe %} bt-featured-collection__grid--swipe-mobile{% endif %}"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
         {%- for product in collection.products limit: products_to_show -%}
           {%- if forloop.index <= 4 -%}
-            <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame, loading: 'eager', fetchpriority: 'high' -%}</div>
+            <div{% if forloop.first %} class="bt-featured-collection__feature"{% endif %}{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame, loading: 'eager', fetchpriority: 'high' -%}</div>
           {%- else -%}
             <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame -%}</div>
           {%- endif -%}
         {%- else -%}
           {%- for i in (1..4) -%}
-            <div class="bt-card bt-card--placeholder">
+            <div class="bt-card bt-card--placeholder{% if forloop.first %} bt-featured-collection__feature{% endif %}">
               <div class="bt-card__media">{{ 'product-' | append: i | placeholder_svg_tag: 'bt-card__placeholder' }}</div>
               <div class="bt-card__body">
                 <h3 class="bt-card__title">{{ 'products.product.title' | t }}</h3>
@@ -73,6 +74,26 @@
   .bt-featured-collection__grid--2-col { grid-template-columns: repeat(2, 1fr); }
   .bt-featured-collection__grid--3-col { grid-template-columns: repeat(3, 1fr); }
   .bt-featured-collection__grid--4-col { grid-template-columns: repeat(4, 1fr); }
+
+  /* ── Editorial layout (default): the first product becomes an oversized
+     feature card spanning 2×2 cells of the uniform grid — asymmetric
+     magazine spread. Bigger title/price match the scale. ── */
+  @media (min-width: 750px) {
+    .bt-featured-collection__grid--editorial .bt-featured-collection__feature {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    .bt-featured-collection__grid--editorial .bt-featured-collection__feature .bt-card__body {
+      padding: var(--bt-space-md);
+      gap: var(--bt-space-2xs);
+    }
+    .bt-featured-collection__grid--editorial .bt-featured-collection__feature .bt-card__title {
+      font-size: var(--bt-fs-h3);
+    }
+    .bt-featured-collection__grid--editorial .bt-featured-collection__feature .bt-card__price {
+      font-size: var(--bt-fs-body);
+    }
+  }
   @media (max-width: 749px) {
     /* Mobile default: a fixed two-up grid with tightened gutters, whatever
        the desktop column count. */
@@ -80,6 +101,15 @@
     .bt-featured-collection__grid--3-col,
     .bt-featured-collection__grid--4-col { grid-template-columns: repeat(2, 1fr); }
     .bt-featured-collection__grid { gap: var(--bt-space-xs); }
+
+    /* Editorial on mobile: the feature card takes the full row of the
+       two-up grid; in swipe mode it becomes a wider leading slide. */
+    .bt-featured-collection__grid--editorial .bt-featured-collection__feature {
+      grid-column: 1 / -1;
+    }
+    .bt-featured-collection__grid--editorial .bt-featured-collection__feature .bt-card__title {
+      font-size: var(--bt-fs-h3);
+    }
 
     /* Mobile swipe (opt-in): cards become a snap-scrolling row, second
        card peeks in */
@@ -100,6 +130,9 @@
       flex: 0 0 68%;
       scroll-snap-align: start;
     }
+    .bt-featured-collection__grid--swipe-mobile > .bt-featured-collection__feature {
+      flex-basis: 84%;
+    }
   }
 {% endstylesheet %}
 
@@ -109,6 +142,16 @@
   "tag": "section",
   "settings": [
     { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.featured_collection.settings.layout.label",
+      "options": [
+        { "value": "editorial", "label": "t:sections.featured_collection.settings.layout.options__1.label" },
+        { "value": "uniform", "label": "t:sections.featured_collection.settings.layout.options__2.label" }
+      ],
+      "default": "editorial"
+    },
     {
       "type": "text",
       "id": "heading",

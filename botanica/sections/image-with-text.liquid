@@ -1,23 +1,31 @@
 {% comment %}
   sections/image-with-text.liquid — Image + text section
-  Configurable layout (image left/right), aspect ratio, content via blocks.
-  All-original. Zero Dawn code.
+  Layouts:
+    'overlap' (default) — editorial offset: the text card slides ~12% over
+      the image edge and floats on a shadow; the image can wear the
+      herbarium specimen frame (double hairline mat).
+    'image_left' / 'image_right' / 'text_first' — the original side-by-side.
+  Content via blocks. All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
   assign image = section.settings.image
-  assign layout = section.settings.layout | default: 'image_left'
+  assign layout = section.settings.layout | default: 'overlap'
   assign aspect = section.settings.image_aspect | default: '4-5'
   assign parts = aspect | split: '-'
   assign aspect_style = parts[0] | append: ' / ' | append: parts[1]
+  assign framed = false
+  if layout == 'overlap' and section.settings.enable_specimen_frame
+    assign framed = true
+  endif
 -%}
 <section
-    class="bt-section bt-image-text color-{{ section.settings.color_scheme }}"
+    class="bt-section bt-image-text bt-image-text--{{ layout }} color-{{ section.settings.color_scheme }}"
     {{ section.shopify_attributes }}
     style="--bt-iwt-padding-top: {{ section.settings.padding_top }}px; --bt-iwt-padding-bottom: {{ section.settings.padding_bottom }}px; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
   >
   <div class="bt-container">
     <div class="bt-image-text__grid bt-image-text__grid--{{ layout }}"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
-      <div class="bt-image-text__media" style="--bt-media-aspect: {{ aspect_style }}"{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>
+      <div class="bt-image-text__media{% if framed %} bt-image-text__media--framed{% endif %}" style="--bt-media-aspect: {{ aspect_style }}"{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>
         {%- if image != blank -%}
           {{ image | image_url: width: 800 | image_tag:
             loading: 'lazy',
@@ -77,12 +85,69 @@
     gap: var(--bt-space-sm);
     padding: var(--bt-space-md);
   }
+
+  /* ── Overlap layout (default): the text card slides ~12% over the image
+     edge and floats on a deep shadow; vertical offset comes from the card
+     centering against the taller framed image. ── */
+  @media (min-width: 750px) {
+    .bt-image-text__grid--overlap {
+      grid-template-columns: repeat(12, 1fr);
+      gap: 0 var(--bt-grid-gap);
+      align-items: stretch;
+    }
+    .bt-image-text__grid--overlap .bt-image-text__media {
+      grid-column: 1 / 8;
+      grid-row: 1;
+    }
+    .bt-image-text__grid--overlap .bt-image-text__content {
+      grid-column: 7 / 13;
+      grid-row: 1;
+      align-self: center;
+      position: relative;
+      z-index: 1;
+      margin-block: var(--bt-space-xl);
+      padding: var(--bt-space-xl);
+      gap: var(--bt-space-md);
+      background: var(--bt-color-surface-raised, var(--bt-color-surface));
+      border: 1px solid var(--bt-hairline);
+      border-radius: var(--bt-radius-card);
+      box-shadow: var(--bt-shadow-lg);
+    }
+  }
+  /* Specimen frame: paper mat + outer hairline + inner image hairline,
+     same mount language as the hero plate. */
+  .bt-image-text__media--framed {
+    --bt-iwt-frame-pad: clamp(8px, 0.9vw, 12px);
+    padding: var(--bt-iwt-frame-pad);
+    border: 1px solid var(--bt-hairline);
+    border-radius: 0;
+    background: var(--bt-color-surface);
+    overflow: visible;
+  }
+  .bt-image-text__media--framed img,
+  .bt-image-text__media--framed .bt-image-text__placeholder {
+    border: 1px solid var(--bt-hairline);
+  }
+  .bt-image-text__media--framed img {
+    width: 100%;
+    height: auto;
+  }
+
   @media (max-width: 749px) {
     .bt-image-text__grid {
       grid-template-columns: 1fr;
     }
     .bt-image-text__grid--image_right .bt-image-text__media { order: 0; }
     .bt-image-text__content { padding: var(--bt-space-md) 0; }
+    /* Overlap on mobile: single column, no offset — the card simply sits
+       below the framed image, still raised. */
+    .bt-image-text__grid--overlap .bt-image-text__content {
+      padding: var(--bt-space-md);
+      background: var(--bt-color-surface-raised, var(--bt-color-surface));
+      border: 1px solid var(--bt-hairline);
+      border-radius: var(--bt-radius-card);
+      box-shadow: var(--bt-shadow-md);
+    }
   }
 {% endstylesheet %}
 
@@ -105,9 +170,17 @@
       "options": [
         { "value": "image_left", "label": "t:sections.image_with_text.settings.layout.options__1.label" },
         { "value": "image_right", "label": "t:sections.image_with_text.settings.layout.options__2.label" },
-        { "value": "text_first", "label": "t:sections.image_with_text.settings.layout.options__3.label" }
+        { "value": "text_first", "label": "t:sections.image_with_text.settings.layout.options__3.label" },
+        { "value": "overlap", "label": "t:sections.image_with_text.settings.layout.options__4.label" }
       ],
-      "default": "image_left"
+      "default": "overlap"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_specimen_frame",
+      "label": "t:sections.image_with_text.settings.enable_specimen_frame.label",
+      "info": "t:sections.image_with_text.settings.enable_specimen_frame.info",
+      "default": true
     },
     {
       "type": "select",

@@ -1,48 +1,108 @@
 {% comment %}
-  sections/collection-list.liquid — Collection list grid
-  Merchants select up to 12 collections. Renders as 2-4 column grid with images.
+  sections/collection-list.liquid — Collection list
+  Two layouts:
+    'numbered' (default) — editorial index: left column of oversized serif
+      rows (01 / collection name / product count, hairline-separated); right
+      column is a sticky specimen frame that swaps to the hovered/focused
+      collection's image. Pure CSS (:has), no scroll hijacking; every row
+      carries a small thumb that shows on mobile and whenever :has is
+      unsupported.
+    'grid' — the original 2–4 column image grid.
   All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
   assign heading = section.settings.heading
+  assign layout = section.settings.layout | default: 'numbered'
   assign columns = section.settings.columns_desktop | default: 3
   assign collections_per_page = section.settings.collections_per_page | default: 6
   assign show_count = section.settings.show_product_count | default: false
 -%}
 {%- if section.settings.collections != blank -%}
-  <section class="bt-section bt-collection-list color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  <section class="bt-section bt-collection-list bt-collection-list--{{ layout }} color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
     <div class="bt-container">
       {%- if heading != blank -%}
         <h2 class="bt-collection-list__heading">{{ heading | escape }}</h2>
       {%- endif -%}
-      <div class="bt-collection-list__grid bt-collection-list__grid--{{ columns }}-col">
-        {%- for collection in section.settings.collections limit: collections_per_page -%}
-          <div class="bt-collection-card">
-            <a href="{{ collection.url }}" class="bt-collection-card__link">
-              <div class="bt-collection-card__media">
-                {%- if collection.featured_image -%}
-                  {{ collection.featured_image | image_url: width: 600 | image_tag:
-                    loading: 'lazy',
-                    widths: '300, 400, 500, 600',
-                    sizes: '(min-width: 990px) 33vw, 50vw',
-                    alt: collection.title
-                  }}
-                {%- else -%}
-                  {{ 'collection-1' | placeholder_svg_tag: 'bt-collection-card__placeholder' }}
-                {%- endif -%}
-              </div>
-              <div class="bt-collection-card__body">
-                <h3 class="bt-collection-card__title">{{ collection.title }}</h3>
-                {%- if show_count and collection.all_products_count > 0 -%}
-                  <span class="bt-collection-card__count">
-                    {{ 'collections.collection.product_count' | t: count: collection.all_products_count }}
+
+      {%- if layout == 'numbered' -%}
+        <div class="bt-collection-list__numbered">
+          <ol class="bt-collection-list__index" role="list">
+            {%- for collection in section.settings.collections limit: collections_per_page -%}
+              {%- assign index_number = forloop.index | prepend: '0' | slice: -2, 2 -%}
+              <li class="bt-collection-list__item">
+                <a href="{{ collection.url }}" class="bt-collection-list__row">
+                  <span class="bt-collection-list__num" aria-hidden="true">{{ index_number }}</span>
+                  <span class="bt-collection-list__name">{{ collection.title }}</span>
+                  {%- if show_count and collection.all_products_count > 0 -%}
+                    <span class="bt-collection-list__count bt-micro-label">
+                      {{ 'collections.collection.product_count' | t: count: collection.all_products_count }}
+                    </span>
+                  {%- endif -%}
+                  <span class="bt-collection-list__thumb" aria-hidden="true">
+                    {%- if collection.featured_image -%}
+                      {{ collection.featured_image | image_url: width: 200 | image_tag:
+                        loading: 'lazy',
+                        widths: '100, 200',
+                        sizes: '64px',
+                        alt: ''
+                      }}
+                    {%- else -%}
+                      {{ 'collection-1' | placeholder_svg_tag: 'bt-collection-list__thumb-placeholder' }}
+                    {%- endif -%}
                   </span>
-                {%- endif -%}
-              </div>
-            </a>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ol>
+          <div class="bt-collection-list__stage" aria-hidden="true">
+            <div class="bt-collection-list__stage-inner">
+              {%- for collection in section.settings.collections limit: collections_per_page -%}
+                <div class="bt-collection-list__stage-media">
+                  {%- if collection.featured_image -%}
+                    {{ collection.featured_image | image_url: width: 800 | image_tag:
+                      loading: 'lazy',
+                      widths: '400, 600, 800',
+                      sizes: '(min-width: 990px) 40vw, 100vw',
+                      alt: ''
+                    }}
+                  {%- else -%}
+                    {{ 'collection-1' | placeholder_svg_tag: 'bt-collection-list__stage-placeholder' }}
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            </div>
           </div>
-        {%- endfor -%}
-      </div>
+        </div>
+      {%- else -%}
+        <div class="bt-collection-list__grid bt-collection-list__grid--{{ columns }}-col">
+          {%- for collection in section.settings.collections limit: collections_per_page -%}
+            <div class="bt-collection-card">
+              <a href="{{ collection.url }}" class="bt-collection-card__link">
+                <div class="bt-collection-card__media">
+                  {%- if collection.featured_image -%}
+                    {{ collection.featured_image | image_url: width: 600 | image_tag:
+                      loading: 'lazy',
+                      widths: '300, 400, 500, 600',
+                      sizes: '(min-width: 990px) 33vw, 50vw',
+                      alt: collection.title
+                    }}
+                  {%- else -%}
+                    {{ 'collection-1' | placeholder_svg_tag: 'bt-collection-card__placeholder' }}
+                  {%- endif -%}
+                </div>
+                <div class="bt-collection-card__body">
+                  <h3 class="bt-collection-card__title">{{ collection.title }}</h3>
+                  {%- if show_count and collection.all_products_count > 0 -%}
+                    <span class="bt-collection-card__count">
+                      {{ 'collections.collection.product_count' | t: count: collection.all_products_count }}
+                    </span>
+                  {%- endif -%}
+                </div>
+              </a>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
     </div>
   </section>
 {%- endif -%}
@@ -56,6 +116,134 @@
     text-align: center;
     margin: 0 0 var(--bt-space-lg);
   }
+  .bt-collection-list--numbered .bt-collection-list__heading {
+    text-align: left;
+    margin-bottom: var(--bt-space-xl);
+  }
+
+  /* ── Numbered index layout (default) ── */
+  .bt-collection-list__numbered {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: var(--bt-space-2xl);
+    align-items: start;
+  }
+  .bt-collection-list__index {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--bt-hairline);
+  }
+  .bt-collection-list__item {
+    border-top: 1px solid var(--bt-hairline);
+  }
+  .bt-collection-list__row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--bt-space-md);
+    padding: var(--bt-space-md) 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .bt-collection-list__num {
+    flex-shrink: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    line-height: 1;
+    color: var(--bt-color-text-muted);
+    font-variant-numeric: oldstyle-nums;
+    min-width: 2.2em;
+  }
+  .bt-collection-list__name {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    line-height: var(--bt-lh-heading);
+    letter-spacing: var(--bt-ls-heading);
+    color: var(--bt-color-text);
+    transition: color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-collection-list__row:hover .bt-collection-list__name,
+  .bt-collection-list__row:focus-visible .bt-collection-list__name {
+    color: var(--bt-color-primary);
+  }
+  .bt-collection-list__count {
+    flex-shrink: 0;
+    color: var(--bt-color-text-muted);
+  }
+  /* Per-row thumb: the mobile / no-:has image (hidden while the sticky
+     stage does the visual work on desktop). */
+  .bt-collection-list__thumb {
+    display: none;
+    flex-shrink: 0;
+    width: 64px;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--bt-hairline);
+    background: var(--bt-color-surface);
+    overflow: hidden;
+  }
+  .bt-collection-list__thumb img,
+  .bt-collection-list__thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Sticky specimen frame: stacked images, hovered/focused row wins.
+     First image is the resting state. */
+  .bt-collection-list__stage {
+    position: sticky;
+    top: var(--bt-space-2xl);
+  }
+  .bt-collection-list__stage-inner {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    --bt-cl-frame-pad: clamp(8px, 0.9vw, 12px);
+    padding: var(--bt-cl-frame-pad);
+    border: 1px solid var(--bt-hairline);
+    background: var(--bt-color-surface);
+  }
+  .bt-collection-list__stage-media {
+    position: absolute;
+    inset: var(--bt-cl-frame-pad);
+    border: 1px solid var(--bt-hairline);
+    background: var(--bt-color-surface-hover);
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-collection-list__stage-media:first-child {
+    opacity: 1;
+  }
+  .bt-collection-list__stage-media img,
+  .bt-collection-list__stage-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Hover / keyboard focus swaps the stage image (pure CSS, no JS).
+     Any active row first clears the resting image, then its own wins. */
+  .bt-collection-list__numbered:has(.bt-collection-list__row:hover) .bt-collection-list__stage-media,
+  .bt-collection-list__numbered:has(.bt-collection-list__row:focus-visible) .bt-collection-list__stage-media {
+    opacity: 0;
+  }
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(1) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(1),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(2) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(2),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(3) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(3),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(4) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(4),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(5) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(5),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(6) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(6),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(7) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(7),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(8) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(8),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(9) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(9),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(10) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(10),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(11) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(11),
+  .bt-collection-list__numbered:has(.bt-collection-list__item:nth-child(12) .bt-collection-list__row:is(:hover, :focus-visible)) .bt-collection-list__stage-media:nth-child(12) {
+    opacity: 1;
+  }
+
+  /* ── Grid layout (original) ── */
   .bt-collection-list__grid {
     display: grid;
     gap: var(--bt-grid-gap);
@@ -100,8 +288,25 @@
     color: var(--bt-color-text-muted);
   }
   .bt-collection-card__placeholder { width: 100%; height: 100%; background: var(--bt-color-surface); }
+
+  /* ── Numbered fallback: single column, stage hidden, per-row thumbs ── */
+  @media (max-width: 989px) {
+    .bt-collection-list__numbered {
+      grid-template-columns: 1fr;
+    }
+    .bt-collection-list__stage {
+      display: none;
+    }
+    .bt-collection-list__thumb {
+      display: block;
+    }
+    .bt-collection-list__name {
+      font-size: var(--bt-fs-h3);
+    }
+  }
   @media (max-width: 749px) {
     .bt-collection-list__grid--3-col, .bt-collection-list__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+    .bt-collection-list__row { align-items: center; }
   }
   @media (max-width: 479px) {
     .bt-collection-list__grid { grid-template-columns: 1fr; }
@@ -114,6 +319,16 @@
   "tag": "section",
   "settings": [
     { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.collection_list.settings.layout.label",
+      "options": [
+        { "value": "numbered", "label": "t:sections.collection_list.settings.layout.options__1.label" },
+        { "value": "grid", "label": "t:sections.collection_list.settings.layout.options__2.label" }
+      ],
+      "default": "numbered"
+    },
     {
       "type": "text",
       "id": "heading",
@@ -138,6 +353,7 @@
       "type": "select",
       "id": "columns_desktop",
       "label": "t:sections.collection_list.settings.columns_desktop.label",
+      "info": "t:sections.collection_list.settings.columns_desktop.info",
       "options": [
         { "value": "2", "label": "t:sections.collection_list.settings.columns_desktop.options__1.label" },
         { "value": "3", "label": "t:sections.collection_list.settings.columns_desktop.options__2.label" },

@@ -815,6 +815,15 @@
     "newsletter": {
       "name": "Newsletter",
       "settings": {
+        "layout": {
+          "label": "Layout",
+          "options__1": {
+            "label": "Statement banner"
+          },
+          "options__2": {
+            "label": "Centered card"
+          }
+        },
         "heading": {
           "label": "Heading"
         },
@@ -925,6 +934,15 @@
     "collection_list": {
       "name": "Collection list",
       "settings": {
+        "layout": {
+          "label": "Layout",
+          "options__1": {
+            "label": "Numbered index"
+          },
+          "options__2": {
+            "label": "Image grid"
+          }
+        },
         "heading": {
           "label": "Heading"
         },
@@ -936,6 +954,7 @@
         },
         "columns_desktop": {
           "label": "Columns on desktop",
+          "info": "Applies to the image grid layout",
           "options__1": {
             "label": "2 columns"
           },
@@ -1063,7 +1082,14 @@
           },
           "options__3": {
             "label": "Text first"
+          },
+          "options__4": {
+            "label": "Overlapping card"
           }
+        },
+        "enable_specimen_frame": {
+          "label": "Specimen frame",
+          "info": "Hairline mat frame around the image in the overlapping card layout"
         },
         "image_aspect": {
           "label": "Image aspect ratio",
@@ -1091,6 +1117,15 @@
     "multicolumn": {
       "name": "Multi-column",
       "settings": {
+        "style": {
+          "label": "Column style",
+          "options__1": {
+            "label": "Editorial numbers"
+          },
+          "options__2": {
+            "label": "Classic centered"
+          }
+        },
         "heading": {
           "label": "Heading"
         },
@@ -1187,6 +1222,15 @@
     "featured_collection": {
       "name": "Featured collection",
       "settings": {
+        "layout": {
+          "label": "Layout",
+          "options__1": {
+            "label": "Editorial feature"
+          },
+          "options__2": {
+            "label": "Uniform grid"
+          }
+        },
         "heading": {
           "label": "Heading"
         },
@@ -1388,6 +1432,15 @@
     "care_blog_teaser": {
       "name": "Care blog teaser",
       "settings": {
+        "layout": {
+          "label": "Layout",
+          "options__1": {
+            "label": "Magazine feature"
+          },
+          "options__2": {
+            "label": "Card grid"
+          }
+        },
         "heading": {
           "label": "Heading"
         },
