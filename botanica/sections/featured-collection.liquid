@@ -20,12 +20,12 @@
           </a>
         </div>
       {%- endif -%}
-      <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col{% if section.settings.mobile_swipe %} bt-featured-collection__grid--swipe-mobile{% endif %}">
+      <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col{% if section.settings.mobile_swipe %} bt-featured-collection__grid--swipe-mobile{% endif %}"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
         {%- for product in collection.products limit: products_to_show -%}
           {%- if forloop.index <= 4 -%}
-            {%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, loading: 'eager', fetchpriority: 'high' -%}
+            <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, loading: 'eager', fetchpriority: 'high' -%}</div>
           {%- else -%}
-            {%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge -%}
+            <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge -%}</div>
           {%- endif -%}
         {%- else -%}
           {%- for i in (1..4) -%}
@@ -60,6 +60,15 @@
   .bt-featured-collection__grid {
     display: grid;
     gap: var(--bt-grid-gap);
+  }
+  /* Cards render inside a wrapper div (reveal-stagger hooks) — keep
+     equal-height stretching identical to bare grid-item cards. */
+  .bt-featured-collection__grid > div {
+    display: flex;
+    flex-direction: column;
+  }
+  .bt-featured-collection__grid > div > .bt-card {
+    flex: 1;
   }
   .bt-featured-collection__grid--2-col { grid-template-columns: repeat(2, 1fr); }
   .bt-featured-collection__grid--3-col { grid-template-columns: repeat(3, 1fr); }
@@ -119,6 +128,13 @@
       "id": "mobile_swipe",
       "label": "t:sections.featured_collection.settings.mobile_swipe.label",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reveal",
+      "label": "t:sections.all.enable_reveal.label",
+      "info": "t:sections.all.enable_reveal.info",
+      "default": false
     },
     {
       "type": "select",

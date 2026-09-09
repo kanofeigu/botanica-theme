@@ -1,48 +1,65 @@
 {% comment %}
-  sections/collage.liquid — Image collage section
-  Asymmetric layout: 3 images in an editorial spread arrangement.
-  Uses image blocks. All-original. Zero Dawn code.
+  sections/collage.liquid — Editorial broken-grid collage.
+  Framed specimen plates in mixed aspect ratios on a 3-column grid.
+  On desktop the middle column drops ~7% (baseline break) and the outer
+  columns reach into it (intentional overlaps); below 990px the grid
+  collapses to clean 2- then 1-column layouts with no offsets.
+  Each tile: image, optional serif heading (inline richtext for italic
+  mixing), text, link, and an optional specimen caption (specimen-tag,
+  no rule — blank fields hide it). Tiles opt into the bt-reveal kit via
+  the section's enable_reveal setting. All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
   assign heading = section.settings.heading
-  assign image_count = 0
-  for block in section.blocks
-    if block.settings.image != blank
-      assign image_count = image_count | plus: 1
-    endif
-  endfor
 -%}
-<section class="bt-section bt-collage color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
+<section class="bt-section bt-collage bt-section-block color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     {%- if heading != blank -%}
       <h2 class="bt-collage__heading">{{ heading | escape }}</h2>
     {%- endif -%}
-    {%- if image_count > 0 -%}
-      <div class="bt-collage__grid">
+    {%- if section.blocks.size > 0 -%}
+      <div class="bt-collage__grid"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
         {%- for block in section.blocks -%}
-          {%- if block.settings.image != blank -%}
-            {%- liquid
-              assign layout_class = ''
-              case forloop.index
-                when 1
-                  assign layout_class = 'bt-collage__item--hero'
-                when 2
-                  assign layout_class = 'bt-collage__item--top'
-                when 3
-                  assign layout_class = 'bt-collage__item--bottom'
-                else
-                  assign layout_class = 'bt-collage__item--extra'
-              endcase
-            -%}
-            <div class="bt-collage__item {{ layout_class }}" {{ block.shopify_attributes }}>
-              {{ block.settings.image | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                widths: '400, 600, 800',
-                sizes: '(min-width: 990px) 50vw, 100vw',
-                alt: block.settings.image.alt | default: heading
-              }}
+          {%- liquid
+            assign ratio = block.settings.aspect_ratio | default: '4-5'
+            assign tile_label = block.settings.heading | strip_html | strip
+            if tile_label == blank and block.settings.image != blank
+              assign tile_label = block.settings.image.alt
+            endif
+          -%}
+          <div class="bt-collage__item bt-collage__item--{{ ratio }}" {{ block.shopify_attributes }}{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>
+            <div class="bt-collage__tile">
+              <figure class="bt-collage__plate">
+                {%- if block.settings.link != blank -%}
+                  <a href="{{ block.settings.link }}" class="bt-collage__media"{% if tile_label != blank %} aria-label="{{ tile_label | escape }}"{% endif %}>
+                {%- else -%}
+                  <div class="bt-collage__media">
+                {%- endif -%}
+                  {%- if block.settings.image != blank -%}
+                    {{ block.settings.image | image_url: width: 900 | image_tag:
+                      loading: 'lazy',
+                      widths: '400, 600, 900, 1200',
+                      sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                      alt: tile_label
+                    }}
+                  {%- else -%}
+                    {{ 'collection-1' | placeholder_svg_tag: 'bt-collage__placeholder' }}
+                  {%- endif -%}
+                {%- if block.settings.link != blank -%}
+                  </a>
+                {%- else -%}
+                  </div>
+                {%- endif -%}
+              </figure>
+              {%- if block.settings.heading != blank -%}
+                <h3 class="bt-collage__tile-heading">{{ block.settings.heading }}</h3>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <p class="bt-collage__tile-text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+              {% render 'specimen-tag', number: block.settings.specimen_number, latin: block.settings.specimen_latin, rule: false %}
             </div>
-          {%- endif -%}
+          </div>
         {%- endfor -%}
       </div>
     {%- endif -%}
@@ -56,57 +73,107 @@
     font-weight: var(--bt-fw-normal);
     color: var(--bt-color-text);
     text-align: center;
-    margin: 0 0 var(--bt-space-lg);
+    margin: 0 0 var(--bt-space-xl);
   }
+
   .bt-collage__grid {
     display: grid;
-    grid-template-areas:
-      "hero top"
-      "hero bottom";
-    grid-template-columns: 1.5fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--bt-grid-gap);
-    min-height: 500px;
   }
-  .bt-collage__item--hero {
-    grid-area: hero;
+
+  /* ── Tile = framed specimen plate + optional caption ── */
+  .bt-collage__tile {
+    position: relative;
   }
-  .bt-collage__item--top {
-    grid-area: top;
-  }
-  .bt-collage__item--bottom {
-    grid-area: bottom;
-  }
-  .bt-collage__item {
-    border-radius: var(--bt-radius-card);
-    overflow: hidden;
+  .bt-collage__plate {
+    margin: 0;
+    padding: var(--bt-space-2xs);
     background: var(--bt-color-surface);
+    border: 1px solid var(--bt-color-border-medium);
   }
-  .bt-collage__item img {
+  .bt-collage__media {
+    display: block;
+    overflow: hidden;
+    background: var(--bt-color-surface-hover);
+    color: inherit;
+  }
+  .bt-collage__media img,
+  .bt-collage__placeholder {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform var(--bt-duration-slow) var(--bt-ease-out);
   }
-  .bt-collage__item:hover img {
-    transform: scale(1.03);
+  /* Mixed aspect ratios per tile */
+  .bt-collage__item--1-1 .bt-collage__media { aspect-ratio: 1 / 1; }
+  .bt-collage__item--3-4 .bt-collage__media { aspect-ratio: 3 / 4; }
+  .bt-collage__item--4-5 .bt-collage__media { aspect-ratio: 4 / 5; }
+
+  .bt-collage__tile-heading {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-weight: var(--bt-fw-normal);
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text);
+    margin: var(--bt-space-sm) 0 0;
+    text-wrap: balance;
   }
-  @media (max-width: 749px) {
+  .bt-collage__tile-heading em {
+    color: var(--bt-color-secondary-text);
+  }
+  .bt-collage__tile-text {
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    line-height: var(--bt-lh-body);
+    color: var(--bt-color-text-muted);
+    margin: var(--bt-space-2xs) 0 0;
+    max-width: 34ch;
+  }
+  .bt-collage__tile .bt-specimen-tag {
+    margin-top: var(--bt-space-xs);
+  }
+
+  /* Linked media affordance */
+  a.bt-collage__media:focus-visible {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bt-collage__media img {
+      transition: transform var(--bt-duration-slow) var(--bt-ease-out);
+    }
+    a.bt-collage__media:hover img,
+    a.bt-collage__media:focus-visible img {
+      transform: scale(1.03);
+    }
+  }
+
+  /* ── Tablet: clean 2-column, no offsets ── */
+  @media (min-width: 750px) {
     .bt-collage__grid {
-      grid-template-areas:
-        "hero"
-        "top"
-        "bottom";
-      grid-template-columns: 1fr;
-      grid-template-rows: auto;
-      min-height: auto;
+      grid-template-columns: repeat(2, 1fr);
     }
-    .bt-collage__item {
-      aspect-ratio: 3 / 2;
+  }
+
+  /* ── Desktop: the broken grid. Offsets/overlaps live on the inner
+       tile so they never fight the reveal kit's transform on the item. ── */
+  @media (min-width: 990px) {
+    .bt-collage__grid {
+      grid-template-columns: repeat(3, 1fr);
+      align-items: start;
     }
-    .bt-collage__item--hero {
-      aspect-ratio: 4 / 5;
+    /* Middle column drops ~7% — the baseline break */
+    .bt-collage__item:nth-child(3n+2) .bt-collage__tile {
+      transform: translateY(7%);
+    }
+    /* Outer columns reach into the middle plate — intentional overlaps */
+    .bt-collage__item:nth-child(3n+1) .bt-collage__tile {
+      margin-right: -12%;
+    }
+    .bt-collage__item:nth-child(3n) .bt-collage__tile {
+      margin-left: -12%;
+      z-index: 2;
     }
   }
 {% endstylesheet %}
@@ -115,6 +182,7 @@
 {
   "name": "t:sections.collage.name",
   "tag": "section",
+  "max_blocks": 12,
   "blocks": [
     {
       "type": "image",
@@ -123,8 +191,46 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "t:sections.collage.blocks.image.settings.image.label",
-          "info": "t:sections.collage.blocks.image.settings.image.info"
+          "label": "t:sections.collage.blocks.image.settings.image.label"
+        },
+        {
+          "type": "select",
+          "id": "aspect_ratio",
+          "label": "t:sections.collage.blocks.image.settings.aspect_ratio.label",
+          "options": [
+            { "value": "1-1", "label": "t:sections.collage.blocks.image.settings.aspect_ratio.options__1.label" },
+            { "value": "3-4", "label": "t:sections.collage.blocks.image.settings.aspect_ratio.options__2.label" },
+            { "value": "4-5", "label": "t:sections.collage.blocks.image.settings.aspect_ratio.options__3.label" }
+          ],
+          "default": "4-5"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "t:sections.collage.blocks.image.settings.heading.label",
+          "info": "t:sections.collage.blocks.image.settings.heading.info"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "t:sections.collage.blocks.image.settings.text.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.collage.blocks.image.settings.link.label"
+        },
+        {
+          "type": "text",
+          "id": "specimen_number",
+          "label": "t:sections.collage.blocks.image.settings.specimen_number.label",
+          "info": "t:sections.collage.blocks.image.settings.specimen_number.info"
+        },
+        {
+          "type": "text",
+          "id": "specimen_latin",
+          "label": "t:sections.collage.blocks.image.settings.specimen_latin.label",
+          "info": "t:sections.collage.blocks.image.settings.specimen_latin.info"
         }
       ]
     }
@@ -137,25 +243,22 @@
       "label": "t:sections.collage.settings.heading.label"
     },
     {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
-      "label": "t:sections.collage.settings.padding_top.label"
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0, "max": 100, "step": 4, "default": 40, "unit": "px",
-      "label": "t:sections.collage.settings.padding_bottom.label"
+      "type": "checkbox",
+      "id": "enable_reveal",
+      "label": "t:sections.all.enable_reveal.label",
+      "info": "t:sections.all.enable_reveal.info",
+      "default": false
     }
   ],
-  "presets": [{
-    "name": "t:sections.collage.name",
-    "blocks": [
-      { "type": "image" },
-      { "type": "image" },
-      { "type": "image" }
-    ]
-  }]
+  "presets": [
+    {
+      "name": "t:sections.collage.name",
+      "blocks": [
+        { "type": "image", "settings": { "aspect_ratio": "3-4", "specimen_number": "Nº 001", "specimen_latin": "Monstera deliciosa" } },
+        { "type": "image", "settings": { "aspect_ratio": "4-5", "specimen_number": "Nº 002", "specimen_latin": "Ficus lyrata" } },
+        { "type": "image", "settings": { "aspect_ratio": "1-1", "specimen_number": "Nº 003", "specimen_latin": "Calathea orbifolia" } }
+      ]
+    }
+  ]
 }
 {% endschema %}

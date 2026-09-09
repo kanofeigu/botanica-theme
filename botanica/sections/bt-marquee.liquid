@@ -1,0 +1,199 @@
+{% comment %}
+  sections/bt-marquee.liquid — Herbarium marquee strip.
+  A single hairline-ruled band of repeating phrases (block per phrase),
+  scrolled infinitely via CSS keyframes (transform-only). Content is
+  duplicated in markup for a seamless loop; the duplicate is aria-hidden.
+  Pause on hover (pointer devices). Reduced motion → static, wrapped row
+  with the duplicate hidden. Zero JS. All-original.
+{% endcomment %}
+{%- liquid
+  assign style = section.settings.style | default: 'micro'
+  assign speed = section.settings.speed | default: 40
+-%}
+{%- if section.blocks.size > 0 -%}
+  <section
+    class="bt-marquee bt-marquee--{{ style }} color-{{ section.settings.color_scheme }}"
+    {{ section.shopify_attributes }}
+    style="--bt-marquee-duration: {{ speed }}s; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
+  >
+    <div class="bt-marquee__viewport">
+      <div class="bt-marquee__track">
+        {%- comment -%} Duplicate carries no shopify_attributes — they contain
+            unique editor IDs and must only exist once in the DOM. {%- endcomment -%}
+        {%- capture marquee_items_plain -%}
+          {%- for block in section.blocks -%}
+            <span class="bt-marquee__item">{{ block.settings.text }}</span>
+            <span class="bt-marquee__sep" aria-hidden="true">{% render 'icon-leaf' %}</span>
+          {%- endfor -%}
+        {%- endcapture -%}
+        <div class="bt-marquee__group">
+          {%- for block in section.blocks -%}
+            <span class="bt-marquee__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+            <span class="bt-marquee__sep" aria-hidden="true">{% render 'icon-leaf' %}</span>
+          {%- endfor -%}
+        </div>
+        <div class="bt-marquee__group" aria-hidden="true">{{ marquee_items_plain }}</div>
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% stylesheet %}
+  .bt-marquee {
+    border-top: 1px solid var(--bt-hairline);
+    border-bottom: 1px solid var(--bt-hairline);
+    overflow: hidden;
+  }
+
+  .bt-marquee__viewport {
+    overflow: hidden;
+  }
+
+  /* Track holds exactly two identical groups; translating -50% loops seamlessly. */
+  .bt-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: bt-marquee-scroll var(--bt-marquee-duration, 40s) linear infinite;
+    will-change: transform;
+  }
+
+  .bt-marquee__group {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-lg);
+    padding-right: var(--bt-space-lg);
+    flex-shrink: 0;
+  }
+
+  .bt-marquee__item {
+    white-space: nowrap;
+    color: var(--bt-color-text);
+  }
+  .bt-marquee__item em {
+    color: var(--bt-color-secondary-text);
+  }
+
+  .bt-marquee__sep {
+    display: inline-flex;
+    color: var(--bt-color-secondary);
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+  .bt-marquee__sep svg {
+    width: 0.75em;
+    height: 0.75em;
+  }
+
+  /* ── Style variants ── */
+  .bt-marquee--micro .bt-marquee__item {
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bt-color-text-muted);
+  }
+  .bt-marquee--serif .bt-marquee__item {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    line-height: var(--bt-lh-heading);
+  }
+
+  /* ── Pause on hover (pointer devices only) ── */
+  @media (hover: hover) {
+    .bt-marquee:hover .bt-marquee__track {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes bt-marquee-scroll {
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── Reduced motion: static wrapped row, duplicate hidden ── */
+  @media (prefers-reduced-motion: reduce) {
+    .bt-marquee__track {
+      animation: none;
+      width: auto;
+      will-change: auto;
+    }
+    .bt-marquee__group {
+      flex-wrap: wrap;
+      row-gap: var(--bt-space-2xs);
+      justify-content: center;
+      width: 100%;
+    }
+    .bt-marquee__group[aria-hidden="true"] {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.bt_marquee.name",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "phrase",
+      "name": "t:sections.bt_marquee.blocks.phrase.name",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "t:sections.bt_marquee.blocks.phrase.settings.text.label",
+          "info": "t:sections.bt_marquee.blocks.phrase.settings.text.info",
+          "default": "t:sections.bt_marquee.blocks.phrase.settings.text.default"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:sections.bt_marquee.settings.style.label",
+      "options": [
+        { "value": "micro", "label": "t:sections.bt_marquee.settings.style.options__1.label" },
+        { "value": "serif", "label": "t:sections.bt_marquee.settings.style.options__2.label" }
+      ],
+      "default": "micro"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "default": 40,
+      "unit": "s",
+      "label": "t:sections.bt_marquee.settings.speed.label",
+      "info": "t:sections.bt_marquee.settings.speed.info"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 60, "step": 4, "default": 16, "unit": "px",
+      "label": "t:sections.bt_marquee.settings.padding_top.label"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 60, "step": 4, "default": 16, "unit": "px",
+      "label": "t:sections.bt_marquee.settings.padding_bottom.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.bt_marquee.name",
+      "blocks": [
+        { "type": "phrase", "settings": { "text": "Free shipping over $50" } },
+        { "type": "phrase", "settings": { "text": "30-day <em>rooting</em> guarantee" } },
+        { "type": "phrase", "settings": { "text": "Carbon-neutral delivery" } },
+        { "type": "phrase", "settings": { "text": "Repotting guide included" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

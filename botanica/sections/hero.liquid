@@ -38,14 +38,14 @@
     <div class="bt-hero__grid">
       <div class="bt-hero__intro">
         {%- if eyebrow != blank -%}
-          <p class="bt-hero__eyebrow bt-micro-label">{{ eyebrow | escape }}</p>
+          <p class="bt-hero__eyebrow bt-micro-label"{% if section.settings.enable_reveal %} data-bt-reveal="load"{% endif %}>{{ eyebrow | escape }}</p>
         {%- endif -%}
         {%- if heading != blank -%}
-          <h1 class="bt-hero__heading bt-display-{{ heading_size }}">{{ heading }}</h1>
+          <h1 class="bt-hero__heading bt-display-{{ heading_size }}"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="120"{% endif %}>{{ heading }}</h1>
         {%- endif -%}
       </div>
 
-      <figure class="bt-hero__plate">
+      <figure class="bt-hero__plate"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="360"{% endif %}>
         <div class="bt-hero__frame">
           <div class="bt-hero__media" style="aspect-ratio: {{ aspect }}">
             {%- if image != blank -%}
@@ -85,7 +85,7 @@
         {%- endif -%}
       </figure>
 
-      <div class="bt-hero__body">
+      <div class="bt-hero__body"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="240"{% endif %}>
         {%- if text != blank -%}
           <p class="bt-hero__text">{{ text | escape }}</p>
         {%- endif -%}
@@ -344,6 +344,13 @@
         { "value": "outline", "label": "t:sections.hero.settings.button_style.options__2.label" }
       ],
       "default": "primary"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reveal",
+      "label": "t:sections.all.enable_reveal.label",
+      "info": "t:sections.all.enable_reveal.info",
+      "default": false
     },
     {
       "type": "text",

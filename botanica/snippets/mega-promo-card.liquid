@@ -1,0 +1,44 @@
+{% comment %}
+  snippets/mega-promo-card.liquid — In-menu promo card.
+  Hairline specimen frame, 4:5 media, micro-label title, small text.
+  When promo_link is set the whole card behaves as a single link via a
+  stretched CTA anchor (one tab stop, card-level focus ring); without a
+  link the card is purely presentational. Used in the desktop mega menu
+  promo column and at the bottom of mobile drawer submenu panels.
+
+  Parameters:
+    block      — a header block of type 'mega-promo' (image required;
+                 callers guard on promo_image != blank)
+    promo_fid  — optional flyout panel id; card stays hidden until that
+                 flyout is activated (desktop mega menu only)
+    attributes — optional attribute string; pass block.shopify_attributes
+                 for the desktop instance only (must appear once per DOM)
+    drawer     — true renders the compact mobile-drawer variant
+{% endcomment %}
+{%- liquid
+  assign promo = block.settings
+  assign promo_cta = promo.promo_label | default: promo.promo_heading
+-%}
+<div class="bt-mega__promo{% if drawer %} bt-mega__promo--drawer{% endif %}{% if promo_fid != blank %} bt-mega__promo--hidden{% endif %}"{% if promo_fid != blank %} data-promo-for="{{ promo_fid }}"{% endif %}{% if attributes %} {{ attributes | strip }}{% endif %}>
+  <span class="bt-mega__promo-media">
+    {{ promo.promo_image | image_url: width: 500 | image_tag: loading: 'lazy', widths: '300, 400, 500', sizes: '(max-width: 989px) 320px, 240px', alt: promo.promo_image.alt | default: promo.promo_heading }}
+  </span>
+  <span class="bt-mega__promo-body">
+    {%- if promo.promo_heading != blank -%}
+      <span class="bt-mega__promo-label bt-micro-label">{{ promo.promo_heading | escape }}</span>
+    {%- endif -%}
+    {%- if promo.promo_text != blank -%}
+      <span class="bt-mega__promo-text">{{ promo.promo_text | escape }}</span>
+    {%- endif -%}
+    {%- if promo.promo_link != blank and promo_cta != blank -%}
+      <a
+        href="{{ promo.promo_link }}"
+        class="bt-mega__promo-cta"
+        {% if promo.promo_heading != blank and promo.promo_label != blank %}aria-label="{{ promo.promo_heading | append: ': ' | append: promo.promo_label | escape }}"{% endif %}
+      >
+        {{- promo_cta | escape -}}
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    {%- endif -%}
+  </span>
+</div>

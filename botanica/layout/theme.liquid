@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="view-transition" content="same-origin">
   {%- for scheme in settings.color_schemes limit: 1 -%}{%- assign default_scheme = scheme -%}{%- endfor -%}
   <meta name="theme-color" content="{{ default_scheme.settings.background }}">
   <link rel="canonical" href="{{ canonical_url }}">
@@ -183,7 +184,10 @@
   {%- endunless -%}
 
   <script>
+    /* JS-availability signal: bt-js gates the reveal kit's hidden initial
+       state (no JS → no class → content always visible). */
     document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+    document.documentElement.classList.add('bt-js');
     if (Shopify.designMode) {
       document.documentElement.classList.add('shopify-design-mode');
     }
@@ -391,6 +395,7 @@
   </script>
 
   <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'bt-reveal.js' | asset_url }}" defer="defer"></script>
   {%- if settings.predictive_search_enabled -%}
     <script src="{{ 'search.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}

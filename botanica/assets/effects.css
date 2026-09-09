@@ -259,55 +259,23 @@
 
 /* ════════════════════════════════════════════
    CROSS-DOCUMENT VIEW TRANSITIONS
-   Product card → PDP morph transition.
-   Only active when browser supports it.
+   Gentle root crossfade only — timing lives in
+   base.css (::view-transition-old/new(root)).
+   Per-element card→PDP morph names were removed:
+   a shared view-transition-name repeats across every
+   product card on a grid page, and browsers skip
+   elements whose name is not unique — the morph never
+   fired and only produced console warnings.
    ════════════════════════════════════════════ */
 
 @view-transition {
   navigation: auto;
 }
 
-/* ── Product card image morphs into PDP main image ── */
-.bt-product-card__image {
-  view-transition-name: bt-product-image;
-}
-
-.bt-product__main-media img {
-  view-transition-name: bt-pdp-image;
-}
-
-/* ── Product title morphs ── */
-.bt-product-card__title {
-  view-transition-name: bt-product-title;
-}
-
-.bt-product-title {
-  view-transition-name: bt-pdp-title;
-}
-
-/* ── Transition animation: 350ms spring ── */
-::view-transition-old(bt-product-image),
-::view-transition-old(bt-product-title) {
-  animation-duration: 350ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-::view-transition-new(bt-product-image),
-::view-transition-new(bt-product-title) {
-  animation-duration: 350ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
 /* Disable VT if user prefers reduced motion */
 @media (prefers-reduced-motion: reduce) {
   @view-transition {
     navigation: none;
-  }
-  .bt-product-card__image,
-  .bt-product__main-media img,
-  .bt-product-card__title,
-  .bt-product-title {
-    view-transition-name: none;
   }
 }
 

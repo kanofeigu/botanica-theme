@@ -1,4 +1,4 @@
-{% comment %} header.liquid — Atrium v3. Clean mega menu, Patch Plants inspired. Zero Dawn code. {% endcomment %}
+{% comment %} header.liquid — Atrium v3. Clean mega menu with flyout columns and merchant-attached promo cards. Zero Dawn code. {% endcomment %}
 
 {%- liquid
   assign main_menu = linklists[section.settings.menu]
@@ -6,6 +6,18 @@
   assign logo_width = settings.logo_width | default: 100
   assign logo_width_2x = logo_width | times: 2
 -%}
+
+{% if sticky -%}
+  {% comment %} Sticky must be applied to the .shopify-section wrapper — a sticky
+       <header> inside a same-height static parent has no travel room. {% endcomment %}
+  <style>
+    #shopify-section-{{ section.id }} {
+      position: sticky;
+      top: 0;
+      z-index: var(--bt-z-sticky, 20);
+    }
+  </style>
+{% endif -%}
 
 <header class="bt-header{% if sticky %} bt-header--sticky{% endif %} color-{{ section.settings.color_scheme }}" role="banner" {{ section.shopify_attributes }}>
   <div class="bt-header__bar bt-container">
@@ -37,9 +49,20 @@
             </a>
 
             {%- if link.links.size > 0 -%}
-              {%- assign mega_id = link.title | handleize -%}
+              {%- liquid
+                assign mega_id = link.title | handleize
+                assign has_blocks = false
+                for block in section.blocks
+                  if block.settings.menu_item == link.title
+                    unless block.type == 'mega-promo' and block.settings.promo_image == blank
+                      assign has_blocks = true
+                      break
+                    endunless
+                  endif
+                endfor
+              -%}
               <div class="bt-mega" data-mega-panel="{{ mega_id }}" hidden>
-                <div class="bt-mega__inner bt-container">
+                <div class="bt-mega__inner bt-container{% unless has_blocks %} bt-mega__inner--no-promo{% endunless %}">
                   {% comment %} Column 1: parent category sidebar {% endcomment %}
                   <div class="bt-mega__sidebar">
                     <p class="bt-mega__title">{{ link.title }}</p>
@@ -98,48 +121,30 @@
                     </div>
                   </div>
 
-                  {%- comment %} Column 3: promo blocks or fallback product images {% endcomment %}
-                  {%- liquid
-                    assign show_blocks = false
-                    for block in section.blocks
-                      if block.settings.menu_item == link.title
-                        assign show_blocks = true
-                      endif
-                    endfor
-                  -%}
-                  {%- if show_blocks -%}
+                  {%- comment %} Column 3: merchant blocks attached to this item
+                       (promo cards / link lists). Renders only when at least one
+                       renderable block matches; the grid otherwise collapses to
+                       two columns via bt-mega__inner--no-promo. {% endcomment %}
+                  {%- if has_blocks -%}
                   <div class="bt-mega__promo-col">
                     {%- for block in section.blocks -%}
                       {%- if block.settings.menu_item == link.title -%}
                         {%- case block.type -%}
                           {%- when 'mega-promo' -%}
-                            {%- liquid
-                              assign promo_fid = ''
-                              if block.settings.flyout_item != blank
-                                for child_link in link.links
-                                  if child_link.title == block.settings.flyout_item
-                                    assign promo_fid = mega_id | append: '-' | append: forloop.index
-                                    break
-                                  endif
-                                endfor
-                              endif
-                            -%}
-                            <div class="bt-mega__promo{% if promo_fid != '' %} bt-mega__promo--hidden{% endif %}"{% if promo_fid != '' %} data-promo-for="{{ promo_fid }}"{% endif %} {{ block.shopify_attributes }}>
-                              {%- if block.settings.promo_image != blank -%}
-                                <a href="{{ block.settings.promo_link | default: '#' }}" class="bt-mega__promo-media">
-                                  {{ block.settings.promo_image | image_url: width: 500 | image_tag: loading: 'lazy', widths: '300,400,500', alt: block.settings.promo_heading | escape }}
-                                </a>
-                              {%- endif -%}
-                              {%- if block.settings.promo_heading != blank -%}
-                                <p class="bt-mega__promo-title">{{ block.settings.promo_heading }}</p>
-                              {%- endif -%}
-                              {%- if block.settings.promo_text != blank -%}
-                                <p class="bt-mega__promo-text">{{ block.settings.promo_text }}</p>
-                              {%- endif -%}
-                              {%- if block.settings.promo_link != blank and block.settings.promo_label != blank -%}
-                                <a href="{{ block.settings.promo_link }}" class="bt-btn bt-btn--outline bt-btn--sm bt-interactive bt-press">{{ block.settings.promo_label }}</a>
-                              {%- endif -%}
-                            </div>
+                            {%- if block.settings.promo_image != blank -%}
+                              {%- liquid
+                                assign promo_fid = ''
+                                if block.settings.flyout_item != blank
+                                  for child_link in link.links
+                                    if child_link.title == block.settings.flyout_item
+                                      assign promo_fid = mega_id | append: '-' | append: forloop.index
+                                      break
+                                    endif
+                                  endfor
+                                endif
+                              -%}
+                              {% render 'mega-promo-card', block: block, promo_fid: promo_fid, attributes: block.shopify_attributes %}
+                            {%- endif -%}
                           {%- when 'mega-links' -%}
                             <div class="bt-mega__links-block" {{ block.shopify_attributes }}>
                               <p class="bt-mega__promo-title">{{ block.settings.heading }}</p>
@@ -174,65 +179,6 @@
                         {%- endcase -%}
                       {%- endif -%}
                     {%- endfor -%}
-                  </div>
-                  {%- else -%}
-                  {%- comment %} Fallback: dynamic promo images that switch per flyout category {% endcomment %}
-                  <div class="bt-mega__promo-col">
-                    {%- assign flyout_idx = 0 -%}
-                    {%- for child in link.links -%}
-                      {%- if child.links.size > 0 -%}
-                        {%- assign child_id = mega_id | append: '-' | append: forloop.index -%}
-                        {%- assign flyout_idx = flyout_idx | plus: 1 -%}
-                        {%- comment %} Pick different image per category group {% endcomment %}
-                        {%- if flyout_idx == 1 -%}
-                          {%- assign promo_title = child.title -%}
-                          {%- assign promo_text = 'sections.header.mega.promo_fresh_html' | t -%}
-                        {%- elsif flyout_idx == 2 -%}
-                          {%- assign promo_title = child.title -%}
-                          {%- assign promo_text = 'sections.header.mega.promo_hardy_html' | t -%}
-                        {%- elsif flyout_idx == 3 -%}
-                          {%- assign promo_title = child.title -%}
-                          {%- assign promo_text = 'sections.header.mega.promo_spot_html' | t -%}
-                        {%- else -%}
-                          {%- assign promo_title = child.title -%}
-                          {%- assign promo_text = 'sections.header.mega.promo_pet_html' | t -%}
-                        {%- endif -%}
-                        <div class="bt-mega__promo{% if child_id != first_flyout %} bt-mega__promo--hidden{% endif %}" data-promo-for="{{ child_id }}">
-                          <a href="{{ routes.all_products_collection_url }}" class="bt-mega__promo-media">
-                            {{ 'collection-1' | placeholder_svg_tag: 'Plant collection' }}
-                          </a>
-                          <p class="bt-mega__promo-title">{{ promo_title }}</p>
-                          <p class="bt-mega__promo-text">{{ promo_text }}</p>
-                          <a href="{{ routes.all_products_collection_url }}" class="bt-btn bt-btn--outline bt-btn--sm bt-interactive bt-press">{{ 'sections.header.mega.shop_now_label' | t: label: promo_title }}</a>
-                        </div>
-                      {%- endif -%}
-                    {%- endfor -%}
-                    {% comment %} Default promo (shown when no flyout is active) {% endcomment %}
-                    {%- liquid
-                      if first_flyout != ''
-                        assign default_hidden = true
-                      else
-                        assign default_hidden = false
-                      endif
-                      assign link_handle = link.title | handleize
-                      if link_handle == 'gifts'
-                        assign def_title = 'sections.header.mega.gift_title' | t
-                        assign def_text = 'sections.header.mega.gift_text_html' | t
-                        assign def_btn = 'sections.header.mega.gift_btn' | t
-                      else
-                        assign def_title = 'sections.header.mega.best_sellers_title' | t
-                        assign def_text = 'sections.header.mega.best_sellers_text_html' | t
-                        assign def_btn = 'sections.header.mega.best_sellers_btn' | t
-                      endif
-                    -%}
-                    <div class="bt-mega__promo{% if default_hidden %} bt-mega__promo--hidden{% endif %}" data-promo-default>
-                      <a href="{{ routes.all_products_collection_url }}" class="bt-mega__promo-media">
-                        {{ 'lifestyle-1' | placeholder_svg_tag: 'Botanical lifestyle' }}
-                      </a>
-                      <p class="bt-mega__promo-title">{{ def_title }}</p>
-                      <p class="bt-mega__promo-text">{{ def_text }}</p>
-                      <a href="{{ routes.all_products_collection_url }}" class="bt-btn bt-btn--outline bt-btn--sm bt-interactive bt-press">{{ def_btn }}</a>
-                    </div>
                   </div>
                   {%- endif -%}
                 </div>
@@ -314,6 +260,19 @@
                       </li>
                     {%- endfor -%}
                   </ul>
+                  {%- comment -%} Merchant promo cards attached to this item render at
+                       the bottom of its drawer panel (flyout scoping is desktop-only;
+                       all attached promos show here). {%- endcomment -%}
+                  {%- capture drawer_promos -%}
+                    {%- for block in section.blocks -%}
+                      {%- if block.type == 'mega-promo' and block.settings.menu_item == link.title and block.settings.promo_image != blank -%}
+                        {% render 'mega-promo-card', block: block, drawer: true %}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endcapture -%}
+                  {%- if drawer_promos != blank -%}
+                    <div class="bt-header__drawer-promos">{{ drawer_promos }}</div>
+                  {%- endif -%}
                 </details>
               {%- else -%}
                 <a href="{{ link.url }}" class="bt-header__drawer-link bt-header__drawer-link--top bt-interactive" {% if link.current %}aria-current="page"{% endif %}>{{ link.title }}</a>
@@ -464,12 +423,38 @@
       }
       activateFlyout(panel, flyoutTrigger);
     });
+
+    // Keyboard parity: tabbing onto a sidebar flyout item activates it
+    panel.addEventListener('focusin', function(e) {
+      var flyoutTrigger = e.target.closest('[data-flyout]');
+      if (flyoutTrigger) activateFlyout(panel, flyoutTrigger);
+    });
   });
 
   // Click outside header → close
   document.addEventListener('click', function(e) {
     if (!header.contains(e.target) && activePanel) closeAll();
   });
+
+  /* ================================================================
+     STICKY HEADER SCROLL STATE
+     Toggles .is-scrolled past ~50px. rAF-throttled, passive listener.
+     ================================================================ */
+
+  if (header.classList.contains('bt-header--sticky')) {
+    var scrollTicking = false;
+    var syncScrollState = function() {
+      header.classList.toggle('is-scrolled', window.scrollY > 50);
+      scrollTicking = false;
+    };
+    window.addEventListener('scroll', function() {
+      if (!scrollTicking) {
+        scrollTicking = true;
+        requestAnimationFrame(syncScrollState);
+      }
+    }, { passive: true });
+    syncScrollState();
+  }
 
   /* ================================================================
      MOBILE DRAWER
@@ -528,6 +513,30 @@
   .bt-header--sticky {
     position: sticky;
     top: 0;
+  }
+  /* Sticky must live on the .shopify-section wrapper: a sticky element can
+     only travel within its parent's box, and the wrapper is exactly the
+     header's height — so sticking the <header> itself never engages. The
+     wrapper rule is emitted inline (see markup) only when sticky is on. */
+
+  /* Scrolled state (sticky only): hairline deepens + faint shadow lift;
+     background gains a blur veil where supported. Class toggled by the
+     header script (rAF-throttled scroll listener). */
+  .bt-header--sticky.is-scrolled {
+    border-bottom-color: var(--bt-color-border-medium);
+    box-shadow: var(--bt-shadow-sm);
+  }
+  @supports (backdrop-filter: blur(8px)) {
+    .bt-header--sticky.is-scrolled {
+      background-color: color-mix(in srgb, var(--bt-color-bg) 90%, transparent);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bt-header {
+      transition: border-color var(--bt-duration-fast), background-color var(--bt-duration-fast), box-shadow var(--bt-duration-fast);
+    }
   }
 
   /* ── Header bar (logo + nav + actions row) ── */
@@ -769,15 +778,25 @@
     margin: var(--bt-space-xs) 0 0;
   }
 
-  /* ── Column 3: promo ── */
+  /* ── Column 3: promo / link blocks ── */
   .bt-mega__promo-col {
     padding: var(--bt-space-lg);
     border-left: 1px solid var(--bt-color-border-light);
-  }
-  .bt-mega__promo {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    gap: var(--bt-space-md);
+  }
+
+  /* Promo card — hairline specimen frame, 4:5 media, micro-label title.
+     The whole card acts as one link through the stretched CTA anchor
+     (single tab stop, focus ring on the card). */
+  .bt-mega__promo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--bt-color-border-medium);
+    background: var(--bt-color-surface);
+    padding: var(--bt-space-2xs);
     animation: bt-flyout-fade var(--bt-duration-fast) var(--bt-ease-out);
   }
   .bt-mega__promo--hidden {
@@ -785,34 +804,71 @@
   }
   .bt-mega__promo-media {
     display: block;
-    border-radius: var(--bt-radius-md);
     overflow: hidden;
-    margin-bottom: var(--bt-space-sm);
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 4 / 5;
     background: var(--bt-color-surface-hover);
   }
   .bt-mega__promo-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--bt-duration-slow) var(--bt-ease-out);
+    display: block;
   }
-  .bt-mega__promo-media:hover img {
-    transform: scale(1.05);
+  .bt-mega__promo-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--bt-space-3xs);
+    padding: var(--bt-space-xs) var(--bt-space-2xs) var(--bt-space-2xs);
   }
+  .bt-mega__promo-text {
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    line-height: var(--bt-lh-body);
+  }
+  .bt-mega__promo-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: var(--bt-space-3xs);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--bt-color-primary);
+    text-decoration: none;
+  }
+  /* Stretched link: the whole card is clickable through this one anchor */
+  .bt-mega__promo-cta::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .bt-mega__promo:focus-within {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: var(--bt-focus-ring-offset);
+  }
+  .bt-mega__promo-cta:focus-visible {
+    outline: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bt-mega__promo-media img {
+      transition: transform var(--bt-duration-slow) var(--bt-ease-out);
+    }
+    .bt-mega__promo:hover .bt-mega__promo-media img,
+    .bt-mega__promo:focus-within .bt-mega__promo-media img {
+      transform: scale(1.04);
+    }
+  }
+  /* Serif heading used by the mega-links / mega-collections blocks */
   .bt-mega__promo-title {
     font-family: var(--bt-font-heading);
     font-size: var(--bt-fs-body-sm);
     font-weight: var(--bt-fw-semibold);
     color: var(--bt-color-text);
     margin: 0 0 var(--bt-space-2xs);
-  }
-  .bt-mega__promo-text {
-    font-family: var(--bt-font-body);
-    font-size: var(--bt-fs-body-xs);
-    color: var(--bt-color-text-muted);
-    margin: 0 0 var(--bt-space-sm);
-    line-height: var(--bt-lh-body);
   }
   .bt-mega__links-block {
     height: 100%;
@@ -997,6 +1053,17 @@
     list-style: none;
     margin: 0;
     padding: 0 0 var(--bt-space-xs);
+  }
+
+  /* Promo cards at the bottom of a drawer submenu panel */
+  .bt-header__drawer-promos {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-sm);
+    padding: var(--bt-space-sm) var(--bt-space-md) var(--bt-space-md);
+  }
+  .bt-mega__promo--drawer .bt-mega__promo-media {
+    aspect-ratio: 3 / 2;
   }
   .bt-header__drawer-sublist .bt-header__drawer-link {
     padding-left: var(--bt-space-xl);

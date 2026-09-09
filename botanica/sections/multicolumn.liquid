@@ -12,9 +12,9 @@
     {%- if heading != blank -%}
       <h2 class="bt-multicolumn__heading">{{ heading | escape }}</h2>
     {%- endif -%}
-    <div class="bt-multicolumn__grid bt-multicolumn__grid--{{ columns }}-col">
+    <div class="bt-multicolumn__grid bt-multicolumn__grid--{{ columns }}-col"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
       {%- for block in section.blocks -%}
-        <div class="bt-multicolumn__item" {{ block.shopify_attributes }}>
+        <div class="bt-multicolumn__item" {{ block.shopify_attributes }}{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>
           {%- if block.settings.image != blank -%}
             <div class="bt-multicolumn__media">
               {{ block.settings.image | image_url: width: 400 | image_tag:
@@ -163,6 +163,13 @@
         { "value": "4", "label": "t:sections.multicolumn.settings.columns_desktop.options__3.label" }
       ],
       "default": "3"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reveal",
+      "label": "t:sections.all.enable_reveal.label",
+      "info": "t:sections.all.enable_reveal.info",
+      "default": false
     },
     {
       "type": "range",

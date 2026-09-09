@@ -206,6 +206,46 @@
     "all": {
       "colors": {
         "label": "Color scheme"
+      },
+      "enable_reveal": {
+        "label": "Reveal on scroll",
+        "info": "Gently fades content in as it enters the viewport. Automatically disabled for visitors who prefer reduced motion."
+      }
+    },
+    "bt_marquee": {
+      "name": "Marquee strip",
+      "settings": {
+        "style": {
+          "label": "Text style",
+          "options__1": {
+            "label": "Micro label"
+          },
+          "options__2": {
+            "label": "Serif"
+          }
+        },
+        "speed": {
+          "label": "Loop duration",
+          "info": "Time for one full scroll loop. Higher is slower."
+        },
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
+      },
+      "blocks": {
+        "phrase": {
+          "name": "Phrase",
+          "settings": {
+            "text": {
+              "label": "Text",
+              "info": "Italicize words to set them as serif accents",
+              "default": "A phrase worth repeating"
+            }
+          }
+        }
       }
     },
     "announcement_bar": {
@@ -1001,21 +1041,44 @@
       "settings": {
         "heading": {
           "label": "Heading"
-        },
-        "padding_top": {
-          "label": "Top padding"
-        },
-        "padding_bottom": {
-          "label": "Bottom padding"
         }
       },
       "blocks": {
         "image": {
-          "name": "Image",
+          "name": "Tile",
           "settings": {
             "image": {
-              "label": "Image",
-              "info": "First 3 images create the collage layout"
+              "label": "Image"
+            },
+            "aspect_ratio": {
+              "label": "Image aspect ratio",
+              "options__1": {
+                "label": "1:1 — Square"
+              },
+              "options__2": {
+                "label": "3:4 — Portrait"
+              },
+              "options__3": {
+                "label": "4:5 — Tall portrait"
+              }
+            },
+            "heading": {
+              "label": "Heading",
+              "info": "Italicize words to set them as serif accents"
+            },
+            "text": {
+              "label": "Text"
+            },
+            "link": {
+              "label": "Link"
+            },
+            "specimen_number": {
+              "label": "Specimen number",
+              "info": "Shown as a micro-label, e.g. 'Nº 001'. Leave blank to hide the caption."
+            },
+            "specimen_latin": {
+              "label": "Specimen caption",
+              "info": "Botanical Latin name or a short caption, set in italic serif. Leave blank to hide."
             }
           }
         }

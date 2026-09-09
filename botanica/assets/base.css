@@ -639,6 +639,51 @@ bt-predictive-search.bt-predictive[hidden] { display: none; }
 .bt-predictive__close { flex-shrink: 0; }
 .bt-predictive__results.bt-container { border-radius: 0 0 var(--bt-radius-md) var(--bt-radius-md); }
 
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL (bt-reveal.js motion kit)
+   Hidden state applies ONLY when JS has armed the kit
+   (html.bt-reveal-armed) — no JS / no IO / reduced
+   motion → content is simply visible. Sections opt in
+   per-element via [data-bt-reveal]; stagger groups via
+   [data-bt-reveal-stagger] on the parent (children get
+   60ms incremental transition-delay, capped at 6).
+   ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  .bt-reveal-armed [data-bt-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity var(--bt-duration-slow) var(--bt-ease-out),
+                transform var(--bt-duration-slow) var(--bt-ease-out);
+    will-change: opacity, transform;
+  }
+  .bt-reveal-armed [data-bt-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+  /* Stagger: incremental delay on siblings, ~60ms steps, cap 6. */
+  .bt-reveal-armed [data-bt-reveal-stagger] > :nth-child(2) { transition-delay: 60ms; }
+  .bt-reveal-armed [data-bt-reveal-stagger] > :nth-child(3) { transition-delay: 120ms; }
+  .bt-reveal-armed [data-bt-reveal-stagger] > :nth-child(4) { transition-delay: 180ms; }
+  .bt-reveal-armed [data-bt-reveal-stagger] > :nth-child(5) { transition-delay: 240ms; }
+  .bt-reveal-armed [data-bt-reveal-stagger] > :nth-child(n+6) { transition-delay: 300ms; }
+  /* Once revealed, drop the delay so later state changes aren't laggy. */
+  .bt-reveal-armed [data-bt-reveal-stagger] > .is-revealed { transition-delay: 0ms; }
+}
+
+/* ═══════════════════════════════════════════
+   VIEW TRANSITIONS — gentle root crossfade.
+   Opt-in lives in layout/theme.liquid (meta tag) and
+   effects.css (@view-transition navigation:auto).
+   Per-element morphing is intentionally NOT done here.
+   ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 200ms;
+    animation-timing-function: var(--bt-ease-out);
+  }
+}
+
 /* ── Print ── */
 @media print {
   body { color: black; background: white; }
