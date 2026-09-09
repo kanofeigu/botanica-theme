@@ -1948,6 +1948,49 @@
         }
       }
     },
+    "spec_meter": {
+      "name": "Spec meter",
+      "settings": {
+        "label": {
+          "label": "Label"
+        },
+        "level": {
+          "label": "Level",
+          "info": "0 = none, 5 = maximum"
+        },
+        "level_label": {
+          "label": "Level text",
+          "info": "Readable value shown after the meter, e.g. \"40 hours\" or \"Medium\""
+        },
+        "icon": {
+          "label": "Icon",
+          "options__1": {
+            "label": "None"
+          },
+          "options__2": {
+            "label": "Drop"
+          },
+          "options__3": {
+            "label": "Flame"
+          },
+          "options__4": {
+            "label": "Leaf"
+          },
+          "options__5": {
+            "label": "Sun"
+          },
+          "options__6": {
+            "label": "Ruler"
+          },
+          "options__7": {
+            "label": "Heart"
+          },
+          "options__8": {
+            "label": "Star"
+          }
+        }
+      }
+    },
     "spotlight_media": {
       "name": "Spotlight media",
       "settings": {

@@ -1,0 +1,153 @@
+{% comment %}
+  blocks/spec-meter.liquid — Generic spec meter for non-plant presets
+  (home fragrance / spa / textile). Optional 1.5px-stroke SVG icon,
+  micro-label caption, 5-segment progressive fill dots (aligned with
+  light-meter), and a readable level text ("40 hours", "Medium",
+  "300 thread count"). role="img" + composed aria-label; sr-only
+  fallback text. No view-transition-name; transitions freeze under
+  prefers-reduced-motion.
+{% endcomment %}
+{%- liquid
+  assign label = block.settings.label | default: 'Burn time'
+  assign level = block.settings.level | plus: 0
+  if level < 0
+    assign level = 0
+  elsif level > 5
+    assign level = 5
+  endif
+  assign level_label = block.settings.level_label | default: 'Medium'
+  assign icon = block.settings.icon | default: 'none'
+-%}
+<div
+  class="bt-spec-meter"
+  {{ block.shopify_attributes }}
+  role="img"
+  aria-label="{{ 'blocks.spec_meter.a11y_label' | t: label: label, level_label: level_label, level: level | escape }}"
+>
+  {%- if icon != 'none' -%}
+    <span class="bt-spec-meter__icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        {%- case icon -%}
+          {%- when 'drop' -%}
+            <path d="M12 3C8 9 5 12 5 15a7 7 0 0 0 14 0c0-3-3-6-7-12Z" stroke-linejoin="round"/>
+          {%- when 'flame' -%}
+            <path d="M12 3c.7 3-1.3 4.4-2.4 6C8.4 10.6 7 12 7 14.2A5 5 0 0 0 17 14.2C17 10.8 13.4 9 12 3Z" stroke-linejoin="round"/>
+            <path d="M12 17.5a2 2 0 0 0 2-2c0-1.2-1-1.8-2-3.5-1 1.7-2 2.3-2 3.5a2 2 0 0 0 2 2Z" opacity="0.55"/>
+          {%- when 'leaf' -%}
+            <path d="M5 19C5 10.5 10 5.5 20 4c-1 10-6.5 15-15 15Z" stroke-linejoin="round"/>
+            <path d="M5 19C8 14.5 11.5 11 15.5 8.5" opacity="0.55"/>
+          {%- when 'sun' -%}
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+          {%- when 'ruler' -%}
+            <rect x="2.5" y="9" width="19" height="6" rx="1"/>
+            <path d="M6.5 9v3M10 9v3M13.5 9v3M17 9v3" opacity="0.7"/>
+          {%- when 'heart' -%}
+            <path d="M12 20C7.5 16.5 3.5 13.2 3.5 9.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 8.5 2.2C20.5 13.2 16.5 16.5 12 20Z" stroke-linejoin="round"/>
+          {%- when 'star' -%}
+            <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" stroke-linejoin="round"/>
+        {%- endcase -%}
+      </svg>
+    </span>
+  {%- endif -%}
+  <span class="bt-spec-meter__label bt-micro-label">{{ label | escape }}</span>
+  <span class="bt-spec-meter__dots" aria-hidden="true">
+    {%- for i in (1..5) -%}
+      <span class="bt-spec-meter__dot{% if i <= level %} is-on{% endif %}"></span>
+    {%- endfor -%}
+  </span>
+  <span class="bt-spec-meter__value" aria-hidden="true">{{ level_label | escape }}</span>
+  <span class="bt-sr-only">{{ 'blocks.spec_meter.a11y_label' | t: label: label, level_label: level_label, level: level }}</span>
+</div>
+
+{% stylesheet %}
+  .bt-spec-meter {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    padding: var(--bt-space-2xs) 0;
+  }
+  .bt-spec-meter__icon {
+    display: flex;
+    color: var(--bt-color-secondary);
+    flex-shrink: 0;
+  }
+  .bt-spec-meter__label {
+    min-width: 4em;
+    flex-shrink: 0;
+  }
+  .bt-spec-meter__dots {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+  }
+  .bt-spec-meter__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bt-color-border-light);
+    transition: background var(--bt-duration-base);
+  }
+  .bt-spec-meter__dot.is-on {
+    background: var(--bt-color-primary);
+    box-shadow: 0 0 6px rgba(var(--bt-color-primary-rgb), 0.3);
+  }
+  .bt-spec-meter__value {
+    font-size: var(--bt-fs-body-sm);
+    font-weight: 500;
+    color: var(--bt-color-text);
+    font-variant-numeric: oldstyle-nums;
+    white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bt-spec-meter__dot { transition: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.spec_meter.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:blocks.spec_meter.settings.label.label",
+      "default": "Burn time"
+    },
+    {
+      "type": "range",
+      "id": "level",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "t:blocks.spec_meter.settings.level.label",
+      "info": "t:blocks.spec_meter.settings.level.info"
+    },
+    {
+      "type": "text",
+      "id": "level_label",
+      "label": "t:blocks.spec_meter.settings.level_label.label",
+      "info": "t:blocks.spec_meter.settings.level_label.info",
+      "default": "Medium"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:blocks.spec_meter.settings.icon.label",
+      "default": "none",
+      "options": [
+        { "value": "none", "label": "t:blocks.spec_meter.settings.icon.options__1.label" },
+        { "value": "drop", "label": "t:blocks.spec_meter.settings.icon.options__2.label" },
+        { "value": "flame", "label": "t:blocks.spec_meter.settings.icon.options__3.label" },
+        { "value": "leaf", "label": "t:blocks.spec_meter.settings.icon.options__4.label" },
+        { "value": "sun", "label": "t:blocks.spec_meter.settings.icon.options__5.label" },
+        { "value": "ruler", "label": "t:blocks.spec_meter.settings.icon.options__6.label" },
+        { "value": "heart", "label": "t:blocks.spec_meter.settings.icon.options__7.label" },
+        { "value": "star", "label": "t:blocks.spec_meter.settings.icon.options__8.label" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "t:blocks.spec_meter.name" }]
+}
+{% endschema %}

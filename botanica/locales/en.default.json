@@ -736,6 +736,25 @@
         }
       }
     },
+    "spec_meter": {
+      "name": "Spec meter",
+      "a11y_label": "{{ label }}: {{ level_label }} — {{ level }} out of 5",
+      "settings": {
+        "label": {
+          "label": "Label"
+        },
+        "level": {
+          "label": "Level",
+          "info": "0 = none, 5 = maximum"
+        },
+        "level_label": {
+          "label": "Level text"
+        },
+        "icon": {
+          "label": "Icon"
+        }
+      }
+    },
     "sticky_atc": {
       "name": "Sticky add to cart"
     }
