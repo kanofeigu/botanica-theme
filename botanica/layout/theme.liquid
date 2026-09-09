@@ -35,6 +35,7 @@
     assign body_font_bold = settings.body_font | font_modify: 'weight', 'bold'
     assign body_font_italic = settings.body_font | font_modify: 'style', 'italic'
     assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
+    assign heading_font_italic = settings.heading_font | font_modify: 'style', 'italic'
   -%}
 
   {{ 'design-tokens.css' | asset_url | stylesheet_tag }}
@@ -64,6 +65,7 @@
     {{ body_font_italic | font_face: font_display: 'swap' }}
     {{ body_font_bold_italic | font_face: font_display: 'swap' }}
     {{ settings.heading_font | font_face: font_display: 'swap' }}
+    {{ heading_font_italic | font_face: font_display: 'swap' }}
 
     {%- comment -%}
       Color schemes — one .color-scheme-N class per scheme defined in
@@ -72,32 +74,88 @@
       (body, drawers) keep the base palette. Derived tokens (hover / tint /
       border-light / shadows) resolve from these vars at point of use via
       color-mix() in design-tokens.css, so they adapt per scheme automatically.
-      Surface / muted derive in Liquid: light schemes lift surface and soften
-      text; dark schemes invert the direction.
+      Surface / muted / secondary-text derive in Liquid with WCAG-checked
+      ladders: each candidate must clear 4.5:1 against the scheme background,
+      else it steps to a safer shade, else falls back to the scheme text color.
+      Light schemes lift surface and soften text; dark schemes invert the
+      direction; mid-tone backgrounds are guarded by an explicit contrast
+      check that flips the surface direction when needed.
     {%- endcomment -%}
     {%- for scheme in settings.color_schemes -%}
-      {%- assign bg_brightness = scheme.settings.background | color_brightness -%}
-      {%- if bg_brightness > 128 -%}
-        {%- assign scheme_surface = scheme.settings.background | color_lighten: 2 -%}
-        {%- assign scheme_muted = scheme.settings.text | color_lighten: 12 -%}
-      {%- else -%}
-        {%- assign scheme_surface = scheme.settings.background | color_lighten: 6 -%}
-        {%- assign scheme_muted = scheme.settings.text | color_darken: 12 -%}
-      {%- endif -%}
+      {%- liquid
+        assign scheme_bg = scheme.settings.background
+        assign scheme_text = scheme.settings.text
+        assign scheme_accent = scheme.settings.accent
+        assign bg_brightness = scheme_bg | color_brightness
+
+        if bg_brightness > 128
+          assign scheme_surface = scheme_bg | color_lighten: 2
+        else
+          assign scheme_surface = scheme_bg | color_lighten: 6
+          assign surface_contrast = scheme_text | color_contrast: scheme_surface
+          if surface_contrast < 4.5
+            assign scheme_surface = scheme_bg | color_darken: 6
+          endif
+        endif
+
+        if bg_brightness > 128
+          assign scheme_muted = scheme_text | color_lighten: 12
+        else
+          assign scheme_muted = scheme_text | color_darken: 12
+        endif
+        assign muted_contrast = scheme_muted | color_contrast: scheme_bg
+        if muted_contrast < 4.5
+          if bg_brightness > 128
+            assign scheme_muted = scheme_text | color_lighten: 6
+          else
+            assign scheme_muted = scheme_text | color_darken: 6
+          endif
+          assign muted_contrast = scheme_muted | color_contrast: scheme_bg
+          if muted_contrast < 4.5
+            assign scheme_muted = scheme_text
+          endif
+        endif
+
+        assign accent_contrast = scheme_accent | color_contrast: scheme_bg
+        if accent_contrast >= 4.5
+          assign scheme_secondary_text = scheme_accent
+        elsif bg_brightness > 128
+          assign scheme_secondary_text = scheme_accent | color_darken: 16
+          assign secondary_contrast = scheme_secondary_text | color_contrast: scheme_bg
+          if secondary_contrast < 4.5
+            assign scheme_secondary_text = scheme_accent | color_darken: 25
+            assign secondary_contrast = scheme_secondary_text | color_contrast: scheme_bg
+            if secondary_contrast < 4.5
+              assign scheme_secondary_text = scheme_text
+            endif
+          endif
+        else
+          assign scheme_secondary_text = scheme_accent | color_lighten: 18
+          assign secondary_contrast = scheme_secondary_text | color_contrast: scheme_bg
+          if secondary_contrast < 4.5
+            assign scheme_secondary_text = scheme_accent | color_lighten: 30
+            assign secondary_contrast = scheme_secondary_text | color_contrast: scheme_bg
+            if secondary_contrast < 4.5
+              assign scheme_secondary_text = scheme_text
+            endif
+          endif
+        endif
+      -%}
       {% if forloop.index == 1 %}:root,{% endif %}
       .color-{{ scheme.id }} {
-        --bt-color-bg: {{ scheme.settings.background }};
-        --bt-color-bg-rgb: {{ scheme.settings.background.red }}, {{ scheme.settings.background.green }}, {{ scheme.settings.background.blue }};
+        --bt-color-bg: {{ scheme_bg }};
+        --bt-color-bg-rgb: {{ scheme_bg.red }}, {{ scheme_bg.green }}, {{ scheme_bg.blue }};
         --bt-color-surface: {{ scheme_surface }};
-        --bt-color-text: {{ scheme.settings.text }};
-        --bt-color-text-rgb: {{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }};
+        --bt-color-text: {{ scheme_text }};
+        --bt-color-text-rgb: {{ scheme_text.red }}, {{ scheme_text.green }}, {{ scheme_text.blue }};
         --bt-color-text-muted: {{ scheme_muted }};
         --bt-color-primary: {{ scheme.settings.button }};
         --bt-color-primary-rgb: {{ scheme.settings.button.red }}, {{ scheme.settings.button.green }}, {{ scheme.settings.button.blue }};
         --bt-color-primary-contrast: {{ scheme.settings.button_label }};
         --bt-color-primary-contrast-rgb: {{ scheme.settings.button_label.red }}, {{ scheme.settings.button_label.green }}, {{ scheme.settings.button_label.blue }};
-        --bt-color-secondary: {{ scheme.settings.accent }};
-        --bt-color-secondary-rgb: {{ scheme.settings.accent.red }}, {{ scheme.settings.accent.green }}, {{ scheme.settings.accent.blue }};
+        --bt-color-secondary: {{ scheme_accent }};
+        --bt-color-secondary-rgb: {{ scheme_accent.red }}, {{ scheme_accent.green }}, {{ scheme_accent.blue }};
+        --bt-color-secondary-text: {{ scheme_secondary_text }};
         --bt-color-border: {{ scheme.settings.shadow }};
         {%- if scheme.settings.background_gradient != blank %}
           --bt-color-bg-gradient: {{ scheme.settings.background_gradient }};

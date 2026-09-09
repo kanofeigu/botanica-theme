@@ -7,6 +7,11 @@
 {% endcomment %}
 <section class="bt-section bt-shop-by-care color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
+    {%- if section.settings.specimen_number != blank or section.settings.latin_caption != blank -%}
+      <div class="bt-shop-by-care__specimen">
+        {% render 'specimen-tag', number: section.settings.specimen_number, latin: section.settings.latin_caption, align: 'center' %}
+      </div>
+    {%- endif -%}
     {%- if section.settings.heading != blank -%}
       <h2 class="bt-shop-by-care__heading">{{ section.settings.heading | escape }}</h2>
     {%- endif -%}
@@ -21,6 +26,9 @@
 </section>
 
 {% stylesheet %}
+  .bt-shop-by-care__specimen {
+    margin-bottom: var(--bt-space-lg);
+  }
   .bt-shop-by-care__heading {
     font-family: var(--bt-font-heading);
     font-size: var(--bt-fs-h2);
@@ -82,6 +90,18 @@
       "id": "description",
       "label": "t:sections.shop_by_care.settings.description.label",
       "default": "Whether you have a green thumb or are just starting your plant journey, we have the perfect companion for your space."
+    },
+    {
+      "type": "text",
+      "id": "specimen_number",
+      "label": "t:sections.shop_by_care.settings.specimen_number.label",
+      "info": "t:sections.shop_by_care.settings.specimen_number.info"
+    },
+    {
+      "type": "text",
+      "id": "latin_caption",
+      "label": "t:sections.shop_by_care.settings.latin_caption.label",
+      "info": "t:sections.shop_by_care.settings.latin_caption.info"
     },
     {
       "type": "range",

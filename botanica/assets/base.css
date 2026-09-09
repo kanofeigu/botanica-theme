@@ -109,15 +109,41 @@ p {
   text-wrap: pretty;
 }
 
-.bt-eyebrow {
+/* Standardized micro-label / eyebrow: 12px Inter, uppercase, 0.1em tracking,
+   medium weight. .bt-micro-label is the canonical utility going forward;
+   .bt-eyebrow remains as the legacy alias used across current sections. */
+.bt-eyebrow,
+.bt-micro-label {
   display: inline-block;
   font-family: var(--bt-font-body);
   font-size: var(--bt-fs-eyebrow);
-  font-weight: var(--bt-fw-semibold);
-  letter-spacing: 0.16em;
+  font-weight: var(--bt-fw-medium);
+  letter-spacing: var(--bt-ls-micro);
   text-transform: uppercase;
   color: var(--bt-color-secondary-text);
   opacity: 1;
+}
+
+/* ── Editorial display utilities ──
+   Fluid specimen-plate headlines; tight leading, negative tracking. */
+.bt-display-xl,
+.bt-display-lg,
+.bt-display-md {
+  font-family: var(--bt-font-heading);
+  font-weight: var(--bt-fw-normal);
+  letter-spacing: var(--bt-ls-display);
+  color: var(--bt-color-text);
+  text-wrap: balance;
+  font-variant-numeric: oldstyle-nums;
+}
+.bt-display-xl { font-size: var(--bt-fs-display-xl); line-height: var(--bt-lh-display-xl); }
+.bt-display-lg { font-size: var(--bt-fs-display-lg); line-height: var(--bt-lh-display-lg); }
+.bt-display-md { font-size: var(--bt-fs-display-md); line-height: var(--bt-lh-display-md); }
+
+/* Italic serif accent — for mixing emphasized words into display headlines */
+.bt-serif-italic {
+  font-family: var(--bt-font-heading);
+  font-style: italic;
 }
 
 .bt-sr-only {
@@ -336,7 +362,9 @@ p {
 }
 .bt-badge--secondary {
   background: var(--bt-color-secondary-tint);
-  color: var(--bt-color-secondary);
+  /* secondary-text (not raw accent) keeps small badge text ≥ 4.5:1 on the
+     tint wash across every scheme. */
+  color: var(--bt-color-secondary-text);
 }
 .bt-badge--outline {
   background: transparent;
@@ -430,6 +458,26 @@ p {
 
 .bt-section {
   padding-block: var(--bt-space-section);
+}
+
+/* Editorial section rhythm (80–120px desktop band) for rebuilt sections */
+.bt-section-block { padding-block: var(--bt-section-padding-block); }
+.bt-section-block--sm { padding-block: var(--bt-section-padding-block-sm); }
+
+/* ── Hairline rules ── 1px low-opacity rules for specimen rows / seams */
+.bt-hairline-top { border-top: 1px solid var(--bt-hairline); }
+.bt-hairline-bottom { border-bottom: 1px solid var(--bt-hairline); }
+
+/* ── Per-section color schemes ──
+   Section roots carry a `color-scheme-N` class emitted from
+   Theme settings → Colors (token scopes are generated in theme.liquid).
+   :where() keeps zero specificity so any existing section-level
+   background/color rule still wins; sections that never painted a
+   background now render their assigned scheme correctly. */
+:where([class*="color-scheme-"]) {
+  background-color: var(--bt-color-bg);
+  background-image: var(--bt-color-bg-gradient, none);
+  color: var(--bt-color-text);
 }
 
 .bt-flex { display: flex; }

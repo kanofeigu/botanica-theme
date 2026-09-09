@@ -60,7 +60,7 @@
             "background": "#F6E9E1",
             "background_gradient": "",
             "text": "#2E2A24",
-            "button": "#B56A48",
+            "button": "#AC5F3D",
             "button_label": "#FFFFFF",
             "accent": "#4A6B4F",
             "shadow": "#2E2A24"
@@ -79,12 +79,12 @@
         },
         "scheme-6": {
           "settings": {
-            "background": "#9E5434",
+            "background": "#83452B",
             "background_gradient": "",
             "text": "#FFF8F2",
             "button": "#FFFFFF",
             "button_label": "#8F4A2E",
-            "accent": "#2E3D2F",
+            "accent": "#F0C9A8",
             "shadow": "#7A4A30"
           }
         }
@@ -149,7 +149,7 @@
             "background": "#F6E9E1",
             "background_gradient": "",
             "text": "#2E2A24",
-            "button": "#B56A48",
+            "button": "#AC5F3D",
             "button_label": "#FFFFFF",
             "accent": "#4A6B4F",
             "shadow": "#2E2A24"
@@ -168,12 +168,12 @@
         },
         "scheme-6": {
           "settings": {
-            "background": "#9E5434",
+            "background": "#83452B",
             "background_gradient": "",
             "text": "#FFF8F2",
             "button": "#FFFFFF",
             "button_label": "#8F4A2E",
-            "accent": "#2E3D2F",
+            "accent": "#F0C9A8",
             "shadow": "#7A4A30"
           }
         }
@@ -238,7 +238,7 @@
             "background": "#F6E9E1",
             "background_gradient": "",
             "text": "#2E2A24",
-            "button": "#B56A48",
+            "button": "#AC5F3D",
             "button_label": "#FFFFFF",
             "accent": "#4A6B4F",
             "shadow": "#2E2A24"
@@ -257,12 +257,12 @@
         },
         "scheme-6": {
           "settings": {
-            "background": "#9E5434",
+            "background": "#83452B",
             "background_gradient": "",
             "text": "#FFF8F2",
             "button": "#FFFFFF",
             "button_label": "#8F4A2E",
-            "accent": "#2E3D2F",
+            "accent": "#F0C9A8",
             "shadow": "#7A4A30"
           }
         }

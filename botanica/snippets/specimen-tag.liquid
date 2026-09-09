@@ -1,25 +1,86 @@
 {% comment %}
-  snippets/specimen-tag.liquid — Vintage botanical specimen identification tag
-  Looks like an archival label pinned to a specimen drawing.
-  Usage: {% render 'specimen-tag', number: 1, label: 'Origin', value: 'Southeast Asia' %}
+  snippets/specimen-tag.liquid — Canonical specimen-plate caption component.
+
+  Two styles:
+    'plate' (default) — hairline rule + micro-label specimen number +
+      serif-italic Latin caption. The reusable specimen-plate language.
+      Renders nothing when both number and latin are blank.
+      {% render 'specimen-tag', number: 'Nº 001', latin: 'Monstera deliciosa', align: 'left' %}
+    'tag' — legacy boxed archival label (kept for blocks/size-card.liquid).
+      {% render 'specimen-tag', style: 'tag', number: 1, label: 'Origin', value: 'Southeast Asia' %}
+
+  Parameters:
+    style   — 'plate' (default) | 'tag'
+    number  — specimen number text, rendered as-is (e.g. "Nº 001")
+    latin   — Latin-name caption, rendered serif italic
+    align   — 'left' (default) | 'center' | 'right'   (plate only)
+    rule    — false to hide the hairline rule          (plate only, default true)
+    label / value — legacy 'tag' fields
 {% endcomment %}
 {%- liquid
-  assign number = number | default: '001'
-  assign label = label | default: 'Specimen'
-  assign value = value | default: ''
+  assign tag_style = style | default: 'plate'
+  assign align = align | default: 'left'
+  if rule == null
+    assign rule = true
+  endif
 -%}
-<div class="bt-specimen-tag" aria-hidden="true">
-  <span class="bt-specimen-tag__number">{{ number }}</span>
-  {%- if value != blank -%}
-    <span class="bt-specimen-tag__label">{{ label }}</span>
-    <span class="bt-specimen-tag__value">{{ value }}</span>
-  {%- else -%}
-    <span class="bt-specimen-tag__label">{{ label }}</span>
-  {%- endif -%}
-</div>
+{%- if tag_style == 'tag' -%}
+  {%- liquid
+    assign number = number | default: '001'
+    assign label = label | default: 'Specimen'
+    assign value = value | default: ''
+  -%}
+  <div class="bt-specimen-tag bt-specimen-tag--tag" aria-hidden="true">
+    <span class="bt-specimen-tag__number">{{ number }}</span>
+    {%- if value != blank -%}
+      <span class="bt-specimen-tag__label">{{ label }}</span>
+      <span class="bt-specimen-tag__value">{{ value }}</span>
+    {%- else -%}
+      <span class="bt-specimen-tag__label">{{ label }}</span>
+    {%- endif -%}
+  </div>
+{%- elsif number != blank or latin != blank -%}
+  <div class="bt-specimen-tag bt-specimen-tag--plate bt-specimen-tag--{{ align }}{% unless rule %} bt-specimen-tag--no-rule{% endunless %}">
+    {%- if number != blank -%}
+      <span class="bt-specimen-tag__num bt-micro-label">{{ number | escape }}</span>
+    {%- endif -%}
+    {%- if latin != blank -%}
+      <span class="bt-specimen-tag__latin">{{ latin | escape }}</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}
 
 {% stylesheet %}
-  .bt-specimen-tag {
+  /* ── Plate: hairline rule + micro number + italic Latin caption ── */
+  .bt-specimen-tag--plate {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--bt-space-sm);
+    margin: 0;
+    padding-top: var(--bt-space-xs);
+    border-top: 1px solid var(--bt-hairline);
+  }
+  .bt-specimen-tag--center { justify-content: center; }
+  .bt-specimen-tag--right { justify-content: flex-end; }
+  .bt-specimen-tag--no-rule {
+    border-top: 0;
+    padding-top: 0;
+  }
+  /* Number styling comes from .bt-micro-label (base.css 1a tokens) */
+  .bt-specimen-tag__num {
+    flex-shrink: 0;
+  }
+  .bt-specimen-tag__latin {
+    font-family: var(--bt-font-heading);
+    font-style: italic;
+    font-size: var(--bt-fs-body-sm);
+    line-height: var(--bt-lh-body);
+    color: var(--bt-color-text-muted);
+  }
+
+  /* ── Tag (legacy boxed archival label) ── */
+  .bt-specimen-tag--tag {
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;

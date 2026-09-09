@@ -831,14 +831,15 @@
         "layout": {
           "label": "Layout",
           "options__1": {
-            "label": "Split"
+            "label": "Image right"
           },
           "options__2": {
-            "label": "Stacked"
-          },
-          "options__3": {
-            "label": "Full bleed"
+            "label": "Image left"
           }
+        },
+        "full_width": {
+          "label": "Full width",
+          "info": "Stretch the composition to the viewport edges instead of the page container"
         },
         "image": {
           "label": "Desktop image"
@@ -847,28 +848,36 @@
           "label": "Mobile image",
           "info": "Displayed on screens under 750px"
         },
-        "video": {
-          "label": "Hero video",
-          "info": "Upload an MP4 video. Takes priority over the image. Autoplays muted, looped, with no controls — ideal for cinematic backgrounds."
-        },
-        "poster_image": {
-          "label": "Video poster image",
-          "info": "Fallback image shown before the video loads, and on mobile devices that block autoplay."
-        },
-        "image_fit": {
-          "label": "Image fit",
+        "image_ratio": {
+          "label": "Image ratio",
           "options__1": {
-            "label": "Cover (fill area)"
+            "label": "Portrait (4:5)"
           },
           "options__2": {
-            "label": "Contain (show full image)"
+            "label": "Portrait (3:4)"
+          },
+          "options__3": {
+            "label": "Square (1:1)"
           }
         },
         "eyebrow": {
           "label": "Eyebrow"
         },
         "heading": {
-          "label": "Heading"
+          "label": "Heading",
+          "info": "Italicize words to set them as serif accents"
+        },
+        "heading_size": {
+          "label": "Heading size",
+          "options__1": {
+            "label": "Extra large"
+          },
+          "options__2": {
+            "label": "Large"
+          },
+          "options__3": {
+            "label": "Medium"
+          }
         },
         "text": {
           "label": "Text"
@@ -888,26 +897,13 @@
             "label": "Outline"
           }
         },
-        "show_scrim": {
-          "label": "Show text scrim",
-          "info": "Dark gradient behind text for readability on full-bleed layouts"
+        "specimen_number": {
+          "label": "Specimen number",
+          "info": "Shown under the image, e.g. “Nº 001”. Leave blank to hide."
         },
-        "mobile_overlay": {
-          "label": "Overlay text on mobile",
-          "info": "On phones, shows the image full-bleed with text overlaid on a gradient"
-        },
-        "scrim_opacity": {
-          "label": "Scrim opacity"
-        },
-        "min_height": {
-          "label": "Minimum height (vh)",
-          "info": "Full-bleed layout only"
-        },
-        "padding_top": {
-          "label": "Top padding"
-        },
-        "padding_bottom": {
-          "label": "Bottom padding"
+        "latin_caption": {
+          "label": "Latin caption",
+          "info": "Serif italic caption under the image, e.g. “Monstera deliciosa”. Leave blank to hide."
         }
       }
     },
@@ -1133,6 +1129,14 @@
         },
         "description": {
           "label": "Description"
+        },
+        "specimen_number": {
+          "label": "Specimen number",
+          "info": "Optional catalogue number above the heading, e.g. “Nº 02”. Leave blank to hide."
+        },
+        "latin_caption": {
+          "label": "Latin caption",
+          "info": "Optional serif italic caption above the heading. Leave blank to hide."
         },
         "padding_top": {
           "label": "Top padding"

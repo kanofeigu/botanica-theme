@@ -93,17 +93,21 @@
       </div>
     {%- endif -%}
 
-    {%- if show_vendor -%}
-      <p class="bt-card__vendor bt-eyebrow">{{ product.vendor }}</p>
-    {%- endif -%}
-
     <h3 class="bt-card__title bt-product-card__title">
       <a href="{{ product.url }}">{{ product.title }}</a>
     </h3>
 
+    {%- comment -%} Specimen corner: Latin metafield wins, otherwise the vendor
+        (when enabled) — one quiet serif-italic line under the title. {%- endcomment -%}
     {%- assign latin_name = product.metafields.custom.latin_name.value -%}
+    {%- assign specimen_line = '' -%}
     {%- if show_latin_name != false and latin_name != blank -%}
-      <p class="bt-card__latin">{{ latin_name }}</p>
+      {%- assign specimen_line = latin_name -%}
+    {%- elsif show_vendor and product.vendor != blank -%}
+      {%- assign specimen_line = product.vendor -%}
+    {%- endif -%}
+    {%- if specimen_line != '' -%}
+      <p class="bt-card__latin">{{ specimen_line | escape }}</p>
     {%- endif -%}
 
     <div class="bt-card__price">
@@ -236,14 +240,13 @@
     flex-shrink: 0;
   }
 
-  /* ── Latin name subtitle ── */
+  /* ── Latin name / vendor specimen line ── */
   .bt-card__latin {
     font-family: var(--bt-font-heading);
     font-style: italic;
     font-size: var(--bt-fs-body-sm);
     color: var(--bt-color-text-muted);
     margin: calc(var(--bt-space-3xs) * -0.5) 0 0;
-    opacity: 0.85;
   }
 
   /* ── New badge ── */
@@ -252,10 +255,11 @@
     color: var(--bt-color-primary-contrast);
   }
 
-  /* ── Card body ── */
+  /* ── Card body — hairline seam above the info block (specimen corner) ── */
   .bt-card--product .bt-card__body {
     padding: var(--bt-space-sm) var(--bt-space-sm) var(--bt-space-md);
     gap: var(--bt-space-2xs);
+    border-top: 1px solid var(--bt-hairline);
   }
 
   /* ── Care chips row ── */
@@ -309,13 +313,6 @@
   }
   .bt-chip--light svg {
     color: var(--bt-color-secondary);
-  }
-
-  /* ── Vendor ── */
-  .bt-card__vendor {
-    font-size: 0.625rem;
-    letter-spacing: 0.12em;
-    margin-bottom: 0;
   }
 
   /* ── Title ── */

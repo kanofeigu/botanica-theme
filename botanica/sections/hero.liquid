@@ -1,122 +1,104 @@
 {% comment %}
-  sections/hero.liquid — Multi-layout hero section
-  Layouts: split (text left + image right), stacked (image top + text overlay),
-  full-bleed (full viewport image + scrim + centered text).
-  ★ Design differentiation: asymmetric compositions, specimen labels, paper texture.
+  sections/hero.liquid — Specimen-plate editorial hero.
+  Two-column composition (~55/45): eyebrow micro-label, oversized fluid display
+  headline (inline richtext → italic accent words), short copy, one primary CTA.
+  The headline overlaps the image column edge; the image is framed as a
+  specimen plate (double hairline frame + Nº / Latin-name caption row).
   All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
-  assign layout = section.settings.layout | default: 'split'
+  assign layout = section.settings.layout | default: 'image_right'
   assign image = section.settings.image
   assign image_mobile = section.settings.image_mobile | default: image
-  assign video = section.settings.video
-  assign poster_image = section.settings.poster_image | default: image
-  assign image_fit = section.settings.image_fit | default: 'cover'
-  assign show_scrim = section.settings.show_scrim | default: false
-  assign scrim_opacity = section.settings.scrim_opacity | default: 40
   assign heading = section.settings.heading
+  assign heading_size = section.settings.heading_size | default: 'xl'
   assign text = section.settings.text
+  assign eyebrow = section.settings.eyebrow
   assign button_label = section.settings.button_label
   assign button_link = section.settings.button_link
   assign button_style = section.settings.button_style | default: 'primary'
-  assign eyebrow = section.settings.eyebrow
-  assign min_height = section.settings.min_height | default: 'auto'
+  assign specimen_number = section.settings.specimen_number
+  assign latin_caption = section.settings.latin_caption
+
+  assign ratio = section.settings.image_ratio | default: '4-5'
+  assign aspect = '4 / 5'
+  if ratio == '1-1'
+    assign aspect = '1 / 1'
+  elsif ratio == '3-4'
+    assign aspect = '3 / 4'
+  endif
+
+  assign hero_alt = image.alt | default: heading | strip_html | escape
 -%}
 <section
-  class="bt-hero bt-hero--{{ layout }} color-{{ section.settings.color_scheme }}{% if section.settings.mobile_overlay and layout == 'split' %} bt-hero--mobile-overlay{% endif %}"
+  class="bt-hero bt-hero--{{ layout }} bt-section-block color-{{ section.settings.color_scheme }}{% if section.settings.full_width %} bt-hero--full{% endif %}"
   {{ section.shopify_attributes }}
-  style="--bt-hero-min-height: {% if min_height != 'auto' %}{{ min_height }}vh{% else %}auto{% endif %}; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
 >
-  {%- if layout == 'full_bleed' or layout == 'stacked' -%}
-    {% render 'botanical-ambience', show_hero_botanical: true %}
-  {%- endif -%}
-  <div class="bt-hero__inner">
-    {%- if video != blank -%}
-      <div class="bt-hero__media{% if image_fit == 'contain' %} bt-hero__media--contain{% endif %}">
-        {{ video | video_tag:
-          image_size: '2000x',
-          autoplay: true,
-          loop: true,
-          muted: true,
-          controls: false,
-          playsinline: true,
-          preload: 'metadata',
-          poster: poster_image | image_url: width: 2000,
-          class: 'bt-hero__vid',
-          loading: 'eager'
-        }}
-        {%- if show_scrim and layout == 'stacked' -%}
-          <div class="bt-hero__scrim" style="--bt-scrim-opacity: {{ scrim_opacity | divided_by: 100.0 }}"></div>
+  <div class="bt-hero__inner{% unless section.settings.full_width %} bt-container{% endunless %}">
+    <div class="bt-hero__grid">
+      <div class="bt-hero__intro">
+        {%- if eyebrow != blank -%}
+          <p class="bt-hero__eyebrow bt-micro-label">{{ eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if heading != blank -%}
+          <h1 class="bt-hero__heading bt-display-{{ heading_size }}">{{ heading }}</h1>
         {%- endif -%}
       </div>
-    {%- elsif image != blank -%}
-      {%- assign has_mobile = false -%}
-      {%- if image_mobile != blank and image_mobile != image -%}
-        {%- assign has_mobile = true -%}
-      {%- endif -%}
-      {%- comment -%} Real <img>/<picture> with srcset + fetchpriority: CSS backgrounds
-          are invisible to the preload scanner and were the LCP bottleneck. {%- endcomment -%}
-      {%- liquid
-        if layout == 'split'
-          assign hero_sizes = '(min-width: 990px) 50vw, 100vw'
-        else
-          assign hero_sizes = '100vw'
-        endif
-        assign hero_alt = image.alt | default: heading | escape
-      -%}
-      <div class="bt-hero__media{% if image_fit == 'contain' %} bt-hero__media--contain{% endif %}">
-        {%- if has_mobile -%}
-          <picture>
-            <source media="(max-width: 749px)" srcset="{{ image_mobile | image_url: width: 750 }} 750w">
-            <img src="{{ image | image_url: width: 1600 }}"
-              srcset="{{ image | image_url: width: 800 }} 800w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w, {{ image | image_url: width: 2000 }} 2000w"
-              sizes="{{ hero_sizes }}"
-              alt="{{ hero_alt }}" class="bt-hero__img"
-              width="{{ image.width }}" height="{{ image.height }}"
-              fetchpriority="high" loading="eager" decoding="async">
-          </picture>
-        {%- else -%}
-          <img src="{{ image | image_url: width: 1600 }}"
-            srcset="{{ image | image_url: width: 800 }} 800w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w, {{ image | image_url: width: 2000 }} 2000w"
-            sizes="{{ hero_sizes }}"
-            alt="{{ hero_alt }}" class="bt-hero__img"
-            width="{{ image.width }}" height="{{ image.height }}"
-            fetchpriority="high" loading="eager" decoding="async">
-        {%- endif -%}
-        {%- if show_scrim and layout == 'stacked' -%}
-          <div class="bt-hero__scrim" style="--bt-scrim-opacity: {{ scrim_opacity | divided_by: 100.0 }}"></div>
-        {%- endif -%}
-      </div>
-    {%- else -%}
-      <div class="bt-hero__media bt-hero__media--placeholder">
-        <div class="bt-hero__placeholder-illustration" aria-hidden="true">
-          {{ 'lifestyle-1' | placeholder_svg_tag: 'Botanical illustration' }}
+
+      <figure class="bt-hero__plate">
+        <div class="bt-hero__frame">
+          <div class="bt-hero__media" style="aspect-ratio: {{ aspect }}">
+            {%- if image != blank -%}
+              {%- assign has_mobile = false -%}
+              {%- if image_mobile != blank and image_mobile != image -%}
+                {%- assign has_mobile = true -%}
+              {%- endif -%}
+              {%- if has_mobile -%}
+                <picture>
+                  <source media="(max-width: 749px)" srcset="{{ image_mobile | image_url: width: 750 }} 750w">
+                  <img src="{{ image | image_url: width: 1200 }}"
+                    srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w"
+                    sizes="(min-width: 750px) 45vw, 100vw"
+                    alt="{{ hero_alt }}" class="bt-hero__img"
+                    width="{{ image.width }}" height="{{ image.height }}"
+                    fetchpriority="high" loading="eager" decoding="async">
+                </picture>
+              {%- else -%}
+                <img src="{{ image | image_url: width: 1200 }}"
+                  srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w"
+                  sizes="(min-width: 750px) 45vw, 100vw"
+                  alt="{{ hero_alt }}" class="bt-hero__img"
+                  width="{{ image.width }}" height="{{ image.height }}"
+                  fetchpriority="high" loading="eager" decoding="async">
+              {%- endif -%}
+            {%- else -%}
+              <div class="bt-hero__placeholder" aria-hidden="true">
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'bt-hero__placeholder-svg' }}
+              </div>
+            {%- endif -%}
+          </div>
         </div>
+        {%- if specimen_number != blank or latin_caption != blank -%}
+          <figcaption class="bt-hero__caption">
+            {% render 'specimen-tag', number: specimen_number, latin: latin_caption %}
+          </figcaption>
+        {%- endif -%}
+      </figure>
+
+      <div class="bt-hero__body">
+        {%- if text != blank -%}
+          <p class="bt-hero__text">{{ text | escape }}</p>
+        {%- endif -%}
+        {%- if button_label != blank -%}
+          <a href="{{ button_link | default: '#' }}" class="bt-btn bt-btn--{{ button_style }} bt-btn--lg">
+            {{ button_label | escape }}
+          </a>
+        {%- endif -%}
       </div>
-    {%- endif -%}
-    {%- if show_scrim and layout == 'full_bleed' -%}
-      <div class="bt-hero__scrim" style="--bt-scrim-opacity: {{ scrim_opacity | divided_by: 100.0 }}"></div>
-    {%- endif -%}
-    <div class="bt-hero__content bt-reveal--left">
-      {%- if eyebrow != blank -%}
-        <p class="bt-hero__eyebrow">{{ eyebrow | escape }}</p>
-      {%- endif -%}
-      {%- if heading != blank -%}
-        <h1 class="bt-hero__heading">{{ heading | escape }}</h1>
-      {%- endif -%}
-      {%- if text != blank -%}
-        <p class="bt-hero__text">{{ text | escape }}</p>
-      {%- endif -%}
-      {%- if button_label != blank -%}
-        <a href="{{ button_link | default: '#' }}" class="bt-btn bt-btn--{{ button_style }} bt-btn--lg">
-          {{ button_label | escape }}
-        </a>
-      {%- endif -%}
     </div>
   </div>
   {%- if section.blocks.size > 0 -%}
-    {% render 'botanical-divider' %}
-    <div class="bt-hero__blocks{% if layout == 'full_bleed' %} bt-hero__blocks--overlay{% endif %}">
+    <div class="bt-hero__blocks{% unless section.settings.full_width %} bt-container{% endunless %}">
       {% content_for "blocks" %}
     </div>
   {%- endif -%}
@@ -124,78 +106,94 @@
 
 {% stylesheet %}
   .bt-hero {
-    --bt-hero-min-height: auto;
     position: relative;
     overflow: hidden;
-    background: var(--bt-color-bg);
   }
-  /* ── Split layout ── */
-  .bt-hero--split .bt-hero__inner {
+  .bt-hero--full .bt-hero__inner {
+    padding-inline: var(--bt-page-gutter);
+  }
+
+  /* ── Two-column editorial grid (~55/45) ── */
+  .bt-hero__grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: clamp(var(--bt-space-lg), 4vw, var(--bt-space-3xl));
-    min-height: var(--bt-hero-min-height);
-    padding-inline-end: clamp(var(--bt-page-gutter), 3vw, var(--bt-space-xl));
-    padding-block: clamp(var(--bt-space-sm), 2.5vw, var(--bt-space-xl));
-  }
-  .bt-hero--split .bt-hero__media {
-    order: 1;
-    aspect-ratio: 4 / 5;
-    max-height: 88vh;
-    border-radius: clamp(14px, 2vw, 24px);
-  }
-  .bt-hero--split .bt-hero__content {
-    order: 0;
-    padding: var(--bt-space-xl) clamp(var(--bt-page-gutter), 6vw, 5rem);
-  }
-  /* ── Stacked layout ── */
-  .bt-hero--stacked .bt-hero__inner {
-    display: grid;
+    grid-template-columns: 1.12fr 0.88fr;
     grid-template-rows: auto auto;
-    gap: 0;
+    row-gap: var(--bt-space-lg);
+    align-content: center;
   }
-  .bt-hero--stacked .bt-hero__media {
-    width: 100%;
-    aspect-ratio: 3 / 2;
-    max-height: 70vh;
-  }
-  .bt-hero--stacked .bt-hero__content {
-    padding: var(--bt-space-xl) clamp(var(--bt-page-gutter), 8vw, var(--bt-space-2xl));
-    text-align: center;
-  }
-  /* ── Full bleed layout ── */
-  .bt-hero--full_bleed .bt-hero__inner {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--bt-hero-min-height, 80vh);
-  }
-  .bt-hero--full_bleed .bt-hero__media {
-    position: absolute;
-    inset: 0;
-  }
-  .bt-hero--full_bleed .bt-hero__content {
+  .bt-hero__intro {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
     position: relative;
     z-index: 2;
-    text-align: center;
-    padding: var(--bt-space-xl);
-    max-width: 720px;
+    /* Signature overlap: the headline extends ~8–12% of the image width
+       over the specimen plate. */
+    margin-inline-end: calc(-1 * clamp(2rem, 5vw, 4.5rem));
   }
-  .bt-hero--full_bleed .bt-hero__heading,
-  .bt-hero--full_bleed .bt-hero__text,
-  .bt-hero--full_bleed .bt-eyebrow {
-    color: var(--bt-color-primary-contrast, #FFFFFF);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  .bt-hero__body {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    padding-inline-end: clamp(1.5rem, 3.5vw, 3.5rem);
   }
-  /* ── Shared ── */
+  .bt-hero__plate {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    margin: 0;
+    min-width: 0;
+  }
+
+  /* ── Flipped: image left, text right ── */
+  .bt-hero--image_left .bt-hero__grid {
+    grid-template-columns: 0.88fr 1.12fr;
+  }
+  .bt-hero--image_left .bt-hero__plate {
+    grid-column: 1;
+  }
+  .bt-hero--image_left .bt-hero__intro {
+    grid-column: 2;
+    margin-inline-end: 0;
+    margin-inline-start: calc(-1 * clamp(2rem, 5vw, 4.5rem));
+  }
+  .bt-hero--image_left .bt-hero__body {
+    grid-column: 2;
+    padding-inline-end: 0;
+    padding-inline-start: clamp(1.5rem, 3.5vw, 3.5rem);
+  }
+
+  /* ── Type ── */
+  .bt-hero__eyebrow {
+    margin: 0 0 var(--bt-space-md);
+  }
+  .bt-hero__heading {
+    margin: 0;
+    max-width: 12ch;
+  }
+  .bt-hero__heading em {
+    letter-spacing: -0.01em;
+  }
+  .bt-hero__text {
+    font-size: calc(var(--bt-fs-body) * 1.0625);
+    line-height: var(--bt-lh-body);
+    color: var(--bt-color-text-muted);
+    margin: 0 0 var(--bt-space-lg);
+    max-width: 46ch;
+  }
+
+  /* ── Specimen plate: outer hairline + inner offset hairline frame ── */
+  .bt-hero__frame {
+    padding: clamp(8px, 0.9vw, 12px);
+    border: 1px solid var(--bt-hairline);
+    background: var(--bt-color-surface);
+  }
   .bt-hero__media {
     position: relative;
     overflow: hidden;
-    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-hairline);
+    background: var(--bt-color-surface-hover);
   }
-  /* Real <img> hero: discoverable by the preload scanner (fetchpriority=high) */
   .bt-hero__img {
     position: absolute;
     inset: 0;
@@ -203,171 +201,50 @@
     height: 100%;
     object-fit: cover;
   }
-  .bt-hero__media--contain .bt-hero__img {
-    object-fit: contain;
-  }
-  .bt-hero__vid {
+  .bt-hero__placeholder {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-  .bt-hero__media--placeholder {
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bt-color-surface);
   }
-  .bt-hero__placeholder-illustration {
+  .bt-hero__placeholder-svg {
     width: 60%;
-    max-width: 400px;
+    max-width: 320px;
     opacity: 0.15;
   }
-  .bt-hero__placeholder-illustration svg {
-    width: 100%;
-    height: auto;
+  .bt-hero__caption {
+    margin-top: var(--bt-space-sm);
   }
-  .bt-hero__scrim {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: linear-gradient(
-      to top,
-      rgba(var(--bt-color-text-rgb), var(--bt-scrim-opacity, 0.4)),
-      rgba(var(--bt-color-text-rgb), 0) 60%
-    );
-  }
-  .bt-hero__heading {
-    font-family: var(--bt-font-heading);
-    font-size: var(--bt-fs-display);
-    font-weight: var(--bt-fw-normal);
-    letter-spacing: -0.015em;
-    line-height: 1.08;
-    color: var(--bt-color-text);
-    margin: 0 0 var(--bt-space-md);
-    text-wrap: balance;
-    font-variant-numeric: oldstyle-nums;
-  }
-  .bt-hero__text {
-    font-size: calc(var(--bt-fs-body) * 1.0625);
-    line-height: var(--bt-lh-body);
-    color: var(--bt-color-text-muted);
-    margin: 0 0 var(--bt-space-lg);
-    max-width: 48ch;
-  }
-  .bt-hero--full_bleed .bt-hero__text { margin-inline: auto; }
-  .bt-hero--split .bt-hero__blocks {
-    padding: var(--bt-space-xl) clamp(var(--bt-page-gutter), 6vw, 5rem);
-    border-top: 1px solid var(--bt-color-border-light);
-  }
-  /* Eyebrow in hero reads as a clean editorial kicker */
-  .bt-hero__eyebrow {
-    margin: 0 0 var(--bt-space-md);
-    font-family: var(--bt-font-body);
-    font-size: var(--bt-fs-eyebrow);
-    font-weight: var(--bt-fw-semibold);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--bt-color-secondary-text);
-  }
-  /* ── Hero botanical decoration — structural rules MUST be local:
-     the ambience snippet is rendered here directly, and its section
-     stylesheet only loads when the botanical-ambience section exists.
-     (botanical-effects.css is async → too late, would cause CLS.) ── */
-  .bt-hero .bt-hero-botanical {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .bt-hero .bt-hero-botanical__img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    opacity: 0.06;
-  }
-  .bt-hero--full_bleed .bt-hero__eyebrow,
-  .bt-hero--mobile-overlay .bt-hero__eyebrow {
-    color: rgba(255,255,255,0.92);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
-  }
-  @media (min-width: 750px) {
-    .bt-hero--mobile-overlay .bt-hero__eyebrow {
-      color: var(--bt-color-secondary-text);
-      text-shadow: none;
-    }
-  }
-  /* ── Responsive ── */
-  /* ── Accessibility ── */
-  @media (prefers-reduced-motion: reduce) {
-    .bt-hero__vid {
-      display: none;
-    }
-  }
-  /* ── Responsive ── */
-  @media (max-width: 749px) {
-    .bt-hero--split .bt-hero__inner {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto auto;
-      gap: 0;
-      padding-inline-end: 0;
-    }
-    .bt-hero--split .bt-hero__media {
-      order: 0;
-      aspect-ratio: 4 / 5;
-      max-height: 60vh;
-      border-radius: 0;
-    }
-    .bt-hero--split .bt-hero__content { order: 1; }
 
-    /* Mobile overlay: full-bleed image with text on scrim */
-    .bt-hero--mobile-overlay .bt-hero__inner {
-      position: relative;
-      display: block;
-      min-height: 0; /* inner must hug the media or content anchors below the image */
+  /* ── Optional theme/app blocks row ── */
+  .bt-hero__blocks {
+    margin-top: var(--bt-space-2xl);
+    padding-top: var(--bt-space-xl);
+    border-top: 1px solid var(--bt-hairline);
+  }
+  .bt-hero--full .bt-hero__blocks {
+    padding-inline: var(--bt-page-gutter);
+  }
+
+  /* ── Mobile: stacked, no overlap — eyebrow → headline → plate → copy → CTA ── */
+  @media (max-width: 749px) {
+    .bt-hero__grid,
+    .bt-hero--image_left .bt-hero__grid {
+      display: flex;
+      flex-direction: column;
+      row-gap: var(--bt-space-lg);
     }
-    .bt-hero--mobile-overlay .bt-hero__media {
-      aspect-ratio: 3 / 4;
-      max-height: 82vh;
-      min-height: 480px;
+    .bt-hero__intro,
+    .bt-hero--image_left .bt-hero__intro {
+      margin-inline: 0;
     }
-    .bt-hero--mobile-overlay .bt-hero__media::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      /* Dual gradient: darken the bottom for the content block AND the top
-         for the eyebrow/kicker — bright foliage was washing both out. */
-      background: linear-gradient(
-        to top,
-        rgba(var(--bt-color-text-rgb), 0.72) 0%,
-        rgba(var(--bt-color-text-rgb), 0.25) 45%,
-        rgba(var(--bt-color-text-rgb), 0.15) 70%,
-        rgba(var(--bt-color-text-rgb), 0.38) 100%
-      );
+    .bt-hero__body,
+    .bt-hero--image_left .bt-hero__body {
+      padding-inline: 0;
     }
-    .bt-hero--mobile-overlay .bt-hero__content {
-      position: absolute;
-      inset-inline: 0;
-      bottom: 0;
-      z-index: 2;
-      padding: var(--bt-space-xl) var(--bt-page-gutter) var(--bt-space-2xl);
-    }
-    .bt-hero--mobile-overlay .bt-hero__heading {
-      font-size: clamp(2.4rem, 10vw, 3.2rem);
-      color: #FFFFFF;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.35);
-    }
-    .bt-hero--mobile-overlay .bt-hero__text {
-      color: rgba(255,255,255,0.92);
-      text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    .bt-hero__heading {
+      max-width: 16ch;
     }
   }
 {% endstylesheet %}
@@ -384,11 +261,16 @@
       "id": "layout",
       "label": "t:sections.hero.settings.layout.label",
       "options": [
-        { "value": "split", "label": "t:sections.hero.settings.layout.options__1.label" },
-        { "value": "stacked", "label": "t:sections.hero.settings.layout.options__2.label" },
-        { "value": "full_bleed", "label": "t:sections.hero.settings.layout.options__3.label" }
+        { "value": "image_right", "label": "t:sections.hero.settings.layout.options__1.label" },
+        { "value": "image_left", "label": "t:sections.hero.settings.layout.options__2.label" }
       ],
-      "default": "split"
+      "default": "image_right"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.hero.settings.full_width.label",
+      "default": false
     },
     {
       "type": "image_picker",
@@ -402,38 +284,39 @@
       "info": "t:sections.hero.settings.image_mobile.info"
     },
     {
-      "type": "video",
-      "id": "video",
-      "label": "t:sections.hero.settings.video.label",
-      "info": "t:sections.hero.settings.video.info"
-    },
-    {
-      "type": "image_picker",
-      "id": "poster_image",
-      "label": "t:sections.hero.settings.poster_image.label",
-      "info": "t:sections.hero.settings.poster_image.info"
-    },
-    {
       "type": "select",
-      "id": "image_fit",
-      "label": "t:sections.hero.settings.image_fit.label",
+      "id": "image_ratio",
+      "label": "t:sections.hero.settings.image_ratio.label",
       "options": [
-        { "value": "cover", "label": "t:sections.hero.settings.image_fit.options__1.label" },
-        { "value": "contain", "label": "t:sections.hero.settings.image_fit.options__2.label" }
+        { "value": "4-5", "label": "t:sections.hero.settings.image_ratio.options__1.label" },
+        { "value": "3-4", "label": "t:sections.hero.settings.image_ratio.options__2.label" },
+        { "value": "1-1", "label": "t:sections.hero.settings.image_ratio.options__3.label" }
       ],
-      "default": "cover"
+      "default": "4-5"
     },
     {
       "type": "text",
       "id": "eyebrow",
       "label": "t:sections.hero.settings.eyebrow.label",
-      "default": "Issue 01 — Field guide"
+      "default": "Indoor Plants — Catalogue Nº 01"
     },
     {
-      "type": "text",
+      "type": "inline_richtext",
       "id": "heading",
       "label": "t:sections.hero.settings.heading.label",
-      "default": "Bring the outside in"
+      "info": "t:sections.hero.settings.heading.info",
+      "default": "Bring the <em>outside</em> in"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "t:sections.hero.settings.heading_size.label",
+      "options": [
+        { "value": "xl", "label": "t:sections.hero.settings.heading_size.options__1.label" },
+        { "value": "lg", "label": "t:sections.hero.settings.heading_size.options__2.label" },
+        { "value": "md", "label": "t:sections.hero.settings.heading_size.options__3.label" }
+      ],
+      "default": "xl"
     },
     {
       "type": "textarea",
@@ -463,51 +346,18 @@
       "default": "primary"
     },
     {
-      "type": "checkbox",
-      "id": "mobile_overlay",
-      "label": "t:sections.hero.settings.mobile_overlay.label",
-      "info": "t:sections.hero.settings.mobile_overlay.info",
-      "default": false
+      "type": "text",
+      "id": "specimen_number",
+      "label": "t:sections.hero.settings.specimen_number.label",
+      "info": "t:sections.hero.settings.specimen_number.info",
+      "default": "Nº 001"
     },
     {
-      "type": "checkbox",
-      "id": "show_scrim",
-      "label": "t:sections.hero.settings.show_scrim.label",
-      "default": true,
-      "info": "t:sections.hero.settings.show_scrim.info"
-    },
-    {
-      "type": "range",
-      "id": "scrim_opacity",
-      "min": 10,
-      "max": 80,
-      "step": 5,
-      "default": 40,
-      "unit": "%",
-      "label": "t:sections.hero.settings.scrim_opacity.label"
-    },
-    {
-      "type": "range",
-      "id": "min_height",
-      "min": 50,
-      "max": 100,
-      "step": 10,
-      "default": 80,
-      "unit": "vh",
-      "label": "t:sections.hero.settings.min_height.label",
-      "info": "t:sections.hero.settings.min_height.info"
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0, "max": 100, "step": 4, "unit": "px",
-      "label": "t:sections.hero.settings.padding_top.label", "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0, "max": 100, "step": 4, "unit": "px",
-      "label": "t:sections.hero.settings.padding_bottom.label", "default": 0
+      "type": "text",
+      "id": "latin_caption",
+      "label": "t:sections.hero.settings.latin_caption.label",
+      "info": "t:sections.hero.settings.latin_caption.info",
+      "default": "Monstera deliciosa"
     }
   ],
   "presets": [{

@@ -50,6 +50,7 @@
     --bt-color-surface-hover: color-mix(in srgb, var(--bt-color-surface) 96%, var(--bt-color-text));
     --bt-color-border-light: color-mix(in srgb, var(--bt-color-border) 15%, transparent);
     --bt-color-border-medium: color-mix(in srgb, var(--bt-color-border) 30%, transparent);
+    --bt-hairline: color-mix(in srgb, var(--bt-color-border) 14%, transparent);
   }
 
   /* Focus ring */
@@ -62,6 +63,17 @@
   --bt-font-body: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --bt-fs-display: clamp(3.2rem, 5vw, 5.6rem);
+  /* Fluid editorial display scale — specimen-plate headlines.
+     Consumed by the .bt-display-* utilities in base.css. The legacy
+     --bt-fs-display above stays untouched for current sections; Batch 1b
+     migrates hero/section headlines onto this scale. */
+  --bt-fs-display-xl: clamp(2.75rem, 8vw, 7.5rem);
+  --bt-fs-display-lg: clamp(2.25rem, 5.5vw, 5rem);
+  --bt-fs-display-md: clamp(1.75rem, 3.5vw, 3rem);
+  --bt-lh-display-xl: 0.98;
+  --bt-lh-display-lg: 1.02;
+  --bt-lh-display-md: 1.08;
+  --bt-ls-display: -0.02em;
   --bt-fs-h1: clamp(2.2rem, 3.5vw, 3.2rem);
   --bt-fs-h2: clamp(1.8rem, 2.5vw, 2.4rem);
   --bt-fs-h3: clamp(1.4rem, 1.8vw, 1.8rem);
@@ -69,7 +81,11 @@
   --bt-fs-body: 1rem;
   --bt-fs-body-sm: 0.875rem;
   --bt-fs-body-xs: 0.75rem;
-  --bt-fs-eyebrow: 0.72rem;
+  /* Standardized micro-label (eyebrow): 12px, uppercase, tracked 0.1em.
+     --bt-fs-eyebrow aliases it so every existing eyebrow consumer follows. */
+  --bt-fs-micro: 0.75rem;
+  --bt-ls-micro: 0.1em;
+  --bt-fs-eyebrow: var(--bt-fs-micro);
   --bt-fs-specimen: 0.68rem;
   --bt-fs-badge: 0.75rem;
 
@@ -92,6 +108,11 @@
   --bt-space-2xl: 64px;
   --bt-space-3xl: 80px;
   --bt-space-section: clamp(2.5rem, 6vw, 5rem);
+  /* Editorial section rhythm: a generous 80–120px vertical band on desktop,
+     proportionally tighter on mobile (56px floor). New/rebuilt sections
+     consume these via .bt-section-block in base.css. */
+  --bt-section-padding-block: clamp(3.5rem, 8vw, 7.5rem);
+  --bt-section-padding-block-sm: clamp(2.5rem, 6vw, 5rem);
 
   /* ── Radii ── */
   --bt-radius-tag: 2px;
@@ -119,6 +140,10 @@
   /* ── Borders ── */
   --bt-border-width: 1.5px;
   --bt-border-style: solid;
+  /* Hairline rule: 1px low-opacity rule derived from the active scheme's
+     text color, so it adapts across color schemes. Used by .bt-hairline-*
+     utilities for specimen rows and section seams. */
+  --bt-hairline: rgba(var(--bt-color-text-rgb), 0.14);
 
   /* ── Layout ── */
   --bt-max-width: 1300px;
