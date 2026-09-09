@@ -133,14 +133,17 @@
     border: 1px solid var(--bt-color-border-light);
     border-radius: var(--bt-radius-card);
     background: var(--bt-color-surface);
-    transition: border-color var(--bt-duration-base) var(--bt-ease-out),
-                box-shadow var(--bt-duration-base) var(--bt-ease-out),
-                transform var(--bt-duration-base) var(--bt-ease-out);
+    transition: border-color 250ms var(--bt-ease-out),
+                box-shadow 250ms var(--bt-ease-out),
+                transform 250ms var(--bt-ease-out);
   }
-  .bt-card--product:hover {
-    border-color: var(--bt-color-border-medium);
-    box-shadow: var(--bt-shadow-md);
-    transform: translateY(-2px);
+  /* Elevation (shadow + 4px lift) comes from the base .bt-card rules in
+     base.css, already gated by hover-capability and reduced-motion; here we
+     only tighten the hairline on hover. */
+  @media (hover: hover) {
+    .bt-card--product:hover {
+      border-color: var(--bt-color-border-medium);
+    }
   }
 
   .bt-card__media {
@@ -187,7 +190,10 @@
     background: var(--bt-color-surface);
     border: 1px solid var(--bt-hairline);
     border-radius: var(--bt-radius-tag);
-    box-shadow: 0 0 0 3px var(--bt-color-surface), 0 0 0 4px var(--bt-hairline);
+    /* Ring mount + a soft drop under the mat so the mounting paper reads
+       as floating above the card face. */
+    box-shadow: 0 0 0 3px var(--bt-color-surface), 0 0 0 4px var(--bt-hairline),
+                var(--bt-shadow-specimen-mat);
   }
   /* Absolutely-positioned swap image aligns to the padding box — pull it
      back onto the mat so both frames crossfade inside the mount. */
@@ -402,6 +408,17 @@
     .bt-card--product .bt-card__body {
       padding: var(--bt-space-xs);
     }
+    /* Two-up mobile grids: step the info block down one notch so title /
+       specimen line / price stay composed at ~half viewport width. */
+    .bt-card--product .bt-card__title {
+      font-size: var(--bt-fs-body);
+    }
+    .bt-card__latin {
+      font-size: var(--bt-fs-body-xs);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .bt-card__quick-add {
       opacity: 1;
       transform: none;
@@ -410,10 +427,26 @@
       left: var(--bt-space-2xs);
       right: var(--bt-space-2xs);
       bottom: var(--bt-space-2xs);
+      white-space: nowrap;
+      gap: 4px;
     }
     .bt-chip {
       font-size: 0.6rem;
       padding: 1px 6px;
+    }
+  }
+
+  /* Narrow phones: drop the Latin/vendor specimen line so the two-up grid
+     keeps a clean title → price rhythm. */
+  @media (max-width: 479px) {
+    .bt-card__latin {
+      display: none;
+    }
+    .bt-card--product .bt-card__title a {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
   }
 

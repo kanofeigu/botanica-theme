@@ -67,11 +67,36 @@
 
 {% stylesheet %}
   .bt-testimonial {
+    position: relative;
     margin: 0;
     padding: var(--bt-space-md);
     background: var(--bt-color-surface);
     border-radius: var(--bt-radius-card);
     text-align: center;
+    box-shadow: var(--bt-shadow-card);
+    transition: transform 250ms var(--bt-ease-out),
+                box-shadow 250ms var(--bt-ease-out);
+  }
+  /* Surface sheen: faint top highlight, same language as product cards. */
+  .bt-testimonial::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--bt-card-sheen);
+    pointer-events: none;
+  }
+  /* Hover elevation: shadow deepens on hover-capable pointers; the lift is
+     motion-gated for reduced-motion users. */
+  @media (hover: hover) {
+    .bt-testimonial:hover {
+      box-shadow: var(--bt-shadow-card-hover);
+    }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .bt-testimonial:hover {
+      transform: translateY(-4px);
+    }
   }
   .bt-testimonial__stars {
     display: flex;

@@ -74,9 +74,15 @@
   .bt-featured-collection__grid--3-col { grid-template-columns: repeat(3, 1fr); }
   .bt-featured-collection__grid--4-col { grid-template-columns: repeat(4, 1fr); }
   @media (max-width: 749px) {
+    /* Mobile default: a fixed two-up grid with tightened gutters, whatever
+       the desktop column count. */
+    .bt-featured-collection__grid--2-col,
+    .bt-featured-collection__grid--3-col,
     .bt-featured-collection__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+    .bt-featured-collection__grid { gap: var(--bt-space-xs); }
 
-    /* Mobile swipe: cards become a snap-scrolling row, second card peeks in */
+    /* Mobile swipe (opt-in): cards become a snap-scrolling row, second
+       card peeks in */
     .bt-featured-collection__grid--swipe-mobile {
       display: flex;
       grid-template-columns: none;
@@ -127,7 +133,7 @@
       "type": "checkbox",
       "id": "mobile_swipe",
       "label": "t:sections.featured_collection.settings.mobile_swipe.label",
-      "default": true
+      "default": false
     },
     {
       "type": "checkbox",

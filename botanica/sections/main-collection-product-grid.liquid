@@ -1044,6 +1044,21 @@
       justify-content: space-between;
     }
     /* sort menu positioning handled by JS portal on all viewports */
+
+    /* Mobile product grid: fixed two-up with tightened gutters. */
+    .bt-collection-grid .bt-grid {
+      gap: var(--bt-space-xs);
+    }
+  }
+
+  /* Base grid collapses to one column below 480px — product grids stay
+     two-up so cards keep a browsable catalogue rhythm on phones. */
+  @media (max-width: 479px) {
+    .bt-collection-grid .bt-grid--2,
+    .bt-collection-grid .bt-grid--3,
+    .bt-collection-grid .bt-grid--4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   /* Reduced motion: disable animations */

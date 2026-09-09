@@ -158,6 +158,23 @@
         --bt-color-secondary-rgb: {{ scheme_accent.red }}, {{ scheme_accent.green }}, {{ scheme_accent.blue }};
         --bt-color-secondary-text: {{ scheme_secondary_text }};
         --bt-color-border: {{ scheme.settings.shadow }};
+        {%- comment -%}
+          Card elevation shadows follow the scheme: light schemes tint the
+          shadow with the scheme text color; dark schemes fall back to pure
+          black at higher alpha so cards stay lifted off dark surfaces.
+          :root fallbacks for the empty-state preview live in
+          design-tokens.css.
+        {%- endcomment -%}
+        {%- if bg_brightness > 128 -%}
+          {%- assign shadow_channels = scheme_text.red | append: ', ' | append: scheme_text.green | append: ', ' | append: scheme_text.blue -%}
+          --bt-shadow-card: 0 1px 2px rgba({{ shadow_channels }}, 0.05), 0 8px 24px -8px rgba({{ shadow_channels }}, 0.08);
+          --bt-shadow-card-hover: 0 2px 4px rgba({{ shadow_channels }}, 0.06), 0 16px 40px -12px rgba({{ shadow_channels }}, 0.14);
+          --bt-shadow-specimen-mat: 0 4px 12px -4px rgba({{ shadow_channels }}, 0.16);
+        {%- else -%}
+          --bt-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 24px -8px rgba(0, 0, 0, 0.48);
+          --bt-shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.36), 0 16px 40px -12px rgba(0, 0, 0, 0.6);
+          --bt-shadow-specimen-mat: 0 4px 12px -4px rgba(0, 0, 0, 0.5);
+        {%- endif -%}
         {%- if scheme.settings.background_gradient != blank %}
           --bt-color-bg-gradient: {{ scheme.settings.background_gradient }};
         {%- endif %}

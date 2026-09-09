@@ -131,7 +131,27 @@
   --bt-shadow-sm: 0 1px 3px rgba(var(--bt-color-text-rgb), 0.06);
   --bt-shadow-md: 0 4px 16px rgba(var(--bt-color-text-rgb), 0.08);
   --bt-shadow-lg: 0 12px 40px rgba(var(--bt-color-text-rgb), 0.10);
-  --bt-shadow-card-hover: 0 16px 48px rgba(var(--bt-color-text-rgb), 0.12);
+
+  /* Card elevation — two-layer ambient shadows: a small, slightly darker
+     near layer defines the edge, a large soft far layer lifts the card off
+     the page. Channels derive from the scheme text color; theme.liquid
+     re-declares these tokens inside each color-scheme scope (light schemes
+     tint with the text color, dark schemes switch to pure black at higher
+     alpha), so elevation reads correctly on every scheme. */
+  --bt-shadow-card:
+    0 1px 2px rgba(var(--bt-color-text-rgb), 0.05),
+    0 8px 24px -8px rgba(var(--bt-color-text-rgb), 0.08);
+  --bt-shadow-card-hover:
+    0 2px 4px rgba(var(--bt-color-text-rgb), 0.06),
+    0 16px 40px -12px rgba(var(--bt-color-text-rgb), 0.14);
+  /* Specimen-mat lift: a small soft drop under the white mat so the
+     mounting paper reads as floating above the card surface. */
+  --bt-shadow-specimen-mat: 0 4px 12px -4px rgba(var(--bt-color-text-rgb), 0.16);
+
+  /* Card surface sheen — a whisper of overhead light across the top edge.
+     Neutral white at low alpha reads as light (not as a color cast) on both
+     light and dark schemes. Consumed as a ::after overlay in base.css. */
+  --bt-card-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.4), rgb(255 255 255 / 0) 28%);
 
   /* ── Duration & easing ── */
   --bt-duration-fast: 150ms;

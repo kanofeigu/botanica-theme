@@ -442,6 +442,23 @@
     }
     .bt-search__sidebar.is-open { transform: translateX(0); }
   }
+
+  @media (max-width: 749px) {
+    /* Mobile results grid: fixed two-up with tightened gutters. */
+    .bt-search__results .bt-grid {
+      gap: var(--bt-space-xs);
+    }
+  }
+
+  /* Base grid collapses to one column below 480px — search results stay
+     two-up so product cards keep a browsable rhythm on phones. */
+  @media (max-width: 479px) {
+    .bt-search__results .bt-grid--2,
+    .bt-search__results .bt-grid--3,
+    .bt-search__results .bt-grid--4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
