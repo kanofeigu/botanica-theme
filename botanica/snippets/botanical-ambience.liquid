@@ -22,6 +22,8 @@
 -%}
 
 {%- if show_leaves -%}
+  {%- comment -%} Batch 3 downgrade: 4 leaves (was 8) — half the density so
+      the cascade stays ambient instead of competing with the content. {%- endcomment -%}
   <div class="bt-falling-leaves" aria-hidden="true">
     <div class="bt-leaf bt-leaf--1">
       <img src="{{ 'leaf-monstera.svg' | asset_url }}" alt="" width="36" height="48" class="bt-leaf__img" loading="lazy" fetchpriority="low">
@@ -34,18 +36,6 @@
     </div>
     <div class="bt-leaf bt-leaf--4">
       <img src="{{ 'leaf-monstera.svg' | asset_url }}" alt="" width="34" height="46" class="bt-leaf__img" loading="lazy" fetchpriority="low">
-    </div>
-    <div class="bt-leaf bt-leaf--5">
-      <img src="{{ 'leaf-fiddle.svg' | asset_url }}" alt="" width="28" height="38" class="bt-leaf__img" loading="lazy" fetchpriority="low">
-    </div>
-    <div class="bt-leaf bt-leaf--6">
-      <img src="{{ 'leaf-small.svg' | asset_url }}" alt="" width="20" height="28" class="bt-leaf__img" loading="lazy" fetchpriority="low">
-    </div>
-    <div class="bt-leaf bt-leaf--7">
-      <img src="{{ 'leaf-monstera.svg' | asset_url }}" alt="" width="32" height="44" class="bt-leaf__img" loading="lazy" fetchpriority="low">
-    </div>
-    <div class="bt-leaf bt-leaf--8">
-      <img src="{{ 'leaf-small.svg' | asset_url }}" alt="" width="24" height="32" class="bt-leaf__img" loading="lazy" fetchpriority="low">
     </div>
   </div>
 {%- endif -%}

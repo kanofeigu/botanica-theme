@@ -212,6 +212,58 @@
         "info": "Gently fades content in as it enters the viewport. Automatically disabled for visitors who prefer reduced motion."
       }
     },
+    "bt_hotspots": {
+      "name": "Shoppable image",
+      "settings": {
+        "heading": {
+          "label": "Heading",
+          "default": "Shop the look"
+        },
+        "image": {
+          "label": "Image"
+        },
+        "image_aspect": {
+          "label": "Image aspect ratio",
+          "options__1": {
+            "label": "16:9 landscape"
+          },
+          "options__2": {
+            "label": "4:3 classic"
+          },
+          "options__3": {
+            "label": "1:1 square"
+          }
+        },
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
+      },
+      "blocks": {
+        "hotspot": {
+          "name": "Hotspot",
+          "settings": {
+            "product": {
+              "label": "Product"
+            },
+            "x": {
+              "label": "Horizontal position",
+              "info": "0% is the left edge of the image, 100% the right edge."
+            },
+            "y": {
+              "label": "Vertical position",
+              "info": "0% is the top edge of the image, 100% the bottom edge."
+            },
+            "label": {
+              "label": "Label",
+              "info": "Optional short caption shown above the product title."
+            }
+          }
+        }
+      }
+    },
     "bt_marquee": {
       "name": "Marquee strip",
       "settings": {
@@ -469,6 +521,19 @@
         },
         "sticky_care": {
           "label": "Sticky care panel"
+        },
+        "enable_sticky_gallery": {
+          "label": "Sticky gallery",
+          "info": "Keeps the media column pinned on desktop while the product details scroll. Always static on mobile."
+        },
+        "gallery_aspect": {
+          "label": "Gallery aspect ratio",
+          "options__1": {
+            "label": "4:5 portrait"
+          },
+          "options__2": {
+            "label": "1:1 square"
+          }
         },
         "show_breadcrumbs": {
           "label": "Show breadcrumbs"

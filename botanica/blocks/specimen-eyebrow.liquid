@@ -12,8 +12,22 @@
   endif
 -%}
 {%- if eyebrow_text != blank -%}
-  <p class="bt-eyebrow" {{ block.shopify_attributes }}>{{ eyebrow_text | escape }}</p>
+  <p class="bt-eyebrow bt-eyebrow--serif" {{ block.shopify_attributes }}>{{ eyebrow_text | escape }}</p>
 {%- endif -%}
+
+{% stylesheet %}
+  /* Serif-italic variant — Latin-name annotation in the herbarium voice.
+     Overrides the micro-label base (higher specificity, order-independent). */
+  .bt-eyebrow.bt-eyebrow--serif {
+    font-family: var(--bt-font-heading);
+    font-style: italic;
+    font-weight: var(--bt-fw-normal);
+    font-size: var(--bt-fs-body);
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--bt-color-text-muted);
+  }
+{% endstylesheet %}
 
 {% schema %}
 {

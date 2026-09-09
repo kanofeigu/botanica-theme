@@ -112,43 +112,39 @@
   will-change: transform;
 }
 
-/* Edge lanes — leaves live in the margins, not over products */
-.bt-leaf--1 { left: 4%;  --bt-leaf-size: 34px; }
-.bt-leaf--2 { left: 90%; --bt-leaf-size: 28px; }
-.bt-leaf--3 { left: 9%;  --bt-leaf-size: 22px; }
-.bt-leaf--4 { left: 95%; --bt-leaf-size: 30px; }
-.bt-leaf--5 { left: 14%; --bt-leaf-size: 26px; }
-.bt-leaf--6 { left: 84%; --bt-leaf-size: 20px; }
-.bt-leaf--7 { left: 20%; --bt-leaf-size: 28px; }
-.bt-leaf--8 { left: 78%; --bt-leaf-size: 24px; }
+/* Edge lanes — leaves live in the margins, not over products.
+   Batch 3 downgrade: smaller leaves, slower fall, lower opacity so the
+   cascade reads as quiet ambience instead of competing with content. */
+.bt-leaf--1 { left: 4%;  --bt-leaf-size: 26px; }
+.bt-leaf--2 { left: 90%; --bt-leaf-size: 22px; }
+.bt-leaf--3 { left: 9%;  --bt-leaf-size: 17px; }
+.bt-leaf--4 { left: 95%; --bt-leaf-size: 23px; }
 
-/* Slow continuous fall — each leaf has its own pace and phase */
-.bt-leaf--1 { animation: bt-leaf-fall-a 22s linear infinite; animation-delay: 0s; }
-.bt-leaf--2 { animation: bt-leaf-fall-b 18s linear infinite; animation-delay: -6s; }
-.bt-leaf--3 { animation: bt-leaf-fall-a 16s linear infinite; animation-delay: -11s; }
-.bt-leaf--4 { animation: bt-leaf-fall-b 24s linear infinite; animation-delay: -3s; }
-.bt-leaf--5 { animation: bt-leaf-fall-a 20s linear infinite; animation-delay: -15s; }
-.bt-leaf--6 { animation: bt-leaf-fall-b 17s linear infinite; animation-delay: -9s; }
-.bt-leaf--7 { animation: bt-leaf-fall-a 26s linear infinite; animation-delay: -19s; }
-.bt-leaf--8 { animation: bt-leaf-fall-b 21s linear infinite; animation-delay: -13s; }
+/* Slow continuous fall — each leaf has its own pace and phase.
+   Durations roughly doubled (was 16–26s) for a calmer drift. */
+.bt-leaf--1 { animation: bt-leaf-fall-a 42s linear infinite; animation-delay: 0s; }
+.bt-leaf--2 { animation: bt-leaf-fall-b 36s linear infinite; animation-delay: -12s; }
+.bt-leaf--3 { animation: bt-leaf-fall-a 34s linear infinite; animation-delay: -22s; }
+.bt-leaf--4 { animation: bt-leaf-fall-b 46s linear infinite; animation-delay: -6s; }
 
-/* Fall + gentle sway + slow tumble — two mirrored variants */
+/* Fall + gentle sway + slow tumble — two mirrored variants.
+   Opacity fallback lowered to 0.2 (was 0.3); the section setting wins. */
 @keyframes bt-leaf-fall-a {
   0%   { transform: translate3d(0, -8vh, 0) rotate(0deg); opacity: 0; }
-  7%   { transform: translate3d(-10px, 6vh, 0) rotate(35deg); opacity: var(--bt-leaf-opacity, 0.3); }
-  25%  { transform: translate3d(12px, 26vh, 0) rotate(95deg); opacity: var(--bt-leaf-opacity, 0.3); }
-  50%  { transform: translate3d(-14px, 52vh, 0) rotate(170deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.9); }
-  75%  { transform: translate3d(10px, 78vh, 0) rotate(255deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.65); }
+  7%   { transform: translate3d(-10px, 6vh, 0) rotate(35deg); opacity: var(--bt-leaf-opacity, 0.2); }
+  25%  { transform: translate3d(12px, 26vh, 0) rotate(95deg); opacity: var(--bt-leaf-opacity, 0.2); }
+  50%  { transform: translate3d(-14px, 52vh, 0) rotate(170deg); opacity: calc(var(--bt-leaf-opacity, 0.2) * 0.9); }
+  75%  { transform: translate3d(10px, 78vh, 0) rotate(255deg); opacity: calc(var(--bt-leaf-opacity, 0.2) * 0.65); }
   93%  { transform: translate3d(-6px, 100vh, 0) rotate(320deg); opacity: 0; }
   100% { transform: translate3d(-6px, 112vh, 0) rotate(340deg); opacity: 0; }
 }
 
 @keyframes bt-leaf-fall-b {
   0%   { transform: translate3d(0, -8vh, 0) rotate(20deg); opacity: 0; }
-  7%   { transform: translate3d(10px, 6vh, 0) rotate(-25deg); opacity: var(--bt-leaf-opacity, 0.3); }
-  25%  { transform: translate3d(-12px, 25vh, 0) rotate(-110deg); opacity: var(--bt-leaf-opacity, 0.3); }
-  50%  { transform: translate3d(14px, 50vh, 0) rotate(-190deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.9); }
-  75%  { transform: translate3d(-10px, 77vh, 0) rotate(-270deg); opacity: calc(var(--bt-leaf-opacity, 0.3) * 0.65); }
+  7%   { transform: translate3d(10px, 6vh, 0) rotate(-25deg); opacity: var(--bt-leaf-opacity, 0.2); }
+  25%  { transform: translate3d(-12px, 25vh, 0) rotate(-110deg); opacity: var(--bt-leaf-opacity, 0.2); }
+  50%  { transform: translate3d(14px, 50vh, 0) rotate(-190deg); opacity: calc(var(--bt-leaf-opacity, 0.2) * 0.9); }
+  75%  { transform: translate3d(-10px, 77vh, 0) rotate(-270deg); opacity: calc(var(--bt-leaf-opacity, 0.2) * 0.65); }
   93%  { transform: translate3d(6px, 100vh, 0) rotate(-335deg); opacity: 0; }
   100% { transform: translate3d(6px, 112vh, 0) rotate(-350deg); opacity: 0; }
 }
@@ -712,10 +708,9 @@
   .bt-bg-botanical--left  { width: 80px; }
   .bt-bg-botanical--right { width: 80px; }
 
-  /* Fewer leaves on mobile */
-  .bt-leaf--5,
-  .bt-leaf--7,
-  .bt-leaf--8 { display: none; }
+  /* Halve the leaf count on mobile (4 rendered → 2 visible) */
+  .bt-leaf--2,
+  .bt-leaf--4 { display: none; }
 
   /* Slower spore count */
   .bt-spore--5,

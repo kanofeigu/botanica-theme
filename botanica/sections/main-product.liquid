@@ -11,16 +11,21 @@
   if section.settings.sticky_care
     assign sticky_care_class = ' bt-product__info--sticky-care'
   endif
+  assign gallery_aspect = section.settings.gallery_aspect | default: '4-5'
+  assign gallery_sticky_class = ''
+  if section.settings.enable_sticky_gallery and section.settings.gallery_layout != 'stacked'
+    assign gallery_sticky_class = ' bt-product__gallery--sticky'
+  endif
 -%}
 
-<section class="bt-product bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+<section class="bt-product bt-product--aspect-{{ gallery_aspect }} bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
   <div class="bt-container">
     {%- if section.settings.show_breadcrumbs -%}
       {% render 'breadcrumbs' %}
     {%- endif -%}
     <div class="bt-product__grid bt-product__grid--{{ section.settings.gallery_layout }}">
 
-      <bt-product-gallery class="bt-product__gallery" role="region" aria-label="{{ 'products.product.media.gallery' | t }}">
+      <bt-product-gallery class="bt-product__gallery{{ gallery_sticky_class }}" role="region" aria-label="{{ 'products.product.media.gallery' | t }}">
         <div class="bt-product__main-media" data-gallery-main>
           {%- if selected_product.media.size > 0 -%}
             {%- for media in selected_product.media -%}
@@ -220,10 +225,26 @@
   .bt-product__grid--thumb_below .bt-product__thumbnails { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; }
   .bt-product__grid--thumb_left { grid-template-columns: 5fr 6fr; }
   .bt-product__grid--thumb_left .bt-product__gallery { flex-direction: row; }
-  .bt-product__grid--thumb_left .bt-product__thumbnails { flex-direction: column; overflow-y: auto; max-height: 580px; }
+  .bt-product__grid--thumb_left .bt-product__thumbnails { flex-direction: column; overflow-y: auto; max-height: min(580px, calc(100vh - 80px - var(--bt-space-sm) * 2)); }
   .bt-product__grid--thumb_left .bt-product__thumb { width: 64px; height: 90px; }
   .bt-product__grid--stacked { grid-template-columns: 1fr; }
-  .bt-product__gallery { display: flex; flex-direction: column; gap: var(--bt-space-sm); position: sticky; top: 100px; }
+  .bt-product__gallery { display: flex; flex-direction: column; gap: var(--bt-space-sm); }
+
+  /* ── Editorial sticky gallery (desktop): media column pins while the
+     info column scrolls. top clears the ~80px fixed header; the whole
+     column is capped at 100vh so tall plates never overflow the viewport. ── */
+  .bt-product__gallery--sticky {
+    position: sticky;
+    top: calc(80px + var(--bt-space-sm));
+    align-self: start;
+    max-height: calc(100vh - 80px - var(--bt-space-sm) * 2);
+  }
+  .bt-product__gallery--sticky .bt-product__main-media {
+    max-height: calc(100vh - 80px - var(--bt-space-sm) * 2);
+  }
+
+  /* ── Merchant-selectable plate aspect (default 4:5 portrait) ── */
+  .bt-product--aspect-1-1 .bt-product__main-media { aspect-ratio: 1 / 1; }
 
   /* ── Main media: 4:5 portrait (Hey Rooted-style) ── */
   .bt-product__main-media {
@@ -345,6 +366,33 @@
   /* Tighter rhythm between the first editorial blocks (eyebrow/title/price) */
   .bt-product__form .shopify-block:first-child { margin-bottom: calc(var(--bt-space-2xs) * -1); }
 
+  /* ── Editorial info-column rhythm (Batch 3) ── */
+  /* Vendor / Latin-name eyebrow styling lives in blocks/specimen-eyebrow.liquid
+     (.bt-eyebrow--serif) so care-icons/care-table titles keep the micro-label look. */
+  /* Product title steps up to the fluid display scale */
+  .bt-product__info .bt-product-title {
+    font-size: var(--bt-fs-display-md);
+    line-height: var(--bt-lh-display-md);
+    letter-spacing: var(--bt-ls-display);
+  }
+  /* Hairline seam above the variant picker — closes the editorial header
+     (eyebrow → title → price → rating) before purchase configuration. */
+  .bt-product__form .shopify-block:has(variant-selects):not(:first-child) {
+    border-top: 1px solid var(--bt-hairline);
+    padding-top: var(--bt-space-md);
+  }
+  /* Hairline accordion — 1px specimen rules (overrides the block's 1.5px
+     border-light); consecutive collapsibles share one seam. */
+  .bt-product__info .bt-collapsible {
+    border-bottom: 1px solid var(--bt-hairline);
+  }
+  .bt-product__info .bt-collapsible:first-of-type {
+    border-top: 1px solid var(--bt-hairline);
+  }
+  .bt-product__form .shopify-block:has(.bt-collapsible) + .shopify-block:has(.bt-collapsible) {
+    margin-top: calc(-1 * var(--bt-space-md) - 1px);
+  }
+
   /* ── Sticky care panel ── */
   .bt-product__info--sticky-care .bt-care-table {
     position: sticky;
@@ -416,8 +464,9 @@
   @media (max-width: 989px) {
     .bt-product__grid--thumb_below,
     .bt-product__grid--thumb_left { grid-template-columns: 1fr; }
-    .bt-product__grid--thumb_below .bt-product__gallery,
-    .bt-product__grid--thumb_left .bt-product__gallery { position: static; }
+    /* Mobile stays single-column: gallery never sticky, no viewport cap */
+    .bt-product__gallery--sticky { position: static; max-height: none; }
+    .bt-product__gallery--sticky .bt-product__main-media { max-height: none; }
     .bt-product__grid--thumb_left .bt-product__thumbnails { flex-direction: row; max-height: none; }
   }
   @media (max-width: 749px) {
@@ -440,6 +489,8 @@
   { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "product", "id": "product", "label": "t:sections.main_product.settings.product.label" },
   { "type": "select", "id": "gallery_layout", "label": "t:sections.main_product.settings.gallery_layout.label", "options": [{"value":"thumb_left","label":"t:sections.main_product.settings.gallery_layout.options__1.label"},{"value":"thumb_below","label":"t:sections.main_product.settings.gallery_layout.options__2.label"},{"value":"stacked","label":"t:sections.main_product.settings.gallery_layout.options__3.label"}], "default": "thumb_below" },
+  { "type": "checkbox", "id": "enable_sticky_gallery", "label": "t:sections.main_product.settings.enable_sticky_gallery.label", "info": "t:sections.main_product.settings.enable_sticky_gallery.info", "default": true },
+  { "type": "select", "id": "gallery_aspect", "label": "t:sections.main_product.settings.gallery_aspect.label", "options": [{"value":"4-5","label":"t:sections.main_product.settings.gallery_aspect.options__1.label"},{"value":"1-1","label":"t:sections.main_product.settings.gallery_aspect.options__2.label"}], "default": "4-5" },
   { "type": "checkbox", "id": "sticky_care", "label": "t:sections.main_product.settings.sticky_care.label", "default": true },
   { "type": "range", "id": "padding_top", "min":0,"max":100,"step":4,"default":40,"unit":"px","label":"t:sections.main_product.settings.padding_top.label" },
   { "type": "range", "id": "padding_bottom", "min":0,"max":100,"step":4,"default":40,"unit":"px","label":"t:sections.main_product.settings.padding_bottom.label" },
@@ -448,6 +499,7 @@
   {"type":"specimen-eyebrow"},
   {"type":"product-title"},
   {"type":"product-price"},
+  {"type":"product-rating"},
   {"type":"variant-picker","settings":{"picker_type":"swatch","swatch_option_index":"1"}},
   {"type":"size-guide-link"},
   {"type":"quantity-selector"},

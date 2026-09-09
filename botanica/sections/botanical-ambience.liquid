@@ -80,15 +80,13 @@
     opacity: 0; /* revealed by the fall animation's keyframes */
   }
   /* Edge lanes — leaves drift in the viewport margins,
-     never over the central content column */
-  .bt-ambience .bt-leaf--1 { left: 4%;  --bt-leaf-size: 34px; }
-  .bt-ambience .bt-leaf--2 { left: 90%; --bt-leaf-size: 28px; }
-  .bt-ambience .bt-leaf--3 { left: 9%;  --bt-leaf-size: 22px; }
-  .bt-ambience .bt-leaf--4 { left: 95%; --bt-leaf-size: 30px; }
-  .bt-ambience .bt-leaf--5 { left: 14%; --bt-leaf-size: 26px; }
-  .bt-ambience .bt-leaf--6 { left: 84%; --bt-leaf-size: 20px; }
-  .bt-ambience .bt-leaf--7 { left: 20%; --bt-leaf-size: 28px; }
-  .bt-ambience .bt-leaf--8 { left: 78%; --bt-leaf-size: 24px; }
+     never over the central content column.
+     Batch 3 downgrade: 4 smaller leaves (was 8), matched in
+     botanical-effects.css. */
+  .bt-ambience .bt-leaf--1 { left: 4%;  --bt-leaf-size: 26px; }
+  .bt-ambience .bt-leaf--2 { left: 90%; --bt-leaf-size: 22px; }
+  .bt-ambience .bt-leaf--3 { left: 9%;  --bt-leaf-size: 17px; }
+  .bt-ambience .bt-leaf--4 { left: 95%; --bt-leaf-size: 23px; }
   /* Explicit box: width from CSS var, height from img width/height attrs */
   .bt-ambience .bt-leaf__img {
     display: block;
@@ -194,9 +192,9 @@
     .bt-ambience .bt-vine--right { width: 60px; transform: translateX(20px); }
     .bt-ambience .bt-bg-botanical--left,
     .bt-ambience .bt-bg-botanical--right { width: 80px; }
-    .bt-ambience .bt-leaf--5,
-    .bt-ambience .bt-leaf--7,
-    .bt-ambience .bt-leaf--8 { display: none; }
+    /* Halve the leaf count on mobile (4 rendered → 2 visible) */
+    .bt-ambience .bt-leaf--2,
+    .bt-ambience .bt-leaf--4 { display: none; }
     .bt-ambience .bt-spore--5,
     .bt-ambience .bt-spore--7,
     .bt-ambience .bt-spore--9,
@@ -282,7 +280,7 @@
       "step": 5,
       "unit": "%",
       "label": "t:sections.botanical_ambience.settings.leaf_opacity.label",
-      "default": 70
+      "default": 20
     },
     {
       "type": "range",

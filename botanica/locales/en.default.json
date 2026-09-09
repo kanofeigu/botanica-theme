@@ -959,6 +959,10 @@
     }
   },
   "sections": {
+    "bt_hotspots": {
+      "show_product": "Show product: {{ product }}",
+      "show_product_generic": "Show product details"
+    },
     "announcements": {
       "previous_announcement": "Previous announcement",
       "next_announcement": "Next announcement",
