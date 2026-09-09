@@ -44,6 +44,23 @@
         }
       }
     },
+    "visual_craft": {
+      "name": "Visual craft",
+      "settings": {
+        "enable_grain": {
+          "label": "Film grain",
+          "info": "Adds a subtle analog paper texture over the whole page"
+        },
+        "grain_opacity": {
+          "label": "Grain opacity",
+          "info": "Higher values make the texture more visible"
+        },
+        "image_tint_strength": {
+          "label": "Image warmth",
+          "info": "Warm archival tint over product and hero images. Set to 0 to disable."
+        }
+      }
+    },
     "layout": {
       "name": "Layout",
       "settings": {

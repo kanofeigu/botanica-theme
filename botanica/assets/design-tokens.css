@@ -12,6 +12,10 @@
      composition; merchant color changes update --bt-color-*-* -rgb too. */
   --bt-color-bg: #F5F1E8;
   --bt-color-surface: #FAF7EF;
+  /* Paper-on-paper: card faces sit half a step brighter than the section
+     surface. The real per-scheme value is derived in Liquid in theme.liquid;
+     this hex is only the empty-state preview fallback (scheme-1 ladder). */
+  --bt-color-surface-raised: #FCFAF4;
   --bt-color-text: #2E2A24;
   --bt-color-text-muted: #4D4840;
   --bt-color-primary: #4A6B4F;
@@ -77,7 +81,10 @@
   --bt-lh-display-xl: 0.98;
   --bt-lh-display-lg: 1.02;
   --bt-lh-display-md: 1.08;
-  --bt-ls-display: -0.02em;
+  --bt-ls-display: -0.025em;
+  /* Editorial tracking contrast: headlines tighten (h1–h4 at -0.02em;
+     display sizes go tighter above) while micro-labels open up wide. */
+  --bt-ls-heading: -0.02em;
   --bt-fs-h1: clamp(2.2rem, 3.5vw, 3.2rem);
   --bt-fs-h2: clamp(1.8rem, 2.5vw, 2.4rem);
   --bt-fs-h3: clamp(1.4rem, 1.8vw, 1.8rem);
@@ -85,10 +92,10 @@
   --bt-fs-body: 1rem;
   --bt-fs-body-sm: 0.875rem;
   --bt-fs-body-xs: 0.75rem;
-  /* Standardized micro-label (eyebrow): 12px, uppercase, tracked 0.1em.
+  /* Standardized micro-label (eyebrow): 12px, uppercase, tracked 0.14em.
      --bt-fs-eyebrow aliases it so every existing eyebrow consumer follows. */
   --bt-fs-micro: 0.75rem;
-  --bt-ls-micro: 0.1em;
+  --bt-ls-micro: 0.14em;
   --bt-fs-eyebrow: var(--bt-fs-micro);
   --bt-fs-specimen: 0.68rem;
   --bt-fs-badge: 0.75rem;
@@ -132,21 +139,34 @@
   --bt-shadow-md: 0 4px 16px rgba(var(--bt-color-text-rgb), 0.08);
   --bt-shadow-lg: 0 12px 40px rgba(var(--bt-color-text-rgb), 0.10);
 
-  /* Card elevation — two-layer ambient shadows: a small, slightly darker
-     near layer defines the edge, a large soft far layer lifts the card off
-     the page. Channels derive from the scheme text color; theme.liquid
-     re-declares these tokens inside each color-scheme scope (light schemes
-     tint with the text color, dark schemes switch to pure black at higher
-     alpha), so elevation reads correctly on every scheme. */
+  /* Card elevation — three layers (contact / mid / far) cast in a fixed
+     green-gray hue (46 58 40), the color of light filtered through
+     foliage, plus a 1px inset top highlight so card faces catch overhead
+     light. theme.liquid re-declares these tokens inside each color-scheme
+     scope (light schemes keep this hue; dark schemes switch to pure black
+     at higher alpha and soften the inset highlight to 0.08), so elevation
+     reads correctly on every scheme. */
   --bt-shadow-card:
-    0 1px 2px rgba(var(--bt-color-text-rgb), 0.05),
-    0 8px 24px -8px rgba(var(--bt-color-text-rgb), 0.08);
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 1px 2px rgb(46 58 40 / 0.06),
+    0 6px 16px -6px rgb(46 58 40 / 0.08),
+    0 16px 40px -16px rgb(46 58 40 / 0.1);
   --bt-shadow-card-hover:
-    0 2px 4px rgba(var(--bt-color-text-rgb), 0.06),
-    0 16px 40px -12px rgba(var(--bt-color-text-rgb), 0.14);
-  /* Specimen-mat lift: a small soft drop under the white mat so the
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 2px 4px rgb(46 58 40 / 0.07),
+    0 10px 24px -8px rgb(46 58 40 / 0.11),
+    0 24px 56px -16px rgb(46 58 40 / 0.16);
+  /* Specimen-mat lift: contact + soft far drop under the white mat so the
      mounting paper reads as floating above the card surface. */
-  --bt-shadow-specimen-mat: 0 4px 12px -4px rgba(var(--bt-color-text-rgb), 0.16);
+  --bt-shadow-specimen-mat:
+    0 2px 6px -2px rgb(46 58 40 / 0.1),
+    0 10px 24px -10px rgb(46 58 40 / 0.14);
+  /* Button hover lift — a lighter take on the card shadow so buttons catch
+     a whisper of the same overhead light. */
+  --bt-shadow-btn:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 1px 2px rgb(46 58 40 / 0.07),
+    0 4px 12px -4px rgb(46 58 40 / 0.1);
 
   /* Card surface sheen — a whisper of overhead light across the top edge.
      Neutral white at low alpha reads as light (not as a color cast) on both
@@ -176,6 +196,9 @@
   --bt-content-max: 65ch;
 
   /* ── Z-index scale ── */
+  /* Grain sits on its own composited layer above page content but below
+     every interactive overlay (dropdowns, sticky chrome, drawers, modals). */
+  --bt-z-grain: 5;
   --bt-z-dropdown: 10;
   --bt-z-sticky: 20;
   --bt-z-drawer: 30;

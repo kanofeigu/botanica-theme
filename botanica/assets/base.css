@@ -95,6 +95,7 @@ h1, .bt-h1, h2, .bt-h2, h3, .bt-h3, h4, .bt-h4 {
   font-family: var(--bt-font-heading);
   font-weight: var(--bt-fw-normal);
   line-height: var(--bt-lh-heading);
+  letter-spacing: var(--bt-ls-heading);
   color: var(--bt-color-text);
   text-wrap: balance;
   font-variant-numeric: oldstyle-nums;
@@ -109,7 +110,7 @@ p {
   text-wrap: pretty;
 }
 
-/* Standardized micro-label / eyebrow: 12px Inter, uppercase, 0.1em tracking,
+/* Standardized micro-label / eyebrow: 12px Inter, uppercase, 0.14em tracking,
    medium weight. .bt-micro-label is the canonical utility going forward;
    .bt-eyebrow remains as the legacy alias used across current sections. */
 .bt-eyebrow,
@@ -176,6 +177,27 @@ p {
   color: var(--bt-color-text);
 }
 
+/* ── Film grain ──
+   A whisper of analog texture laid over the whole page: fixed SVG-noise
+   tile (240px, fractalNoise @ baseFrequency 0.9), composited on its own
+   layer via translateZ(0), pointer-events none. --bt-z-grain (5) keeps it
+   above page content but below every overlay (dropdowns and up).
+   Static layer — no animation — so reduced-motion needs no special-casing.
+   Merchant controls (Theme settings → Visual craft): body.bt-no-grain
+   removes the layer; --bt-grain-opacity sets its strength. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: var(--bt-z-grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='bt-grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23bt-grain)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  opacity: var(--bt-grain-opacity, 0.03);
+  pointer-events: none;
+  transform: translateZ(0);
+}
+body.bt-no-grain::after { content: none; }
+
 /* ── Buttons ── */
 .bt-btn {
   display: inline-flex;
@@ -198,7 +220,7 @@ p {
   user-select: none;
   -webkit-user-select: none;
 }
-.bt-btn:hover { transform: translateY(-1px); box-shadow: var(--bt-shadow-sm); }
+.bt-btn:hover { transform: translateY(-1px); box-shadow: var(--bt-shadow-btn); }
 .bt-btn:active { transform: scale(0.97); }
 .bt-btn:disabled { opacity: 0.5; transform: none; box-shadow: none; }
 
@@ -303,7 +325,10 @@ p {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--bt-color-surface);
+  /* Paper-on-paper: half-step brighter than the section surface so the
+     card reads as a sheet laid over the page (per-scheme value derived
+     in theme.liquid; falls back to the plain surface). */
+  background: var(--bt-color-surface-raised, var(--bt-color-surface));
   border-radius: var(--bt-radius-card);
   overflow: hidden;
   box-shadow: var(--bt-shadow-card);
@@ -731,5 +756,6 @@ bt-predictive-search.bt-predictive[hidden] { display: none; }
 /* ── Print ── */
 @media print {
   body { color: black; background: white; }
+  body::after { display: none; } /* no film grain on paper */
   .bt-btn { border: 1px solid black; }
 }

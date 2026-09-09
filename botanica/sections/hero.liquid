@@ -223,10 +223,36 @@
   /* ── Specimen plate: outer hairline + inner offset hairline frame ── */
   .bt-hero__frame {
     position: relative;
-    padding: clamp(8px, 0.9vw, 12px);
+    --bt-hero-frame-pad: clamp(8px, 0.9vw, 12px);
+    padding: var(--bt-hero-frame-pad);
     border: 1px solid var(--bt-hairline);
     background: var(--bt-color-surface);
   }
+  /* ── Photo treatment: bottom fade-to-page + warm archival tint ──
+     Both layers are inset by the mat padding so the paper frame and its
+     hairlines stay crisp (the fade never washes the mat). They paint
+     above the photo but below the overlapping headline (z-index 2 on
+     .bt-hero__intro) and the floating product card (z-index 3).
+     The fade is always on; tint strength follows --bt-img-tint (Theme
+     settings → Visual craft) and is removed entirely when set to 0. */
+  .bt-hero__frame::before {
+    content: '';
+    position: absolute;
+    inset: var(--bt-hero-frame-pad);
+    z-index: 1;
+    background: linear-gradient(180deg, rgb(var(--bt-color-bg-rgb) / 0) 75%, var(--bt-color-bg) 100%);
+    pointer-events: none;
+  }
+  .bt-hero__frame::after {
+    content: '';
+    position: absolute;
+    inset: var(--bt-hero-frame-pad);
+    z-index: 1;
+    background: linear-gradient(160deg, rgb(255 214 165 / var(--bt-img-tint, 0.07)), rgb(120 100 60 / calc(var(--bt-img-tint, 0.07) * 0.7)) 70%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+  .bt-no-img-tint .bt-hero__frame::after { content: none; }
   .bt-hero__media {
     position: relative;
     overflow: hidden;

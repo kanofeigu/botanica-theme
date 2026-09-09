@@ -99,6 +99,19 @@
           endif
         endif
 
+        comment
+          Paper-on-paper: card faces lift half a step above the section
+          surface. Light schemes brighten by 2; dark schemes by 5 so cards
+          stay visibly lifted off dark palettes (lighter reads as raised on
+          both). Consumed by .bt-card in base.css via
+          --bt-color-surface-raised.
+        endcomment
+        if bg_brightness > 128
+          assign scheme_surface_raised = scheme_surface | color_lighten: 2
+        else
+          assign scheme_surface_raised = scheme_surface | color_lighten: 5
+        endif
+
         if bg_brightness > 128
           assign scheme_muted = scheme_text | color_lighten: 12
         else
@@ -147,6 +160,7 @@
         --bt-color-bg: {{ scheme_bg }};
         --bt-color-bg-rgb: {{ scheme_bg.red }}, {{ scheme_bg.green }}, {{ scheme_bg.blue }};
         --bt-color-surface: {{ scheme_surface }};
+        --bt-color-surface-raised: {{ scheme_surface_raised }};
         --bt-color-text: {{ scheme_text }};
         --bt-color-text-rgb: {{ scheme_text.red }}, {{ scheme_text.green }}, {{ scheme_text.blue }};
         --bt-color-text-muted: {{ scheme_muted }};
@@ -159,21 +173,52 @@
         --bt-color-secondary-text: {{ scheme_secondary_text }};
         --bt-color-border: {{ scheme.settings.shadow }};
         {%- comment -%}
-          Card elevation shadows follow the scheme: light schemes tint the
-          shadow with the scheme text color; dark schemes fall back to pure
-          black at higher alpha so cards stay lifted off dark surfaces.
-          :root fallbacks for the empty-state preview live in
+          Card elevation shadows follow the scheme. Three layers —
+          contact / mid / far — plus a 1px inset top highlight so card
+          faces catch overhead light. Light schemes cast a fixed
+          green-gray hue (46 58 40 — light filtered through foliage)
+          instead of a neutral text-colored shade; dark schemes fall back
+          to pure black at higher alpha with the inset highlight softened
+          to 0.08. --bt-shadow-btn is the lightweight variant buttons pick
+          up on hover. :root fallbacks for the empty-state preview live in
           design-tokens.css.
         {%- endcomment -%}
         {%- if bg_brightness > 128 -%}
-          {%- assign shadow_channels = scheme_text.red | append: ', ' | append: scheme_text.green | append: ', ' | append: scheme_text.blue -%}
-          --bt-shadow-card: 0 1px 2px rgba({{ shadow_channels }}, 0.05), 0 8px 24px -8px rgba({{ shadow_channels }}, 0.08);
-          --bt-shadow-card-hover: 0 2px 4px rgba({{ shadow_channels }}, 0.06), 0 16px 40px -12px rgba({{ shadow_channels }}, 0.14);
-          --bt-shadow-specimen-mat: 0 4px 12px -4px rgba({{ shadow_channels }}, 0.16);
+          --bt-shadow-card:
+            inset 0 1px 0 rgb(255 255 255 / 0.5),
+            0 1px 2px rgb(46 58 40 / 0.06),
+            0 6px 16px -6px rgb(46 58 40 / 0.08),
+            0 16px 40px -16px rgb(46 58 40 / 0.1);
+          --bt-shadow-card-hover:
+            inset 0 1px 0 rgb(255 255 255 / 0.5),
+            0 2px 4px rgb(46 58 40 / 0.07),
+            0 10px 24px -8px rgb(46 58 40 / 0.11),
+            0 24px 56px -16px rgb(46 58 40 / 0.16);
+          --bt-shadow-specimen-mat:
+            0 2px 6px -2px rgb(46 58 40 / 0.1),
+            0 10px 24px -10px rgb(46 58 40 / 0.14);
+          --bt-shadow-btn:
+            inset 0 1px 0 rgb(255 255 255 / 0.35),
+            0 1px 2px rgb(46 58 40 / 0.07),
+            0 4px 12px -4px rgb(46 58 40 / 0.1);
         {%- else -%}
-          --bt-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 24px -8px rgba(0, 0, 0, 0.48);
-          --bt-shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.36), 0 16px 40px -12px rgba(0, 0, 0, 0.6);
-          --bt-shadow-specimen-mat: 0 4px 12px -4px rgba(0, 0, 0, 0.5);
+          --bt-shadow-card:
+            inset 0 1px 0 rgb(255 255 255 / 0.08),
+            0 1px 2px rgb(0 0 0 / 0.34),
+            0 6px 16px -6px rgb(0 0 0 / 0.44),
+            0 16px 40px -16px rgb(0 0 0 / 0.56);
+          --bt-shadow-card-hover:
+            inset 0 1px 0 rgb(255 255 255 / 0.08),
+            0 2px 4px rgb(0 0 0 / 0.38),
+            0 10px 24px -8px rgb(0 0 0 / 0.5),
+            0 24px 56px -16px rgb(0 0 0 / 0.64);
+          --bt-shadow-specimen-mat:
+            0 2px 6px -2px rgb(0 0 0 / 0.4),
+            0 10px 24px -10px rgb(0 0 0 / 0.5);
+          --bt-shadow-btn:
+            inset 0 1px 0 rgb(255 255 255 / 0.08),
+            0 1px 2px rgb(0 0 0 / 0.3),
+            0 4px 12px -4px rgb(0 0 0 / 0.42);
         {%- endif -%}
         {%- if scheme.settings.background_gradient != blank %}
           --bt-color-bg-gradient: {{ scheme.settings.background_gradient }};
@@ -190,6 +235,12 @@
       --bt-radius-btn: {{ settings.button_corner_radius }}px;
       --bt-radius-input: {{ settings.inputs_corner_radius }}px;
       --bt-radius-card: {{ settings.card_corner_radius }}px;
+      {%- comment -%}
+        Visual craft dials (Theme settings → Visual craft): grain opacity
+        and image-tint strength are percentages → alpha channels.
+      {%- endcomment -%}
+      --bt-grain-opacity: {{ settings.grain_opacity | divided_by: 100.0 }};
+      --bt-img-tint: {{ settings.image_tint_strength | divided_by: 100.0 }};
     }
   {% endstyle %}
 
@@ -211,7 +262,7 @@
   </script>
 </head>
 
-<body>
+<body class="{%- unless settings.enable_grain %}bt-no-grain {% endunless -%}{%- if settings.image_tint_strength == 0 %}bt-no-img-tint{%- endif -%}">
   <a class="bt-skip-link" href="#MainContent">
     {{ 'accessibility.skip_to_text' | t }}
   </a>

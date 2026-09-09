@@ -135,6 +135,40 @@
     ]
   },
   {
+    "name": "t:settings_schema.visual_craft.name",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "enable_grain",
+        "label": "t:settings_schema.visual_craft.settings.enable_grain.label",
+        "info": "t:settings_schema.visual_craft.settings.enable_grain.info",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "grain_opacity",
+        "min": 0,
+        "max": 8,
+        "step": 1,
+        "default": 3,
+        "unit": "%",
+        "label": "t:settings_schema.visual_craft.settings.grain_opacity.label",
+        "info": "t:settings_schema.visual_craft.settings.grain_opacity.info"
+      },
+      {
+        "type": "range",
+        "id": "image_tint_strength",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "default": 7,
+        "unit": "%",
+        "label": "t:settings_schema.visual_craft.settings.image_tint_strength.label",
+        "info": "t:settings_schema.visual_craft.settings.image_tint_strength.info"
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.layout.name",
     "settings": [
       {
