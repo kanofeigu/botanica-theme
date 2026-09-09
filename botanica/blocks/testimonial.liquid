@@ -7,6 +7,7 @@
   assign author = block.settings.author
   assign role_text = block.settings.role
   assign stars = block.settings.stars | plus: 0
+  assign linked_product = block.settings.product
 -%}
 {%- if quote != blank -%}
   <figure class="bt-testimonial" {{ block.shopify_attributes }}>
@@ -27,6 +28,39 @@
           <span>{{ role_text | escape }}</span>
         {%- endif -%}
       </figcaption>
+    {%- endif -%}
+    {%- if linked_product != blank -%}
+      <a
+        class="bt-testimonial__product"
+        href="{{ linked_product.url }}"
+        aria-label="{{ 'products.product.view_product' | t }}: {{ linked_product.title | escape }}"
+      >
+        <span class="bt-testimonial__product-media">
+          {%- if linked_product.featured_media -%}
+            {{ linked_product.featured_media | image_url: width: 112 | image_tag:
+              loading: 'lazy',
+              widths: '56, 112',
+              sizes: '56px',
+              alt: linked_product.featured_media.alt | default: linked_product.title
+            }}
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'bt-testimonial__product-placeholder' }}
+          {%- endif -%}
+        </span>
+        <span class="bt-testimonial__product-body">
+          <span class="bt-testimonial__product-title">{{ linked_product.title | escape }}</span>
+          <span class="bt-testimonial__product-price">
+            {%- if linked_product.compare_at_price > linked_product.price -%}
+              <s>{{ linked_product.compare_at_price | money }}</s>
+            {%- endif -%}
+            {%- if linked_product.price_varies -%}
+              {{ 'products.product.price.from_price_html' | t: price: linked_product.price | money }}
+            {%- else -%}
+              {{ linked_product.price | money }}
+            {%- endif -%}
+          </span>
+        </span>
+      </a>
     {%- endif -%}
   </figure>
 {%- endif -%}
@@ -67,6 +101,63 @@
     color: var(--bt-color-text);
     font-weight: var(--bt-fw-semibold);
   }
+
+  /* ── Linked product: hairline-ruled mini product strip ── */
+  .bt-testimonial__product {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-sm);
+    margin-top: var(--bt-space-md);
+    padding-top: var(--bt-space-md);
+    border-top: 1px solid var(--bt-hairline);
+    text-align: start;
+    text-decoration: none;
+    color: var(--bt-color-text);
+  }
+  .bt-testimonial__product-media {
+    flex-shrink: 0;
+    display: block;
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--bt-hairline);
+    background: var(--bt-color-surface-hover);
+    overflow: hidden;
+  }
+  .bt-testimonial__product-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bt-testimonial__product-placeholder {
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+  }
+  .bt-testimonial__product-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .bt-testimonial__product-title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body);
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text);
+    transition: color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-testimonial__product:hover .bt-testimonial__product-title {
+    color: var(--bt-color-primary);
+  }
+  .bt-testimonial__product-price {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-testimonial__product-price s {
+    opacity: 0.6;
+    margin-inline-end: 0.4em;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -99,6 +190,12 @@
       "step": 1,
       "default": 5,
       "label": "t:blocks.testimonial.settings.stars.label"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:blocks.testimonial.settings.product.label",
+      "info": "t:blocks.testimonial.settings.product.info"
     }
   ],
   "presets": [{ "name": "t:blocks.testimonial.name" }]

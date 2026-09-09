@@ -22,13 +22,21 @@
             unique editor IDs and must only exist once in the DOM. {%- endcomment -%}
         {%- capture marquee_items_plain -%}
           {%- for block in section.blocks -%}
-            <span class="bt-marquee__item">{{ block.settings.text }}</span>
+            {%- if block.settings.link != blank -%}
+              <a class="bt-marquee__item bt-marquee__pill" href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+            {%- else -%}
+              <span class="bt-marquee__item">{{ block.settings.text }}</span>
+            {%- endif -%}
             <span class="bt-marquee__sep" aria-hidden="true">{% render 'icon-leaf' %}</span>
           {%- endfor -%}
         {%- endcapture -%}
         <div class="bt-marquee__group">
           {%- for block in section.blocks -%}
-            <span class="bt-marquee__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+            {%- if block.settings.link != blank -%}
+              <a class="bt-marquee__item bt-marquee__pill" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</a>
+            {%- else -%}
+              <span class="bt-marquee__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+            {%- endif -%}
             <span class="bt-marquee__sep" aria-hidden="true">{% render 'icon-leaf' %}</span>
           {%- endfor -%}
         </div>
@@ -99,6 +107,26 @@
     line-height: var(--bt-lh-heading);
   }
 
+  /* ── Linked phrase: small pill button in the scheme's button colour ── */
+  .bt-marquee__item.bt-marquee__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35em 1.1em;
+    border: 1px solid var(--bt-color-primary);
+    border-radius: var(--bt-radius-pill);
+    color: var(--bt-color-primary);
+    text-decoration: none;
+    transition: background-color var(--bt-duration-fast) var(--bt-ease-out),
+                color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-marquee__item.bt-marquee__pill:hover {
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+  }
+  .bt-marquee__item.bt-marquee__pill em {
+    color: inherit;
+  }
+
   /* ── Pause on hover (pointer devices only) ── */
   @media (hover: hover) {
     .bt-marquee:hover .bt-marquee__track {
@@ -144,6 +172,12 @@
           "label": "t:sections.bt_marquee.blocks.phrase.settings.text.label",
           "info": "t:sections.bt_marquee.blocks.phrase.settings.text.info",
           "default": "t:sections.bt_marquee.blocks.phrase.settings.text.default"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.bt_marquee.blocks.phrase.settings.link.label",
+          "info": "t:sections.bt_marquee.blocks.phrase.settings.link.info"
         }
       ]
     }

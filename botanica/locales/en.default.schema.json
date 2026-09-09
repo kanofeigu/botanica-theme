@@ -295,6 +295,10 @@
               "label": "Text",
               "info": "Italicize words to set them as serif accents",
               "default": "A phrase worth repeating"
+            },
+            "link": {
+              "label": "Link",
+              "info": "Optional. Renders the phrase as a small pill button linking here."
             }
           }
         }
@@ -1009,6 +1013,14 @@
         "latin_caption": {
           "label": "Latin caption",
           "info": "Serif italic caption under the image, e.g. “Monstera deliciosa”. Leave blank to hide."
+        },
+        "product": {
+          "label": "Featured product",
+          "info": "Optional. Floats a specimen-style mini product card over the corner of the image."
+        },
+        "product_label": {
+          "label": "Product label",
+          "default": "Featured specimen"
         }
       }
     },
@@ -1896,6 +1908,10 @@
         },
         "stars": {
           "label": "Rating"
+        },
+        "product": {
+          "label": "Product",
+          "info": "Optional. Adds a mini product strip with a link to the bottom of the card."
         }
       }
     },

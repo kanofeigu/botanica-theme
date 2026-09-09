@@ -19,6 +19,8 @@
   assign button_style = section.settings.button_style | default: 'primary'
   assign specimen_number = section.settings.specimen_number
   assign latin_caption = section.settings.latin_caption
+  assign hero_product = section.settings.product
+  assign hero_product_label = section.settings.product_label
 
   assign ratio = section.settings.image_ratio | default: '4-5'
   assign aspect = '4 / 5'
@@ -77,6 +79,42 @@
               </div>
             {%- endif -%}
           </div>
+          {%- if hero_product != blank -%}
+            <div class="bt-hero__product-card">
+              <span class="bt-hero__product-media">
+                {%- if hero_product.featured_media -%}
+                  {{ hero_product.featured_media | image_url: width: 300 | image_tag:
+                    loading: 'lazy',
+                    widths: '150, 300',
+                    sizes: '72px',
+                    alt: hero_product.featured_media.alt | default: hero_product.title
+                  }}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'bt-hero__product-placeholder' }}
+                {%- endif -%}
+              </span>
+              <span class="bt-hero__product-body">
+                {%- if hero_product_label != blank -%}
+                  <span class="bt-hero__product-label bt-micro-label">{{ hero_product_label | escape }}</span>
+                {%- endif -%}
+                <a
+                  href="{{ hero_product.url }}"
+                  class="bt-hero__product-title"
+                  aria-label="{{ 'products.product.view_product' | t }}: {{ hero_product.title | escape }}"
+                >{{ hero_product.title | escape }}</a>
+                <span class="bt-hero__product-price">
+                  {%- if hero_product.compare_at_price > hero_product.price -%}
+                    <s>{{ hero_product.compare_at_price | money }}</s>
+                  {%- endif -%}
+                  {%- if hero_product.price_varies -%}
+                    {{ 'products.product.price.from_price_html' | t: price: hero_product.price | money }}
+                  {%- else -%}
+                    {{ hero_product.price | money }}
+                  {%- endif -%}
+                </span>
+              </span>
+            </div>
+          {%- endif -%}
         </div>
         {%- if specimen_number != blank or latin_caption != blank -%}
           <figcaption class="bt-hero__caption">
@@ -184,6 +222,7 @@
 
   /* ── Specimen plate: outer hairline + inner offset hairline frame ── */
   .bt-hero__frame {
+    position: relative;
     padding: clamp(8px, 0.9vw, 12px);
     border: 1px solid var(--bt-hairline);
     background: var(--bt-color-surface);
@@ -217,6 +256,83 @@
     margin-top: var(--bt-space-sm);
   }
 
+  /* ── Floating featured-product card — specimen mini card, double hairline ── */
+  .bt-hero__product-card {
+    position: absolute;
+    inset-inline-end: calc(-1 * var(--bt-space-sm));
+    bottom: var(--bt-space-md);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-sm);
+    width: min(260px, 72%);
+    padding: var(--bt-space-xs);
+    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-hairline);
+    box-shadow: 0 0 0 3px var(--bt-color-surface), 0 0 0 4px var(--bt-hairline), var(--bt-shadow-sm);
+    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-hero__product-card:hover {
+    transform: translateY(-2px);
+  }
+  .bt-hero__product-card:focus-within {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: 5px;
+  }
+  .bt-hero__product-media {
+    flex-shrink: 0;
+    display: block;
+    width: 72px;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--bt-hairline);
+    background: var(--bt-color-surface-hover);
+    overflow: hidden;
+  }
+  .bt-hero__product-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bt-hero__product-placeholder {
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+  }
+  .bt-hero__product-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .bt-hero__product-label {
+    color: var(--bt-color-text-muted);
+  }
+  .bt-hero__product-title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body);
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-color-text);
+    text-decoration: none;
+  }
+  /* Stretched link: the whole card is clickable through this one anchor */
+  .bt-hero__product-title::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .bt-hero__product-card:hover .bt-hero__product-title {
+    color: var(--bt-color-primary);
+  }
+  .bt-hero__product-price {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+  }
+  .bt-hero__product-price s {
+    opacity: 0.6;
+    margin-inline-end: 0.4em;
+  }
+
   /* ── Optional theme/app blocks row ── */
   .bt-hero__blocks {
     margin-top: var(--bt-space-2xl);
@@ -245,6 +361,18 @@
     }
     .bt-hero__heading {
       max-width: 16ch;
+    }
+    /* Featured-product card leaves the float and joins the flow under the image */
+    .bt-hero__product-card {
+      position: relative;
+      inset-inline-end: auto;
+      bottom: auto;
+      width: 100%;
+      margin-top: var(--bt-space-sm);
+      box-shadow: none;
+    }
+    .bt-hero__product-card:hover {
+      transform: none;
     }
   }
 {% endstylesheet %}
@@ -365,6 +493,18 @@
       "label": "t:sections.hero.settings.latin_caption.label",
       "info": "t:sections.hero.settings.latin_caption.info",
       "default": "Monstera deliciosa"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:sections.hero.settings.product.label",
+      "info": "t:sections.hero.settings.product.info"
+    },
+    {
+      "type": "text",
+      "id": "product_label",
+      "label": "t:sections.hero.settings.product_label.label",
+      "default": "t:sections.hero.settings.product_label.default"
     }
   ],
   "presets": [{
