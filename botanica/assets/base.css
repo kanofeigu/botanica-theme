@@ -371,19 +371,39 @@ p {
   color: var(--bt-color-text-muted);
   border: 1px solid var(--bt-color-border-medium);
 }
-/* PDP badge contexts (blocks/product-badges) */
-.bt-badge--stock {
-  background: var(--bt-color-primary-tint);
-  color: var(--bt-color-primary);
+
+/* ── Specimen tags (.bt-tag) — canonical product-status label ──
+   Herbarium paper label: white surface, 1px hairline, micro-label type
+   (12px uppercase, 0.1em tracking — same spec as .bt-micro-label),
+   square corners (≤2px). Status shows through typography or a 3px edge
+   bar, never a filled color block. Shared by product cards and PDP
+   badges; one size at every breakpoint (labels do not shrink on
+   mobile). */
+.bt-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px var(--bt-space-2xs);
+  background: var(--bt-color-surface);
+  border: 1px solid var(--bt-hairline);
+  border-radius: var(--bt-radius-tag);
+  font-family: var(--bt-font-body);
+  font-size: var(--bt-fs-micro);
+  font-weight: var(--bt-fw-medium);
+  letter-spacing: var(--bt-ls-micro);
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--bt-color-text);
+  white-space: nowrap;
 }
-.bt-badge--sale {
-  background: var(--bt-color-secondary);
-  color: var(--bt-color-primary-contrast);
+/* Sale: the accent lives only on the 3px left edge bar (the label's
+   mounting tape); text stays scheme text for WCAG-safe contrast. */
+.bt-tag--sale {
+  border-left: 3px solid var(--bt-color-accent);
+  padding-left: calc(var(--bt-space-2xs) - 2px);
 }
-.bt-badge--soldout {
-  background: var(--bt-color-text);
-  color: var(--bt-color-bg);
-}
+.bt-tag--new { color: var(--bt-color-text); }
+.bt-tag--soldout { color: var(--bt-color-text-muted); }
+.bt-tag--stock { color: var(--bt-color-text-muted); }
 
 /* ── Interaction primitives ── */
 .bt-interactive {

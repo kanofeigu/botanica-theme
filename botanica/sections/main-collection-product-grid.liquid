@@ -201,9 +201,9 @@
               {%- for product in collection.products -%}
                 {%- if forloop.index <= 4 -%}
                   {% comment %} First row = LCP candidates: eager + high priority {% endcomment %}
-                  {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, loading: 'eager', fetchpriority: 'high' %}
+                  {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame, loading: 'eager', fetchpriority: 'high' %}
                 {%- else -%}
-                  {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
+                  {% render 'card-product', product: product, show_secondary_image: section.settings.show_secondary_image, show_vendor: section.settings.show_vendor, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame %}
                 {%- endif -%}
               {%- endfor -%}
             </div>
@@ -1164,6 +1164,12 @@
       "type": "checkbox",
       "id": "show_vendor",
       "label": "t:sections.main_collection_product_grid.settings.show_vendor.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_specimen_frame",
+      "label": "t:sections.main_collection_product_grid.settings.enable_specimen_frame.label",
       "default": false
     }
   ],

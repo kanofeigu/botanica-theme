@@ -96,7 +96,7 @@
             <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
               {%- for item in search.results -%}
                 {%- if item.object_type == 'product' -%}
-                  {% render 'card-product', product: item, show_secondary_image: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge %}
+                  {% render 'card-product', product: item, show_secondary_image: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame %}
                 {%- else -%}
                   {%- assign type_label_key = 'general.search.object_types.' | append: item.object_type -%}
                   <div class="bt-card">
@@ -448,6 +448,7 @@
 { "name": "t:sections.main_search.name", "settings": [
   { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "checkbox", "id": "enable_filtering", "label": "t:sections.main_search.settings.enable_filtering.label", "default": true },
+  { "type": "checkbox", "id": "enable_specimen_frame", "label": "t:sections.main_search.settings.enable_specimen_frame.label", "default": false },
   { "type": "range", "id": "columns_desktop", "min":2,"max":4,"step":1,"default":3,"label":"t:sections.main_search.settings.columns_desktop.label" }
 ] }
 {% endschema %}

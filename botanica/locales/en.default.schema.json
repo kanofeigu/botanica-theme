@@ -667,6 +667,9 @@
         },
         "show_vendor": {
           "label": "Vendor"
+        },
+        "enable_specimen_frame": {
+          "label": "Specimen frame on product images"
         }
       }
     },
@@ -678,6 +681,9 @@
         },
         "enable_filtering": {
           "label": "Enable product filters"
+        },
+        "enable_specimen_frame": {
+          "label": "Specimen frame on product images"
         }
       }
     },
@@ -1193,6 +1199,9 @@
         },
         "mobile_swipe": {
           "label": "Swipeable cards on mobile"
+        },
+        "enable_specimen_frame": {
+          "label": "Specimen frame on product images"
         }
       }
     },

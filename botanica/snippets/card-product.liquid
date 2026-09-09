@@ -11,6 +11,12 @@
   assign show_sold = show_sold_out_badge | default: settings.show_sold_out_badge
   assign show_care = show_care_badge | default: settings.show_care_badge | default: false
   assign show_light = show_light_badge | default: settings.show_light_badge | default: false
+  comment
+    Specimen frame: opt-in per section (enable_specimen_frame). Wraps the
+    media in the herbarium double-line mount (white mat + hairline + outer
+    ring). Defaults off so existing placements keep their current look.
+  endcomment
+  assign specimen_frame = specimen_frame | default: false
 
   comment
     LCP control: callers pass loading: 'eager', fetchpriority: 'high'
@@ -45,7 +51,7 @@
     assign light_dots = 1
   endif
 -%}
-<div class="bt-card bt-card--product{% if show_secondary_image and product.media[1] != blank %} bt-card--swap{% endif %}">
+<div class="bt-card bt-card--product{% if specimen_frame %} bt-card--specimen{% endif %}{% if show_secondary_image and product.media[1] != blank %} bt-card--swap{% endif %}">
   <div class="bt-card__media" style="aspect-ratio: {{ aspect }}">
     <a href="{{ product.url }}" aria-label="{{ product.title }}" class="bt-card__media-link">
       {%- if product.featured_media -%}
@@ -59,12 +65,12 @@
     </a>
 
     {%- if show_sale and product.compare_at_price > product.price -%}
-      <span class="bt-badge bt-card__sale-badge">{{ 'products.product.on_sale' | t }}</span>
+      <span class="bt-tag bt-tag--sale bt-card__sale-badge">{{ 'products.product.on_sale' | t }}</span>
     {%- elsif product.available and product.tags contains 'new' -%}
-      <span class="bt-badge bt-badge--new bt-card__sale-badge">{{ 'products.product.new_badge' | t }}</span>
+      <span class="bt-tag bt-tag--new bt-card__sale-badge">{{ 'products.product.new_badge' | t }}</span>
     {%- endif -%}
     {%- if show_sold and product.available == false -%}
-      <span class="bt-badge bt-badge--outline bt-card__sale-badge">{{ 'products.product.sold_out' | t }}</span>
+      <span class="bt-tag bt-tag--soldout bt-card__sale-badge">{{ 'products.product.sold_out' | t }}</span>
     {%- endif -%}
 
     {%- if product.available -%}
@@ -169,6 +175,26 @@
     background: var(--bt-color-surface);
   }
 
+  /* ── Specimen frame (opt-in: section setting enable_specimen_frame) ──
+     Herbarium double-line mount around the media: white mat padding,
+     1px hairline, outer 1px shadow ring — same language as the hero
+     product card. Applied to the outer media container so hover
+     crossfade / zoom on the inner <img> keeps working untouched. */
+  .bt-card--specimen .bt-card__media {
+    --bt-specimen-pad: var(--bt-space-2xs);
+    margin: var(--bt-space-xs) var(--bt-space-xs) 0;
+    padding: var(--bt-specimen-pad);
+    background: var(--bt-color-surface);
+    border: 1px solid var(--bt-hairline);
+    border-radius: var(--bt-radius-tag);
+    box-shadow: 0 0 0 3px var(--bt-color-surface), 0 0 0 4px var(--bt-hairline);
+  }
+  /* Absolutely-positioned swap image aligns to the padding box — pull it
+     back onto the mat so both frames crossfade inside the mount. */
+  .bt-card--specimen .bt-card__secondary-image {
+    inset: var(--bt-specimen-pad);
+  }
+
   /* ── Sale badge ── */
   .bt-card__sale-badge {
     position: absolute;
@@ -250,12 +276,6 @@
     font-size: var(--bt-fs-body-sm);
     color: var(--bt-color-text-muted);
     margin: calc(var(--bt-space-3xs) * -0.5) 0 0;
-  }
-
-  /* ── New badge ── */
-  .bt-badge--new {
-    background: var(--bt-color-primary);
-    color: var(--bt-color-primary-contrast);
   }
 
   /* ── Card body — hairline seam above the info block (specimen corner) ── */

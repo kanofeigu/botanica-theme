@@ -23,9 +23,9 @@
       <div class="bt-featured-collection__grid bt-featured-collection__grid--{{ columns }}-col{% if section.settings.mobile_swipe %} bt-featured-collection__grid--swipe-mobile{% endif %}"{% if section.settings.enable_reveal %} data-bt-reveal-stagger{% endif %}>
         {%- for product in collection.products limit: products_to_show -%}
           {%- if forloop.index <= 4 -%}
-            <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, loading: 'eager', fetchpriority: 'high' -%}</div>
+            <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame, loading: 'eager', fetchpriority: 'high' -%}</div>
           {%- else -%}
-            <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge -%}</div>
+            <div{% if section.settings.enable_reveal %} data-bt-reveal{% endif %}>{%- render 'card-product', product: product, show_secondary_image: true, show_vendor: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame -%}</div>
           {%- endif -%}
         {%- else -%}
           {%- for i in (1..4) -%}
@@ -128,6 +128,12 @@
       "id": "mobile_swipe",
       "label": "t:sections.featured_collection.settings.mobile_swipe.label",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_specimen_frame",
+      "label": "t:sections.featured_collection.settings.enable_specimen_frame.label",
+      "default": false
     },
     {
       "type": "checkbox",

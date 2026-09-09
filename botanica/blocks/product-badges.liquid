@@ -1,21 +1,21 @@
 {% comment %}
   blocks/product-badges.liquid — Sale/sold out/stock badges on PDP
   Data from product tags (care/light) + settings (sale/sold-out).
-  Note: bt-badge styles are global utilities from base.css.
+  Note: bt-tag specimen-label styles are global utilities from base.css.
 {% endcomment %}
 <div class="bt-product-badges" {{ block.shopify_attributes }}>
   {%- if block.settings.show_stock_badge -%}
     {%- if product.selected_or_first_available_variant.available -%}
       {% comment %}theme-check-disable ValidScopedCSSClass{% endcomment %}
-      <span class="bt-badge bt-badge--stock">{{ 'products.product.inventory_in_stock' | t }}</span>
+      <span class="bt-tag bt-tag--stock">{{ 'products.product.inventory_in_stock' | t }}</span>
     {%- else -%}
-      <span class="bt-badge bt-badge--soldout">{{ 'products.product.sold_out' | t }}</span>
+      <span class="bt-tag bt-tag--soldout">{{ 'products.product.sold_out' | t }}</span>
       {% comment %}theme-check-enable ValidScopedCSSClass{% endcomment %}
     {%- endif -%}
   {%- endif -%}
   {%- if block.settings.show_sale_badge and product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price -%}
     {% comment %}theme-check-disable ValidScopedCSSClass{% endcomment %}
-    <span class="bt-badge bt-badge--sale">{{ 'products.product.on_sale' | t }}</span>
+    <span class="bt-tag bt-tag--sale">{{ 'products.product.on_sale' | t }}</span>
     {% comment %}theme-check-enable ValidScopedCSSClass{% endcomment %}
   {%- endif -%}
 </div>

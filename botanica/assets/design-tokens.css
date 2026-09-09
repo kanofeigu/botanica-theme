@@ -40,6 +40,10 @@
   --bt-color-border-light: rgba(var(--bt-color-text-rgb), 0.12);
   --bt-color-border-medium: rgba(var(--bt-color-text-rgb), 0.25);
   --bt-color-scrim: rgba(var(--bt-color-text-rgb), 0.4);
+  /* Accent alias: the scheme's accent (secondary) color under its
+     design-language name. Used sparingly — specimen-tag edge bars,
+     small ornaments — never as a filled block behind text. */
+  --bt-color-accent: var(--bt-color-secondary);
 
   @supports (color: color-mix(in srgb, black 50%, white)) {
     --bt-color-primary-hover: color-mix(in srgb, var(--bt-color-primary) 85%, black);
