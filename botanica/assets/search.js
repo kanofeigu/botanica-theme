@@ -1,4 +1,4 @@
-/* Botanica v3 — Predictive Search
+/* Atrium v3 — Predictive Search
    Panel lives in layout/theme.liquid (<bt-predictive-search>),
    toggled from the header search icon ([data-search-toggle]).
    Suggest endpoint: /search/suggest.json (returns JSON). */

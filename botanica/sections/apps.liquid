@@ -1,7 +1,7 @@
 {% comment %}
   apps.liquid — @app block support wrapper. No "templates" property.
   Provides a neutral editorial container so any app block (reviews,
-  widgets, etc.) lands in a styled region that inherits Botanica's
+  widgets, etc.) lands in a styled region that inherits Atrium's
   rhythm. Generic selectors below gently harmonize common review-app
   patterns (stars, headings, buttons) without deep-coupling to any
   single app's internal DOM — so the theme passes Theme Store's
@@ -40,7 +40,7 @@
   }
 
   /* Star rating color: keep on-brand secondary (terracotta) instead of
-     each app's default pure gold — matches Botanica's editorial palette.
+     each app's default pure gold — matches Atrium's editorial palette.
      Targets the well-known star fill classes. */
   .bt-apps__inner :where(
     .jdgm-star,
@@ -58,7 +58,7 @@
   }
 
   /* Review cards / list rows: cream surface + subtle border, matching
-     Botanica's editorial card rhythm. Applies only to the outermost
+     Atrium's editorial card rhythm. Applies only to the outermost
      review container, not internal layout. */
   .bt-apps__inner :where(
     .jdgm-rev,
@@ -100,7 +100,7 @@
     font-variant-numeric: oldstyle-nums;
   }
 
-  /* Write-a-review / submit buttons: align to Botanica button treatment.
+  /* Write-a-review / submit buttons: align to Atrium button treatment.
      Apps usually render their own <button>; we nudge border-radius + colors
      without overriding their layout. */
   .bt-apps__inner :where(
@@ -137,7 +137,7 @@
     color: var(--bt-color-text);
   }
 
-  /* Remove apps' default drop-shadows that clash with Botanica's soft shadows */
+  /* Remove apps' default drop-shadows that clash with Atrium's soft shadows */
   .bt-apps__inner :where(.jdgm-widget, .loox-reviews-widget, .yotpo-widget, .stamped-main-widget) {
     box-shadow: none !important;
   }

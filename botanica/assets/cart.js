@@ -1,4 +1,4 @@
-/* Botanica v3 — Cart drawer with AJAX qty, upsell, gift note & free shipping */
+/* Atrium v3 — Cart drawer with AJAX qty, upsell, gift note & free shipping */
 
 /* ────────────────────────────────────────────────────────────
    Defensive polyfill: Shopify.formatMoney

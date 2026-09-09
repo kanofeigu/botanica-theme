@@ -1,10 +1,10 @@
-# Botanica v3.0.0 — Release Notes
+# Atrium v3.0.0 — Release Notes
 
 ## First Release
 
-Botanica is a multi-purpose premium Shopify theme with a flagship botanical/plant-store demo. Built from the ground up on Shopify Skeleton with the theme-blocks architecture, it delivers editorial design, care-guide commerce, and specimen-grade product pages — all without a single line of Dawn or Horizon code.
+Atrium is a multi-purpose premium Shopify theme with a flagship botanical/plant-store demo. Built from the ground up on Shopify Skeleton with the theme-blocks architecture, it delivers editorial design, care-guide commerce, and specimen-grade product pages — all without a single line of Dawn or Horizon code.
 
-### What makes Botanica different
+### What makes Atrium different
 
 **Editorial design language.** Fraunces headings with oldstyle numerals, Inter body, botanical specimen tags, paper-texture overlays, and field-note styling. Not "green-themed" — it's built like a plant encyclopedia.
 
@@ -16,7 +16,7 @@ Botanica is a multi-purpose premium Shopify theme with a flagship botanical/plan
 
 **Mobile-optimized checkout.** A sticky add-to-cart bar appears on mobile when the main button scrolls out of view, keeping the purchase action always accessible without screen clutter.
 
-**Three curated presets.** Botanical (warm cream and sage), Home & Decor (clean white and charcoal), and Wellness (terracotta and warm cream) — each with distinct colors, spacing, and feel.
+**Three curated presets.** Atrium (warm cream and sage), Terracotta (clean white and charcoal), and Solace (terracotta and warm cream) — each with distinct colors, spacing, and feel.
 
 ### Features
 
@@ -49,8 +49,8 @@ Botanica is a multi-purpose premium Shopify theme with a flagship botanical/plan
 
 ### Support
 
-- Documentation: https://botanica-theme.com/docs
-- Support: https://botanica-theme.com/support
+- Documentation: https://atrium-theme.com/docs
+- Support: https://atrium-theme.com/support
 - Response time: Within 2 business days
 
 ---

@@ -1,5 +1,5 @@
 /**
- * assets/variant-selects.js — Botanica v3 original variant picker behavior.
+ * assets/variant-selects.js — Atrium v3 original variant picker behavior.
  *
  * Responsibilities (single custom element, mirrors `variant-picker.liquid`):
  *  - When any option radio inside this <variant-selects> changes, recompute
@@ -17,7 +17,7 @@
  * Architecture: pure ES class extending HTMLElement, attached via
  * `customElements.define('variant-selects', …)`. No external dependencies,
  * no shared modules — stays inside the 16KB JS budget. Talks to other
- * Botanica components only through DOM data-* attributes:
+ * Atrium components only through DOM data-* attributes:
  *   [data-variants]            — JSON array of product variants
  *   [data-variant-id]          — hidden id input (in main-product form)
  *   [data-current-price]       — span holding current price text

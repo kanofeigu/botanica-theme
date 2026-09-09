@@ -1,5 +1,5 @@
 /**
- * Botanica v3 — Sticky Add-to-Cart
+ * Atrium v3 — Sticky Add-to-Cart
  * IntersectionObserver-based. Appears when main ATC scrolls out.
  * Vanilla JS, ES module, ~600 bytes minified.
  */

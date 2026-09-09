@@ -1,7 +1,7 @@
 {
-  "current": "Botanica",
+  "current": "Atrium",
   "presets": {
-    "Home Decor": {
+    "Terracotta": {
       "logo_width": 120,
       "heading_font": "fraunces_n4",
       "body_font": "inter_n4",
@@ -90,7 +90,7 @@
         }
       }
     },
-    "Wellness": {
+    "Solace": {
       "logo_width": 100,
       "heading_font": "fraunces_n4",
       "body_font": "inter_n4",
@@ -179,7 +179,7 @@
         }
       }
     },
-    "Botanica": {
+    "Atrium": {
       "logo_width": 120,
       "heading_font": "fraunces_n4",
       "body_font": "inter_n4",

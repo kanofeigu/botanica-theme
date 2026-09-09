@@ -1,4 +1,4 @@
-/* Botanica v3 — Product gallery: slide-based media switcher (image / video /
+/* Atrium v3 — Product gallery: slide-based media switcher (image / video /
    external video / 3D model) + click-to-zoom lightbox (images only).
    Public API: activateMedia(id) — used by variant-selects.js. */
 class BtProductGallery extends HTMLElement {

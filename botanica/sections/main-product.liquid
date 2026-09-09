@@ -69,7 +69,7 @@
           <button type="button" class="bt-product__zoom-btn" data-zoom-open aria-label="{{ 'products.product.media.open_media' | t }}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
           </button>
-          {%- comment -%} Editorial silhouette overlay (only Botanica) {%- endcomment -%}
+          {%- comment -%} Editorial silhouette overlay (only Atrium) {%- endcomment -%}
           <span class="bt-product__silhouette bt-product__silhouette--tl" aria-hidden="true"></span>
           <span class="bt-product__silhouette bt-product__silhouette--br" aria-hidden="true"></span>
           {%- if first_variant.sku != blank -%}
@@ -293,7 +293,7 @@
   .bt-product__main-media:hover .bt-product__zoom-btn,
   .bt-product__main-media:focus-within .bt-product__zoom-btn { opacity: 1; }
 
-  /* ── Editorial silhouettes (only Botanica, never Hey Rooted) ── */
+  /* ── Editorial silhouettes (only Atrium, never Hey Rooted) ── */
   .bt-product__silhouette {
     position: absolute;
     width: 140px;

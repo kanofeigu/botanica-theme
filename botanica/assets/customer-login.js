@@ -1,4 +1,4 @@
-/* Botanica v3 — Customer login view switcher
+/* Atrium v3 — Customer login view switcher
    Toggles between the login view and the password-recovery view on
    /account/login, driven by the URL hash (#recover / #login).
    Progressive enhancement: without JS both views render stacked and the
