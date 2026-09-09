@@ -3,7 +3,7 @@
   "presets": {
     "Terracotta": {
       "logo_width": 120,
-      "heading_font": "fraunces_n4",
+      "heading_font": "playfair_display_n4",
       "body_font": "inter_n4",
       "body_scale": 100,
       "max_width": 1400,
@@ -26,74 +26,74 @@
           "settings": {
             "background": "#FFFFFF",
             "background_gradient": "",
-            "text": "#1A1A1A",
-            "button": "#2C2C2C",
+            "text": "#1F1B16",
+            "button": "#3A3330",
             "button_label": "#FFFFFF",
-            "accent": "#8B7355",
-            "shadow": "#1A1A1A"
+            "accent": "#A9603C",
+            "shadow": "#1F1B16"
           }
         },
         "scheme-2": {
           "settings": {
-            "background": "#F7F7F5",
+            "background": "#F7F3EE",
             "background_gradient": "",
-            "text": "#1A1A1A",
-            "button": "#2C2C2C",
+            "text": "#1F1B16",
+            "button": "#3A3330",
             "button_label": "#FFFFFF",
-            "accent": "#8B7355",
-            "shadow": "#1A1A1A"
+            "accent": "#A9603C",
+            "shadow": "#1F1B16"
           }
         },
         "scheme-3": {
           "settings": {
-            "background": "#2E3D2F",
+            "background": "#3B2F28",
             "background_gradient": "",
-            "text": "#F5F1E8",
-            "button": "#FFFFFF",
-            "button_label": "#2E3D2F",
+            "text": "#F7EFE7",
+            "button": "#F7EFE7",
+            "button_label": "#3B2F28",
             "accent": "#D99A77",
-            "shadow": "#F5F1E8"
+            "shadow": "#F7EFE7"
           }
         },
         "scheme-4": {
           "settings": {
-            "background": "#F6E9E1",
+            "background": "#F4E4D7",
             "background_gradient": "",
-            "text": "#2E2A24",
-            "button": "#AC5F3D",
+            "text": "#33261E",
+            "button": "#9C4A2F",
             "button_label": "#FFFFFF",
-            "accent": "#4A6B4F",
-            "shadow": "#2E2A24"
+            "accent": "#4A5B50",
+            "shadow": "#33261E"
           }
         },
         "scheme-5": {
           "settings": {
-            "background": "#211D18",
+            "background": "#1C1712",
             "background_gradient": "",
-            "text": "#F5F1E8",
-            "button": "#FFFFFF",
-            "button_label": "#211D18",
+            "text": "#F7EFE7",
+            "button": "#F7EFE7",
+            "button_label": "#1C1712",
             "accent": "#D99A77",
-            "shadow": "#F5F1E8"
+            "shadow": "#F7EFE7"
           }
         },
         "scheme-6": {
           "settings": {
-            "background": "#83452B",
+            "background": "#7A3B22",
             "background_gradient": "",
-            "text": "#FFF8F2",
-            "button": "#FFFFFF",
-            "button_label": "#8F4A2E",
+            "text": "#FFF6EE",
+            "button": "#FFF6EE",
+            "button_label": "#7A3B22",
             "accent": "#F0C9A8",
-            "shadow": "#7A4A30"
+            "shadow": "#FFF6EE"
           }
         }
       }
     },
     "Solace": {
       "logo_width": 100,
-      "heading_font": "fraunces_n4",
-      "body_font": "inter_n4",
+      "heading_font": "lora_n4",
+      "body_font": "jost_n4",
       "body_scale": 100,
       "max_width": 1200,
       "grid_horizontal_spacing": 20,
@@ -113,68 +113,68 @@
       "color_schemes": {
         "scheme-1": {
           "settings": {
-            "background": "#FAF5F0",
+            "background": "#FAF5EF",
             "background_gradient": "",
-            "text": "#3D2E2A",
-            "button": "#B5533A",
+            "text": "#39322C",
+            "button": "#6F5B4C",
             "button_label": "#FFFFFF",
-            "accent": "#C97D5A",
-            "shadow": "#3D2E2A"
+            "accent": "#7C6350",
+            "shadow": "#39322C"
           }
         },
         "scheme-2": {
           "settings": {
-            "background": "#FFFBF7",
+            "background": "#FFFDFA",
             "background_gradient": "",
-            "text": "#3D2E2A",
-            "button": "#B5533A",
+            "text": "#39322C",
+            "button": "#6F5B4C",
             "button_label": "#FFFFFF",
-            "accent": "#C97D5A",
-            "shadow": "#3D2E2A"
+            "accent": "#7C6350",
+            "shadow": "#39322C"
           }
         },
         "scheme-3": {
           "settings": {
-            "background": "#2E3D2F",
+            "background": "#39443B",
             "background_gradient": "",
-            "text": "#F5F1E8",
-            "button": "#FFFFFF",
-            "button_label": "#2E3D2F",
-            "accent": "#D99A77",
-            "shadow": "#F5F1E8"
+            "text": "#F2EEE6",
+            "button": "#F2EEE6",
+            "button_label": "#39443B",
+            "accent": "#C9B79C",
+            "shadow": "#F2EEE6"
           }
         },
         "scheme-4": {
           "settings": {
-            "background": "#F6E9E1",
+            "background": "#F3E8E2",
             "background_gradient": "",
-            "text": "#2E2A24",
-            "button": "#AC5F3D",
+            "text": "#413730",
+            "button": "#8C5A50",
             "button_label": "#FFFFFF",
-            "accent": "#4A6B4F",
-            "shadow": "#2E2A24"
+            "accent": "#52655A",
+            "shadow": "#413730"
           }
         },
         "scheme-5": {
           "settings": {
-            "background": "#211D18",
+            "background": "#232019",
             "background_gradient": "",
-            "text": "#F5F1E8",
-            "button": "#FFFFFF",
-            "button_label": "#211D18",
-            "accent": "#D99A77",
-            "shadow": "#F5F1E8"
+            "text": "#F2EEE6",
+            "button": "#F2EEE6",
+            "button_label": "#232019",
+            "accent": "#C9B79C",
+            "shadow": "#F2EEE6"
           }
         },
         "scheme-6": {
           "settings": {
-            "background": "#83452B",
+            "background": "#6E5154",
             "background_gradient": "",
-            "text": "#FFF8F2",
-            "button": "#FFFFFF",
-            "button_label": "#8F4A2E",
-            "accent": "#F0C9A8",
-            "shadow": "#7A4A30"
+            "text": "#FBF4F2",
+            "button": "#FBF4F2",
+            "button_label": "#6E5154",
+            "accent": "#EBC9C0",
+            "shadow": "#FBF4F2"
           }
         }
       }
