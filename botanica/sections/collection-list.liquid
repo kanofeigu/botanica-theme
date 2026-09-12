@@ -113,8 +113,10 @@
     background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / 0.28));
     pointer-events: none;
   }
-  /* Frosted label strip — floats over the image's lower edge */
-  .bt-collection-card__label {
+  /* Frosted label strip — floats over the image's lower edge.
+     Scoped under .bt-collection-card__media so its absolute positioning
+     outranks utility classes of equal specificity. */
+  .bt-collection-card__media .bt-collection-card__label {
     position: absolute;
     inset-inline: var(--bt-space-xs);
     bottom: var(--bt-space-xs);

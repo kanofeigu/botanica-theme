@@ -23,7 +23,10 @@
    ─────────────────────────────────────────── */
 
 .bt-glass {
-  position: relative;
+  /* No position here — glass must never fight the host component's
+     positioning (an equal-specificity `position` race once demoted the
+     collection label strip from absolute to relative and clipped it).
+     Components that need a positioning context set it themselves. */
   /* Solid fallback (no backdrop support): the scheme bg at
      high opacity — text in the scheme's own color keeps its
      WCAG-checked contrast because this IS the scheme pairing. */
@@ -62,6 +65,14 @@
 .bt-glass__muted,
 .bt-glass .bt-glass__muted {
   color: var(--bt-glass-text-muted);
+}
+
+/* Micro-labels inside glass: the accent color alone can sink into the
+   frost — lift it halfway toward the glass text so gold eyebrows stay
+   readable on the dark veil (and remain a deep gold on porcelain frost). */
+.bt-glass .bt-micro-label,
+.bt-glass .bt-eyebrow {
+  color: color-mix(in srgb, var(--bt-color-secondary-text) 55%, var(--bt-glass-text));
 }
 
 /* Hairline seam inside glass (dividers under captions) */

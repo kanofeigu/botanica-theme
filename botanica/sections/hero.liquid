@@ -356,13 +356,9 @@
     margin: 0 0 var(--bt-space-sm);
     /* Gold eyebrow: secondary-text resolves to the scheme accent when it
        clears WCAG on the scheme bg — on the dark hero schemes this is the
-       antique gold. */
+       antique gold. Inside glass, the .bt-glass .bt-micro-label rule in
+       glass.css lifts it toward the glass text for readability. */
     color: var(--bt-color-secondary-text);
-  }
-  .bt-glass .bt-hero__eyebrow {
-    /* Inside glass, contrast is against the frosted panel, not the scheme
-       bg — keep the gold but lift it toward the glass text on dark frost. */
-    color: color-mix(in srgb, var(--bt-color-secondary-text) 82%, var(--bt-glass-text));
   }
   .bt-hero--full-bleed .bt-hero__heading {
     margin: 0 0 var(--bt-space-sm);
