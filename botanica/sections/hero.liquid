@@ -144,11 +144,6 @@
         </div>
       {%- endif -%}
     </div>
-    {%- if section.blocks.size > 0 -%}
-      <div class="bt-hero__blocks bt-container">
-        {% content_for "blocks" %}
-      </div>
-    {%- endif -%}
   </section>
 {%- else -%}
   <section
@@ -254,12 +249,17 @@
         </div>
       </div>
     </div>
-    {%- if section.blocks.size > 0 -%}
-      <div class="bt-hero__blocks{% unless section.settings.full_width %} bt-container{% endunless %}">
-        {% content_for "blocks" %}
-      </div>
-    {%- endif -%}
   </section>
+{%- endif -%}
+{%- comment -%}
+  Theme/app blocks row — rendered once for every layout (Shopify rejects
+  duplicate content_for tags in a section). Contained unless a split
+  layout runs full-width; the full-bleed stylesheet re-scopes it.
+{%- endcomment -%}
+{%- if section.blocks.size > 0 -%}
+  <div class="bt-hero__blocks{% unless section.settings.full_width and layout != 'full_bleed' %} bt-container{% endunless %}">
+    {% content_for "blocks" %}
+  </div>
 {%- endif -%}
 
 {% stylesheet %}
@@ -644,19 +644,11 @@
     color: var(--bt-color-primary);
   }
 
-  /* ── Optional theme/app blocks row ── */
+  /* ── Optional theme/app blocks row (rendered once, after the section) ── */
   .bt-hero__blocks {
     margin-top: var(--bt-space-2xl);
     padding-top: var(--bt-space-xl);
     border-top: 1px solid var(--bt-hairline);
-  }
-  .bt-hero--full .bt-hero__blocks {
-    padding-inline: var(--bt-page-gutter);
-  }
-  .bt-hero--full-bleed .bt-hero__blocks {
-    position: relative;
-    z-index: 2;
-    border-top-color: rgb(var(--bt-color-text-rgb) / 0.25);
   }
 
   /* ── Mobile: glass drops to a solid card, panel centers, type clamps ── */
