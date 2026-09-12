@@ -382,7 +382,7 @@
     color: var(--bt-color-text); margin: 0 0 var(--bt-space-md);
   }
   .bt-comment-list { list-style: none; margin: 0 0 var(--bt-space-lg); padding: 0; display: flex; flex-direction: column; gap: var(--bt-space-md); }
-  .bt-comment { padding: var(--bt-space-sm); background: var(--bt-color-surface); border: 1px solid var(--bt-color-border-light); border-radius: var(--bt-radius-card); }
+  .bt-comment { padding: var(--bt-space-sm); background: var(--bt-color-surface-raised, var(--bt-color-surface)); border-radius: var(--bt-radius-card); box-shadow: var(--bt-shadow-card); }
   .bt-comment__content { margin: 0 0 var(--bt-space-2xs); font-size: var(--bt-fs-body); line-height: var(--bt-lh-relaxed); color: var(--bt-color-text); }
   .bt-comment__meta { display: flex; align-items: baseline; gap: var(--bt-space-2xs); font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); }
   .bt-comment__author { font-weight: var(--bt-fw-semibold); color: var(--bt-color-text); }
@@ -459,7 +459,7 @@
   .bt-article--sidebar .bt-article__body { max-width: none; }
   .bt-article__sidebar-sticky { position: sticky; top: calc(80px + var(--bt-space-md)); display: flex; flex-direction: column; gap: var(--bt-space-lg); }
   .bt-article__sidebar-heading { font-family: var(--bt-font-body); font-size: var(--bt-fs-body-xs); font-weight: var(--bt-fw-semibold); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bt-color-text-muted); margin: 0 0 var(--bt-space-xs); }
-  .bt-article__author-card { display: flex; align-items: center; gap: var(--bt-space-sm); padding: var(--bt-space-sm); background: var(--bt-color-surface); border-radius: var(--bt-radius-md); border: 1px solid var(--bt-color-border-light); }
+  .bt-article__author-card { display: flex; align-items: center; gap: var(--bt-space-sm); padding: var(--bt-space-sm); background: var(--bt-color-surface); border-radius: var(--bt-radius-md); box-shadow: var(--bt-shadow-card); }
   .bt-article__author-avatar { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--bt-color-primary-tint); color: var(--bt-color-primary); border-radius: 50%; flex-shrink: 0; }
   .bt-article__author-name { font-family: var(--bt-font-heading); font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-semibold); color: var(--bt-color-text); margin: 0; }
   .bt-article__author-label { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); margin: 0; }

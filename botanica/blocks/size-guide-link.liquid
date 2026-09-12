@@ -14,7 +14,7 @@
   <div class="bt-size-guide-link" {{ block.shopify_attributes }}>
     <button
       type="button"
-      class="bt-size-guide-link__btn bt-btn bt-btn--outline bt-btn--sm bt-interactive"
+      class="bt-size-guide-link__btn"
       data-size-guide-open="{{ dialog_id }}"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
@@ -78,11 +78,25 @@
 
 {% stylesheet %}
   .bt-size-guide-link { margin-top: var(--bt-space-2xs); }
+  /* Quiet text link with icon — no button box */
   .bt-size-guide-link__btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    transition: color var(--bt-duration-fast) var(--bt-ease-out);
   }
+  .bt-size-guide-link__btn:hover { color: var(--bt-color-text); }
   .bt-size-guide__inner {
     max-width: min(560px, 92vw);
     margin: auto;

@@ -85,7 +85,7 @@
           <div class="bt-search__results-head">
             <p class="bt-search__count" role="status">{{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}</p>
             {%- if show_filters -%}
-              <button type="button" class="bt-search__filter-trigger bt-btn bt-btn--outline bt-btn--sm" data-filter-toggle aria-label="{{ 'collections.filters.title' | t }}">
+              <button type="button" class="bt-search__filter-trigger" data-filter-toggle aria-label="{{ 'collections.filters.title' | t }}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
                 <span>{{ 'collections.filters.title' | t }}</span>
                 {%- if has_active_filters -%}<span class="bt-search__filter-count">{{ active_filter_count }}</span>{%- endif -%}
@@ -211,18 +211,21 @@
   }
   .bt-search__scope-pill {
     display: block;
-    padding: 0.35em 1em;
-    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
+    padding: 0.4em 1.05em;
+    /* Soft-fill chip, selected state is a solid primary pill */
+    background: var(--bt-color-surface-hover);
+    border: none;
     border-radius: var(--bt-radius-pill);
     font-size: var(--bt-fs-body-xs);
     color: var(--bt-color-text-muted);
     cursor: pointer;
-    transition: all var(--bt-duration-fast);
+    transition: background var(--bt-duration-fast) var(--bt-ease-out),
+                color var(--bt-duration-fast) var(--bt-ease-out);
   }
-  .bt-search__scope-option:hover .bt-search__scope-pill { border-color: var(--bt-color-primary); color: var(--bt-color-primary); }
+  .bt-search__scope-option:hover .bt-search__scope-pill { background: var(--bt-color-primary-tint); color: var(--bt-color-primary); }
   .bt-search__scope-option input:checked + .bt-search__scope-pill {
-    border-color: var(--bt-color-text);
-    color: var(--bt-color-text);
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
     font-weight: var(--bt-fw-semibold);
   }
   .bt-search__scope-option input:focus-visible + .bt-search__scope-pill {
@@ -246,7 +249,23 @@
     margin-bottom: var(--bt-space-md);
   }
   .bt-search__count { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); margin: 0; }
-  .bt-search__filter-trigger { display: none; }
+  .bt-search__filter-trigger {
+    display: none;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    padding: 0.5em 1em;
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    background: var(--bt-color-surface-hover);
+    border: none;
+    border-radius: var(--bt-radius-pill);
+    cursor: pointer;
+    transition: background var(--bt-duration-fast) var(--bt-ease-out),
+                color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-search__filter-trigger:hover { background: var(--bt-color-primary-tint); color: var(--bt-color-primary); }
   .bt-search__filter-count {
     display: inline-flex;
     align-items: center;
@@ -379,16 +398,23 @@
   .bt-search .bt-price-range__input-wrap {
     display: flex;
     align-items: center;
-    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border);
+    /* Soft-fill field, no outline */
+    background: var(--bt-color-surface-hover);
+    border: var(--bt-border-width) var(--bt-border-style) transparent;
     border-radius: var(--bt-radius-sm);
     overflow: hidden;
+    transition: border-color var(--bt-duration-fast) var(--bt-ease-out),
+                box-shadow var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-search .bt-price-range__input-wrap:focus-within {
+    border-color: var(--bt-color-primary);
+    box-shadow: 0 0 0 3px var(--bt-color-primary-tint);
   }
   .bt-search .bt-price-range__currency {
     padding: 0 8px;
     font-size: var(--bt-fs-body-sm);
     color: var(--bt-color-text-muted);
-    background: var(--bt-color-surface);
-    border-right: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border);
+    background: transparent;
     user-select: none;
   }
   .bt-search .bt-price-range__input {
@@ -396,7 +422,7 @@
     padding: 8px 10px;
     border: 0;
     outline: none;
-    background: var(--bt-color-bg);
+    background: transparent;
     font-size: var(--bt-fs-body-sm);
     color: var(--bt-color-text);
     -moz-appearance: textfield;

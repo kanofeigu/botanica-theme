@@ -8,7 +8,7 @@
   <div class="bt-container">
 
     {%- if section.settings.show_collection_image and collection.image -%}
-      <div class="bt-collection-hero__frame bt-specimen-frame">
+      <div class="bt-collection-hero__frame">
         {{ collection.image | image_url: width: 1600 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '400,800,1200,1600', sizes: '(min-width: 990px) 1200px, 100vw', alt: collection.title, class: 'bt-collection-hero__image' }}
         <span class="bt-specimen-label">
           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="var(--bt-color-secondary)"/></svg>
@@ -62,16 +62,25 @@
     align-items: center;
   }
 
-  /* ── Specimen frame ── */
+  /* ── Hero image: borderless plate, shadow-layered like product cards ── */
   .bt-collection-hero__frame {
     aspect-ratio: 4 / 3;
     position: relative;
     overflow: hidden;
+    border-radius: var(--bt-radius-card);
+    box-shadow: var(--bt-shadow-md);
   }
   .bt-collection-hero__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  /* Count tag: borderless glass chip (overrides effects.css specimen label) */
+  .bt-collection-hero .bt-specimen-label {
+    border: none;
+    background: rgba(var(--bt-color-bg-rgb), 0.85);
+    backdrop-filter: blur(3px);
+    border-radius: var(--bt-radius-tag);
   }
 
   /* ── Body ── */

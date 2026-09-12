@@ -312,35 +312,41 @@
   .bt-qty__controls {
     display: inline-flex;
     align-items: center;
-    border: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
-    border-radius: var(--bt-radius-input);
-    overflow: hidden;
-    background: var(--bt-color-bg);
+    gap: 2px;
+    padding: 3px;
+    /* Borderless soft pill — the stepper reads as one tactile control */
+    border-radius: var(--bt-radius-pill);
+    background: var(--bt-color-surface-hover);
   }
   .bt-qty__btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border: none;
+    border-radius: var(--bt-radius-pill);
     background: transparent;
     color: var(--bt-color-text);
     cursor: pointer;
-    transition: background var(--bt-duration-fast);
+    transition: background var(--bt-duration-fast), color var(--bt-duration-fast), box-shadow var(--bt-duration-fast);
   }
-  .bt-qty__btn:hover { background: var(--bt-color-primary-tint); }
+  .bt-qty__btn:hover {
+    background: var(--bt-color-bg);
+    color: var(--bt-color-primary);
+    box-shadow: var(--bt-shadow-sm);
+  }
   .bt-qty__input {
-    width: 60px;
-    height: 44px;
+    width: 44px;
+    height: 40px;
     border: none;
-    border-left: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
-    border-right: var(--bt-border-width) var(--bt-border-style) var(--bt-color-border-light);
     text-align: center;
     font-size: var(--bt-fs-body);
+    font-weight: var(--bt-fw-semibold);
     font-family: var(--bt-font-body);
     -moz-appearance: textfield;
-    background: var(--bt-color-bg);
+    background: transparent;
+    color: var(--bt-color-text);
   }
   .bt-qty__input::-webkit-inner-spin-button,
   .bt-qty__input::-webkit-outer-spin-button { -webkit-appearance: none; }

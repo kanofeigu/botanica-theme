@@ -88,8 +88,8 @@
     align-items: center;
     gap: var(--bt-space-3xs);
     padding: var(--bt-space-sm) var(--bt-space-2xs);
-    background: var(--bt-color-bg);
-    border: 1px solid var(--bt-color-border-light);
+    /* Borderless soft tile — shadow-layered surfaces carry separation */
+    background: var(--bt-color-surface);
     border-radius: var(--bt-radius-md);
     transition: transform var(--bt-duration-base) var(--bt-ease-out);
   }
@@ -98,9 +98,8 @@
     width: 56px; height: 56px;
     display: flex; align-items: center; justify-content: center;
     color: var(--bt-color-secondary);
-    background: var(--bt-color-surface);
+    background: var(--bt-color-secondary-tint);
     border-radius: var(--bt-radius-pill);
-    border: 1px solid var(--bt-color-border-light);
   }
   .bt-care-icons__label {
     font-family: var(--bt-font-body);

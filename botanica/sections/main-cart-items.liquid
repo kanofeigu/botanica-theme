@@ -171,7 +171,7 @@
                   data-cart-note
                 >{{ cart.note | escape }}</textarea>
                 <div class="bt-cart__note-actions">
-                  <button type="button" class="bt-btn bt-btn--outline bt-cart__note-save" data-note-save>{{ 'sections.cart.note_save' | t }}</button>
+                  <button type="button" class="bt-cart__note-save" data-note-save>{{ 'sections.cart.note_save' | t }}</button>
                   <span class="bt-cart__note-status" role="status" data-note-status hidden>{{ 'sections.cart.note_saved' | t }}</span>
                 </div>
               </div>
@@ -260,11 +260,13 @@
     gap: var(--bt-space-md);
     align-items: start;
     padding: var(--bt-space-md);
-    background: var(--bt-color-surface);
-    border: 1px solid var(--bt-color-border-light);
+    /* Borderless card — shadow layering does the separation */
+    background: var(--bt-color-surface-raised, var(--bt-color-surface));
     border-radius: var(--bt-radius-card);
+    box-shadow: var(--bt-shadow-card);
     transition: opacity var(--bt-duration-base) var(--bt-ease-out),
-                transform var(--bt-duration-base) var(--bt-ease-out);
+                transform var(--bt-duration-base) var(--bt-ease-out),
+                box-shadow var(--bt-duration-base) var(--bt-ease-out);
   }
   .bt-cart__item.is-removing { opacity: 0; transform: translateX(12px); }
   .bt-cart__item.is-loading { opacity: 0.6; }
@@ -340,7 +342,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px 8px;
+    padding: 3px 9px;
     font-family: var(--bt-font-body);
     font-size: 0.625rem;
     font-weight: var(--bt-fw-semibold);
@@ -350,24 +352,21 @@
     border-radius: var(--bt-radius-pill);
     background: var(--bt-color-surface-hover);
     color: var(--bt-color-text-muted);
-    border: 1px solid var(--bt-color-border-light);
     white-space: nowrap;
   }
   .bt-cart .bt-chip svg { width: 10px; height: 10px; flex-shrink: 0; }
+  /* Borderless soft-fill chips — same spec as snippets/card-product.liquid */
   .bt-cart .bt-chip--easy {
     color: var(--bt-color-primary);
     background: var(--bt-color-primary-tint);
-    border-color: rgba(var(--bt-color-primary-rgb), 0.2);
   }
   .bt-cart .bt-chip--medium {
-    color: var(--bt-color-secondary);
+    color: var(--bt-color-secondary-text);
     background: var(--bt-color-secondary-tint);
-    border-color: rgba(var(--bt-color-secondary-rgb), 0.2);
   }
   .bt-cart .bt-chip--expert {
     color: var(--bt-color-text);
     background: var(--bt-color-surface-hover);
-    border-color: rgba(var(--bt-color-text-rgb), 0.2);
   }
 
   .bt-cart__item-unit { margin: var(--bt-space-2xs) 0 0; font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); }
@@ -412,9 +411,9 @@
     flex-direction: column;
     gap: var(--bt-space-md);
     padding: var(--bt-space-md);
-    background: var(--bt-color-surface);
-    border: 1px solid var(--bt-color-border-light);
+    background: var(--bt-color-surface-raised, var(--bt-color-surface));
     border-radius: var(--bt-radius-card);
+    box-shadow: var(--bt-shadow-card);
   }
 
   .bt-cart__shipping { display: flex; flex-direction: column; gap: var(--bt-space-2xs); }
@@ -440,7 +439,7 @@
     align-items: baseline;
     margin: 0;
     padding-top: var(--bt-space-md);
-    border-top: 2px solid var(--bt-color-border);
+    border-top: 1px solid var(--bt-hairline);
     font-family: var(--bt-font-heading);
     font-size: var(--bt-fs-h4);
   }
@@ -449,7 +448,21 @@
   .bt-cart__note-label { font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-semibold); }
   .bt-cart__note-input { resize: vertical; min-height: 72px; }
   .bt-cart__note-actions { display: flex; align-items: center; gap: var(--bt-space-sm); }
-  .bt-cart__note-save { padding: 0.5em 1.25em; font-size: var(--bt-fs-body-sm); }
+  /* Soft-fill secondary action — no outline box */
+  .bt-cart__note-save {
+    padding: 0.55em 1.35em;
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-sm);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-primary);
+    background: var(--bt-color-primary-tint);
+    border: none;
+    border-radius: var(--bt-radius-pill);
+    cursor: pointer;
+    transition: background var(--bt-duration-fast) var(--bt-ease-out),
+                color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-cart__note-save:hover { background: var(--bt-color-primary); color: var(--bt-color-primary-contrast); }
   .bt-cart__note-status { font-size: var(--bt-fs-body-sm); font-weight: var(--bt-fw-semibold); color: var(--bt-color-primary); }
 
   .bt-cart__checkout-form { margin: 0; }

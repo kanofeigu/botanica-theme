@@ -56,8 +56,10 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--bt-color-bg);
-    border-top: 1px solid var(--bt-color-border-medium);
+    /* Glass bar — no hard seam, floats above the page */
+    background: rgba(var(--bt-color-bg-rgb), 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: var(--bt-space-sm) var(--bt-space-md);
     z-index: var(--bt-z-sticky);
     display: flex;
@@ -65,7 +67,7 @@
     gap: var(--bt-space-sm);
     transform: translateY(100%);
     transition: transform var(--bt-duration-base) var(--bt-ease-out);
-    box-shadow: 0 -4px 16px rgba(var(--bt-color-text-rgb), 0.06);
+    box-shadow: 0 -8px 24px rgba(var(--bt-color-text-rgb), 0.08);
   }
   .bt-sticky-atc.is-visible {
     transform: translateY(0);
