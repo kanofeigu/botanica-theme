@@ -321,8 +321,8 @@
     z-index: 1;
     pointer-events: none;
     background:
-      linear-gradient(180deg, rgb(var(--bt-color-bg-rgb) / calc(var(--bt-hero-scrim, 0.45) * 0.35)) 0%, rgb(var(--bt-color-bg-rgb) / 0) 22%),
-      linear-gradient(180deg, rgb(var(--bt-color-bg-rgb) / 0) 38%, rgb(var(--bt-color-bg-rgb) / var(--bt-hero-scrim, 0.45)) 100%);
+      linear-gradient(180deg, rgba(var(--bt-color-bg-rgb), calc(var(--bt-hero-scrim, 0.45) * 0.35)) 0%, rgba(var(--bt-color-bg-rgb), 0) 22%),
+      linear-gradient(180deg, rgba(var(--bt-color-bg-rgb), 0) 38%, rgba(var(--bt-color-bg-rgb), var(--bt-hero-scrim, 0.45)) 100%);
   }
 
   .bt-hero__stage {
@@ -345,7 +345,7 @@
      text still readable thanks to the gradient beneath. */
   .bt-hero--full-bleed .bt-hero__panel:not(.bt-glass) {
     color: var(--bt-color-text);
-    text-shadow: 0 1px 24px rgb(var(--bt-color-bg-rgb) / 0.5);
+    text-shadow: 0 1px 24px rgba(var(--bt-color-bg-rgb), 0.5);
   }
   .bt-hero--panel-center .bt-hero__panel { margin-inline: auto; text-align: center; }
   .bt-hero--panel-right .bt-hero__panel { margin-inline-start: auto; }
@@ -567,7 +567,7 @@
     position: absolute;
     inset: var(--bt-hero-frame-pad);
     z-index: 1;
-    background: linear-gradient(180deg, rgb(var(--bt-color-bg-rgb) / 0) 75%, var(--bt-color-bg) 100%);
+    background: linear-gradient(180deg, rgba(var(--bt-color-bg-rgb), 0) 75%, var(--bt-color-bg) 100%);
     pointer-events: none;
   }
   .bt-hero__frame::after {
@@ -671,7 +671,7 @@
     .bt-hero--full-bleed .bt-hero__panel.bt-glass {
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
-      background: rgb(var(--bt-color-bg-rgb) / 0.78);
+      background: rgba(var(--bt-color-bg-rgb), 0.86);
       background-image: none;
     }
     .bt-hero--full-bleed .bt-hero__panel {
@@ -693,7 +693,7 @@
     .bt-hero--full-bleed .bt-hero__product-card.bt-glass {
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
-      background: rgb(var(--bt-color-bg-rgb) / 0.78);
+      background: rgba(var(--bt-color-bg-rgb), 0.86);
       background-image: none;
     }
     .bt-hero--full-bleed .bt-hero__product-card:hover {

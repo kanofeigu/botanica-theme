@@ -27,8 +27,8 @@
   /* Solid fallback (no backdrop support): the scheme bg at
      high opacity — text in the scheme's own color keeps its
      WCAG-checked contrast because this IS the scheme pairing. */
-  background: rgb(var(--bt-color-bg-rgb) / 0.72);
-  border: 1px solid rgb(var(--bt-color-text-rgb) / 0.22);
+  background: rgba(var(--bt-color-bg-rgb), 0.72);
+  border: 1px solid rgba(var(--bt-color-text-rgb), 0.22);
   border-radius: var(--bt-radius-card);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.14),
@@ -38,21 +38,21 @@
      captions) follow the frost, not the page surface. */
   --bt-glass-text: var(--bt-color-text);
   --bt-glass-text-rgb: var(--bt-color-text-rgb);
-  --bt-glass-text-muted: rgb(var(--bt-color-text-rgb) / 0.78);
-  --bt-glass-hairline: rgb(var(--bt-color-text-rgb) / 0.18);
+  --bt-glass-text-muted: rgba(var(--bt-color-text-rgb), 0.78);
+  --bt-glass-hairline: rgba(var(--bt-color-text-rgb), 0.18);
 }
 
 @supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
   .bt-glass {
     /* White frost veiled by the scheme bg so the panel stays
        anchored to its palette even over busy photography. */
-    background: rgb(var(--bt-color-text-rgb) / 0.09);
+    background: rgba(var(--bt-color-text-rgb), 0.09);
     background-image: linear-gradient(
       165deg,
-      rgb(var(--bt-color-bg-rgb) / 0.42),
-      rgb(var(--bt-color-bg-rgb) / 0.18) 70%
+      rgba(var(--bt-color-bg-rgb), 0.42),
+      rgba(var(--bt-color-bg-rgb), 0.18) 70%
     );
-    border-color: rgb(var(--bt-color-text-rgb) / 0.26);
+    border-color: rgba(var(--bt-color-text-rgb), 0.26);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
     backdrop-filter: blur(18px) saturate(140%);
   }
