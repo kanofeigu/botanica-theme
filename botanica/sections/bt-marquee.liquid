@@ -1,10 +1,11 @@
 {% comment %}
   sections/bt-marquee.liquid — Herbarium marquee strip.
-  A single hairline-ruled band of repeating phrases (block per phrase),
-  scrolled infinitely via CSS keyframes (transform-only). Content is
-  duplicated in markup for a seamless loop; the duplicate is aria-hidden.
-  Pause on hover (pointer devices). Reduced motion → static, wrapped row
-  with the duplicate hidden. Zero JS. All-original.
+  A borderless band of repeating phrases (block per phrase) separated by
+  small leaf marks, scrolled infinitely via CSS keyframes
+  (transform-only). Content is duplicated in markup for a seamless loop;
+  the duplicate is aria-hidden. Pause on hover (pointer devices).
+  Reduced motion → static, wrapped row with the duplicate hidden.
+  Zero JS. All-original.
 {% endcomment %}
 {%- liquid
   assign style = section.settings.style | default: 'micro'
@@ -48,8 +49,6 @@
 
 {% stylesheet %}
   .bt-marquee {
-    border-top: 1px solid var(--bt-hairline);
-    border-bottom: 1px solid var(--bt-hairline);
     overflow: hidden;
   }
 
@@ -97,7 +96,7 @@
     font-family: var(--bt-font-body);
     font-size: var(--bt-fs-body-xs);
     font-weight: var(--bt-fw-semibold);
-    letter-spacing: 0.14em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--bt-color-text-muted);
   }
@@ -107,21 +106,17 @@
     line-height: var(--bt-lh-heading);
   }
 
-  /* ── Linked phrase: small pill button in the scheme's button colour ── */
+  /* ── Linked phrase: plain text link, leaf separators carry the rhythm ── */
   .bt-marquee__item.bt-marquee__pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.35em 1.1em;
-    border: 1px solid var(--bt-color-primary);
-    border-radius: var(--bt-radius-pill);
     color: var(--bt-color-primary);
     text-decoration: none;
-    transition: background-color var(--bt-duration-fast) var(--bt-ease-out),
-                color var(--bt-duration-fast) var(--bt-ease-out);
+    transition: color var(--bt-duration-fast) var(--bt-ease-out);
   }
   .bt-marquee__item.bt-marquee__pill:hover {
-    background: var(--bt-color-primary);
-    color: var(--bt-color-primary-contrast);
+    color: var(--bt-color-text);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
   }
   .bt-marquee__item.bt-marquee__pill em {
     color: inherit;

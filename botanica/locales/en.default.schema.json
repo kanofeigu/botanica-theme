@@ -1228,6 +1228,15 @@
     "featured_collection": {
       "name": "Featured collection",
       "settings": {
+        "layout": {
+          "label": "Layout",
+          "options__1": {
+            "label": "Editorial"
+          },
+          "options__2": {
+            "label": "Uniform"
+          }
+        },
         "heading": {
           "label": "Heading"
         },

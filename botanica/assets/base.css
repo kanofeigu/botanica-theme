@@ -433,18 +433,16 @@ body.bt-no-grain::after { content: none; }
 }
 
 /* ── Specimen tags (.bt-tag) — canonical product-status label ──
-   Herbarium paper label: white surface, 1px hairline, micro-label type
-   (12px uppercase, 0.1em tracking — same spec as .bt-micro-label),
-   square corners (≤2px). Status shows through typography or a 3px edge
-   bar, never a filled color block. Shared by product cards and PDP
-   badges; one size at every breakpoint (labels do not shrink on
-   mobile). */
+   Borderless soft-fill label: scheme-derived tint surface, micro-label
+   type (12px uppercase, 0.1em tracking — same spec as .bt-micro-label),
+   square corners (≤2px). Status shows through fill steps or a 3px edge
+   bar, never an outline. Shared by product cards and PDP badges; one
+   size at every breakpoint (labels do not shrink on mobile). */
 .bt-tag {
   display: inline-flex;
   align-items: center;
   padding: 4px var(--bt-space-2xs);
-  background: var(--bt-color-surface);
-  border: 1px solid var(--bt-hairline);
+  background: var(--bt-color-secondary-tint);
   border-radius: var(--bt-radius-tag);
   font-family: var(--bt-font-body);
   font-size: var(--bt-fs-micro);
@@ -452,17 +450,24 @@ body.bt-no-grain::after { content: none; }
   letter-spacing: var(--bt-ls-micro);
   text-transform: uppercase;
   line-height: 1.4;
-  color: var(--bt-color-text);
+  color: var(--bt-color-secondary-text);
   white-space: nowrap;
 }
 /* Sale: the accent lives only on the 3px left edge bar (the label's
-   mounting tape); text stays scheme text for WCAG-safe contrast. */
+   mounting tape); text stays WCAG-safe on the soft tint. */
 .bt-tag--sale {
   border-left: 3px solid var(--bt-color-accent);
   padding-left: calc(var(--bt-space-2xs) - 2px);
 }
-.bt-tag--new { color: var(--bt-color-text); }
-.bt-tag--soldout { color: var(--bt-color-text-muted); }
+/* New: the one solid tag — filled with the scheme's button colour. */
+.bt-tag--new {
+  background: var(--bt-color-primary);
+  color: var(--bt-color-primary-contrast);
+}
+.bt-tag--soldout {
+  background: var(--bt-color-surface-hover);
+  color: var(--bt-color-text-muted);
+}
 .bt-tag--stock { color: var(--bt-color-text-muted); }
 
 /* ── Interaction primitives ── */
