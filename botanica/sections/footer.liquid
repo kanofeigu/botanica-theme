@@ -154,6 +154,15 @@
   .bt-footer__form-row { display: flex; gap: var(--bt-space-2xs); }
   .bt-footer__input { min-width: 0; }
   .bt-footer__submit { flex-shrink: 0; }
+  /* Fields on the dark field: pin them to the scheme surface (a half-step
+     above the footer bg) so the light text stays legible — the global
+     soft-fill derivation resolves too light on dark schemes. */
+  .bt-footer .bt-input,
+  .bt-footer .bt-select {
+    background: var(--bt-color-surface);
+    color: var(--bt-color-text);
+  }
+  .bt-footer .bt-input::placeholder { color: var(--bt-color-text-muted); opacity: 0.75; }
   .bt-footer__localization { margin-bottom: var(--bt-space-lg); }
   .bt-localization { display: flex; flex-wrap: wrap; gap: var(--bt-space-sm); }
   .bt-localization__field { flex: 0 1 260px; min-width: 200px; }
