@@ -61,25 +61,37 @@
 </section>
 
 {% stylesheet %}
+  /* Organic Luxe: the newsletter is a full-bleed deep-forest band
+     (default scheme-3). No card box — type floats on the field with a
+     quiet gold rule above the heading. */
   .bt-newsletter__inner {
-    max-width: 560px;
+    max-width: 600px;
     margin: 0 auto;
     text-align: center;
     padding: var(--bt-space-xl) var(--bt-space-md);
-    background: var(--bt-color-surface);
-    border-radius: var(--bt-radius-card);
   }
   .bt-newsletter__heading {
     font-family: var(--bt-font-heading);
     font-size: var(--bt-fs-h2);
-    font-weight: var(--bt-fw-normal);
+    font-weight: var(--bt-fw-medium);
     color: var(--bt-color-text);
     margin: 0 0 var(--bt-space-2xs);
+  }
+  /* Gold ornament rule — the antique-gold accent at whisper weight */
+  .bt-newsletter__heading::before {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 1px;
+    margin: 0 auto var(--bt-space-md);
+    background: var(--bt-color-secondary);
+    opacity: 0.85;
   }
   .bt-newsletter__desc {
     color: var(--bt-color-text-muted);
     font-size: var(--bt-fs-body-sm);
-    margin: 0 0 var(--bt-space-md);
+    margin: 0 auto var(--bt-space-md);
+    max-width: 48ch;
   }
   .bt-newsletter__form { margin-top: var(--bt-space-sm); }
   .bt-newsletter__fields {
@@ -89,6 +101,10 @@
   .bt-newsletter__input {
     flex: 1;
     min-width: 0;
+    min-height: 48px;
+  }
+  .bt-newsletter__fields .bt-btn {
+    min-height: 48px;
   }
   .bt-form-error {
     display: block;
@@ -97,7 +113,7 @@
   }
   .bt-newsletter__success {
     margin-top: var(--bt-space-sm);
-    color: var(--bt-color-primary);
+    color: var(--bt-color-secondary);
     font-weight: var(--bt-fw-medium);
   }
   @media (max-width: 479px) {
@@ -110,7 +126,7 @@
   "name": "t:sections.newsletter.name",
   "tag": "section",
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-3" },
     {
       "type": "text",
       "id": "heading",

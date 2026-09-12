@@ -50,7 +50,7 @@
             "type": "color",
             "id": "background",
             "label": "t:settings_schema.colors.settings.scheme.background",
-            "default": "#F5F1E8"
+            "default": "#FAF9F6"
           },
           {
             "type": "color_background",
@@ -61,13 +61,13 @@
             "type": "color",
             "id": "text",
             "label": "t:settings_schema.colors.settings.scheme.text",
-            "default": "#2E2A24"
+            "default": "#1C1917"
           },
           {
             "type": "color",
             "id": "button",
             "label": "t:settings_schema.colors.settings.scheme.button",
-            "default": "#4A6B4F"
+            "default": "#22432F"
           },
           {
             "type": "color",
@@ -79,13 +79,13 @@
             "type": "color",
             "id": "accent",
             "label": "t:settings_schema.colors.settings.scheme.accent",
-            "default": "#C97D5A"
+            "default": "#A16207"
           },
           {
             "type": "color",
             "id": "shadow",
             "label": "t:settings_schema.colors.settings.scheme.shadow",
-            "default": "#2E2A24"
+            "default": "#1C1917"
           }
         ],
         "role": {
@@ -113,13 +113,13 @@
         "type": "font_picker",
         "id": "heading_font",
         "label": "t:settings_schema.typography.settings.heading_font.label",
-        "default": "fraunces_n4"
+        "default": "cormorant_n5"
       },
       {
         "type": "font_picker",
         "id": "body_font",
         "label": "t:settings_schema.typography.settings.body_font.label",
-        "default": "inter_n4"
+        "default": "montserrat_n4"
       },
       {
         "type": "range",

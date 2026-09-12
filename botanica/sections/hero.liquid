@@ -1,13 +1,20 @@
 {% comment %}
-  sections/hero.liquid — Specimen-plate editorial hero.
-  Two-column composition (~55/45): eyebrow micro-label, oversized fluid display
-  headline (inline richtext → italic accent words), short copy, one primary CTA.
-  The headline overlaps the image column edge; the image is framed as a
-  specimen plate (double hairline frame + Nº / Latin-name caption row).
+  sections/hero.liquid — Organic Luxe hero.
+  Default mode: full-bleed photography with a gradient scrim and a frosted
+  liquid-glass panel (Cormorant display headline + gold CTA) pinned to a
+  bottom corner. The featured-specimen product card floats as a glass chip.
+  Legacy split layouts (image_right / image_left) are preserved verbatim —
+  any stored value that isn't a split mode resolves to full_bleed, so older
+  templates (e.g. "split") upgrade to the flagship composition automatically.
+  All colors resolve from the section's color scheme; glass translucency
+  lives in assets/glass.css with @supports fallbacks.
   All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
-  assign layout = section.settings.layout | default: 'image_right'
+  assign layout = section.settings.layout | default: 'full_bleed'
+  if layout != 'image_right' and layout != 'image_left'
+    assign layout = 'full_bleed'
+  endif
   assign image = section.settings.image
   assign image_mobile = section.settings.image_mobile | default: image
   assign heading = section.settings.heading
@@ -16,11 +23,18 @@
   assign eyebrow = section.settings.eyebrow
   assign button_label = section.settings.button_label
   assign button_link = section.settings.button_link
-  assign button_style = section.settings.button_style | default: 'primary'
+  assign button_style = section.settings.button_style | default: 'gold'
   assign specimen_number = section.settings.specimen_number
   assign latin_caption = section.settings.latin_caption
   assign hero_product = section.settings.product
   assign hero_product_label = section.settings.product_label
+  assign height = section.settings.height | default: 'large'
+  assign panel_position = section.settings.panel_position | default: 'left'
+  assign scrim = section.settings.scrim_strength | default: 45
+  assign glass_panel = section.settings.glass_panel
+  if section.settings.glass_panel == null
+    assign glass_panel = true
+  endif
 
   assign ratio = section.settings.image_ratio | default: '4-5'
   assign aspect = '4 / 5'
@@ -32,98 +46,52 @@
 
   assign hero_alt = image.alt | default: heading | strip_html | escape
 -%}
-<section
-  class="bt-hero bt-hero--{{ layout }} bt-section-block color-{{ section.settings.color_scheme }}{% if section.settings.full_width %} bt-hero--full{% endif %}"
-  {{ section.shopify_attributes }}
->
-  <div class="bt-hero__inner{% unless section.settings.full_width %} bt-container{% endunless %}">
-    <div class="bt-hero__grid">
-      <div class="bt-hero__intro">
+{%- if layout == 'full_bleed' -%}
+  <section
+    class="bt-hero bt-hero--full-bleed bt-hero--height-{{ height }} bt-hero--panel-{{ panel_position }} color-{{ section.settings.color_scheme }}"
+    style="--bt-hero-scrim: {{ scrim | divided_by: 100.0 }}"
+    {{ section.shopify_attributes }}
+  >
+    <div class="bt-hero__bg">
+      {%- if image != blank -%}
+        {%- assign has_mobile = false -%}
+        {%- if image_mobile != blank and image_mobile != image -%}
+          {%- assign has_mobile = true -%}
+        {%- endif -%}
+        {%- if has_mobile -%}
+          <picture>
+            <source media="(max-width: 749px)" srcset="{{ image_mobile | image_url: width: 900 }} 900w">
+            <img src="{{ image | image_url: width: 1600 }}"
+              srcset="{{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1400 }} 1400w, {{ image | image_url: width: 2000 }} 2000w, {{ image | image_url: width: 2600 }} 2600w"
+              sizes="100vw"
+              alt="{{ hero_alt }}" class="bt-hero__img"
+              width="{{ image.width }}" height="{{ image.height }}"
+              fetchpriority="high" loading="eager" decoding="async">
+          </picture>
+        {%- else -%}
+          <img src="{{ image | image_url: width: 1600 }}"
+            srcset="{{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1400 }} 1400w, {{ image | image_url: width: 2000 }} 2000w, {{ image | image_url: width: 2600 }} 2600w"
+            sizes="100vw"
+            alt="{{ hero_alt }}" class="bt-hero__img"
+            width="{{ image.width }}" height="{{ image.height }}"
+            fetchpriority="high" loading="eager" decoding="async">
+        {%- endif -%}
+      {%- else -%}
+        <div class="bt-hero__placeholder" aria-hidden="true">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'bt-hero__placeholder-svg' }}
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="bt-hero__scrim" aria-hidden="true"></div>
+
+    <div class="bt-hero__stage bt-container">
+      <div class="bt-hero__panel{% if glass_panel %} bt-glass{% endif %}"{% if section.settings.enable_reveal %} data-bt-reveal="load"{% endif %}>
         {%- if eyebrow != blank -%}
-          <p class="bt-hero__eyebrow bt-micro-label"{% if section.settings.enable_reveal %} data-bt-reveal="load"{% endif %}>{{ eyebrow | escape }}</p>
+          <p class="bt-hero__eyebrow bt-micro-label"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="120"{% endif %}>{{ eyebrow | escape }}</p>
         {%- endif -%}
         {%- if heading != blank -%}
-          <h1 class="bt-hero__heading bt-display-{{ heading_size }}"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="120"{% endif %}>{{ heading }}</h1>
+          <h1 class="bt-hero__heading bt-display-{{ heading_size }}">{{ heading }}</h1>
         {%- endif -%}
-      </div>
-
-      <figure class="bt-hero__plate"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="360"{% endif %}>
-        <div class="bt-hero__frame">
-          <div class="bt-hero__media" style="aspect-ratio: {{ aspect }}">
-            {%- if image != blank -%}
-              {%- assign has_mobile = false -%}
-              {%- if image_mobile != blank and image_mobile != image -%}
-                {%- assign has_mobile = true -%}
-              {%- endif -%}
-              {%- if has_mobile -%}
-                <picture>
-                  <source media="(max-width: 749px)" srcset="{{ image_mobile | image_url: width: 750 }} 750w">
-                  <img src="{{ image | image_url: width: 1200 }}"
-                    srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w"
-                    sizes="(min-width: 750px) 45vw, 100vw"
-                    alt="{{ hero_alt }}" class="bt-hero__img"
-                    width="{{ image.width }}" height="{{ image.height }}"
-                    fetchpriority="high" loading="eager" decoding="async">
-                </picture>
-              {%- else -%}
-                <img src="{{ image | image_url: width: 1200 }}"
-                  srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w"
-                  sizes="(min-width: 750px) 45vw, 100vw"
-                  alt="{{ hero_alt }}" class="bt-hero__img"
-                  width="{{ image.width }}" height="{{ image.height }}"
-                  fetchpriority="high" loading="eager" decoding="async">
-              {%- endif -%}
-            {%- else -%}
-              <div class="bt-hero__placeholder" aria-hidden="true">
-                {{ 'lifestyle-1' | placeholder_svg_tag: 'bt-hero__placeholder-svg' }}
-              </div>
-            {%- endif -%}
-          </div>
-          {%- if hero_product != blank -%}
-            <div class="bt-hero__product-card">
-              <span class="bt-hero__product-media">
-                {%- if hero_product.featured_media -%}
-                  {{ hero_product.featured_media | image_url: width: 300 | image_tag:
-                    loading: 'lazy',
-                    widths: '150, 300',
-                    sizes: '72px',
-                    alt: hero_product.featured_media.alt | default: hero_product.title
-                  }}
-                {%- else -%}
-                  {{ 'product-1' | placeholder_svg_tag: 'bt-hero__product-placeholder' }}
-                {%- endif -%}
-              </span>
-              <span class="bt-hero__product-body">
-                {%- if hero_product_label != blank -%}
-                  <span class="bt-hero__product-label bt-micro-label">{{ hero_product_label | escape }}</span>
-                {%- endif -%}
-                <a
-                  href="{{ hero_product.url }}"
-                  class="bt-hero__product-title"
-                  aria-label="{{ 'products.product.view_product' | t }}: {{ hero_product.title | escape }}"
-                >{{ hero_product.title | escape }}</a>
-                <span class="bt-hero__product-price">
-                  {%- if hero_product.compare_at_price > hero_product.price -%}
-                    <s>{{ hero_product.compare_at_price | money }}</s>
-                  {%- endif -%}
-                  {%- if hero_product.price_varies -%}
-                    {{ 'products.product.price.from_price_html' | t: price: hero_product.price | money }}
-                  {%- else -%}
-                    {{ hero_product.price | money }}
-                  {%- endif -%}
-                </span>
-              </span>
-            </div>
-          {%- endif -%}
-        </div>
-        {%- if specimen_number != blank or latin_caption != blank -%}
-          <figcaption class="bt-hero__caption">
-            {% render 'specimen-tag', number: specimen_number, latin: latin_caption %}
-          </figcaption>
-        {%- endif -%}
-      </figure>
-
-      <div class="bt-hero__body"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="240"{% endif %}>
         {%- if text != blank -%}
           <p class="bt-hero__text">{{ text | escape }}</p>
         {%- endif -%}
@@ -132,15 +100,167 @@
             {{ button_label | escape }}
           </a>
         {%- endif -%}
+        {%- if specimen_number != blank or latin_caption != blank -%}
+          <div class="bt-hero__specimen">
+            {% render 'specimen-tag', number: specimen_number, latin: latin_caption %}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if hero_product != blank -%}
+        <div class="bt-hero__product-card{% if glass_panel %} bt-glass{% endif %}"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="360"{% endif %}>
+          <span class="bt-hero__product-media">
+            {%- if hero_product.featured_media -%}
+              {{ hero_product.featured_media | image_url: width: 300 | image_tag:
+                loading: 'lazy',
+                widths: '150, 300',
+                sizes: '72px',
+                alt: hero_product.featured_media.alt | default: hero_product.title
+              }}
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'bt-hero__product-placeholder' }}
+            {%- endif -%}
+          </span>
+          <span class="bt-hero__product-body">
+            {%- if hero_product_label != blank -%}
+              <span class="bt-hero__product-label bt-micro-label">{{ hero_product_label | escape }}</span>
+            {%- endif -%}
+            <a
+              href="{{ hero_product.url }}"
+              class="bt-hero__product-title"
+              aria-label="{{ 'products.product.view_product' | t }}: {{ hero_product.title | escape }}"
+            >{{ hero_product.title | escape }}</a>
+            <span class="bt-hero__product-price">
+              {%- if hero_product.compare_at_price > hero_product.price -%}
+                <s>{{ hero_product.compare_at_price | money }}</s>
+              {%- endif -%}
+              {%- if hero_product.price_varies -%}
+                {{ 'products.product.price.from_price_html' | t: price: hero_product.price | money }}
+              {%- else -%}
+                {{ hero_product.price | money }}
+              {%- endif -%}
+            </span>
+          </span>
+        </div>
+      {%- endif -%}
+    </div>
+    {%- if section.blocks.size > 0 -%}
+      <div class="bt-hero__blocks bt-container">
+        {% content_for "blocks" %}
+      </div>
+    {%- endif -%}
+  </section>
+{%- else -%}
+  <section
+    class="bt-hero bt-hero--{{ layout }} bt-section-block color-{{ section.settings.color_scheme }}{% if section.settings.full_width %} bt-hero--full{% endif %}"
+    {{ section.shopify_attributes }}
+  >
+    <div class="bt-hero__inner{% unless section.settings.full_width %} bt-container{% endunless %}">
+      <div class="bt-hero__grid">
+        <div class="bt-hero__intro">
+          {%- if eyebrow != blank -%}
+            <p class="bt-hero__eyebrow bt-micro-label"{% if section.settings.enable_reveal %} data-bt-reveal="load"{% endif %}>{{ eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if heading != blank -%}
+            <h1 class="bt-hero__heading bt-display-{{ heading_size }}"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="120"{% endif %}>{{ heading }}</h1>
+          {%- endif -%}
+        </div>
+
+        <figure class="bt-hero__plate"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="360"{% endif %}>
+          <div class="bt-hero__frame">
+            <div class="bt-hero__media" style="aspect-ratio: {{ aspect }}">
+              {%- if image != blank -%}
+                {%- assign has_mobile = false -%}
+                {%- if image_mobile != blank and image_mobile != image -%}
+                  {%- assign has_mobile = true -%}
+                {%- endif -%}
+                {%- if has_mobile -%}
+                  <picture>
+                    <source media="(max-width: 749px)" srcset="{{ image_mobile | image_url: width: 750 }} 750w">
+                    <img src="{{ image | image_url: width: 1200 }}"
+                      srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w"
+                      sizes="(min-width: 750px) 45vw, 100vw"
+                      alt="{{ hero_alt }}" class="bt-hero__img"
+                      width="{{ image.width }}" height="{{ image.height }}"
+                      fetchpriority="high" loading="eager" decoding="async">
+                  </picture>
+                {%- else -%}
+                  <img src="{{ image | image_url: width: 1200 }}"
+                    srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1600 }} 1600w"
+                    sizes="(min-width: 750px) 45vw, 100vw"
+                    alt="{{ hero_alt }}" class="bt-hero__img"
+                    width="{{ image.width }}" height="{{ image.height }}"
+                    fetchpriority="high" loading="eager" decoding="async">
+                {%- endif -%}
+              {%- else -%}
+                <div class="bt-hero__placeholder" aria-hidden="true">
+                  {{ 'lifestyle-1' | placeholder_svg_tag: 'bt-hero__placeholder-svg' }}
+                </div>
+              {%- endif -%}
+            </div>
+            {%- if hero_product != blank -%}
+              <div class="bt-hero__product-card">
+                <span class="bt-hero__product-media">
+                  {%- if hero_product.featured_media -%}
+                    {{ hero_product.featured_media | image_url: width: 300 | image_tag:
+                      loading: 'lazy',
+                      widths: '150, 300',
+                      sizes: '72px',
+                      alt: hero_product.featured_media.alt | default: hero_product.title
+                    }}
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'bt-hero__product-placeholder' }}
+                  {%- endif -%}
+                </span>
+                <span class="bt-hero__product-body">
+                  {%- if hero_product_label != blank -%}
+                    <span class="bt-hero__product-label bt-micro-label">{{ hero_product_label | escape }}</span>
+                  {%- endif -%}
+                  <a
+                    href="{{ hero_product.url }}"
+                    class="bt-hero__product-title"
+                    aria-label="{{ 'products.product.view_product' | t }}: {{ hero_product.title | escape }}"
+                  >{{ hero_product.title | escape }}</a>
+                  <span class="bt-hero__product-price">
+                    {%- if hero_product.compare_at_price > hero_product.price -%}
+                      <s>{{ hero_product.compare_at_price | money }}</s>
+                    {%- endif -%}
+                    {%- if hero_product.price_varies -%}
+                      {{ 'products.product.price.from_price_html' | t: price: hero_product.price | money }}
+                    {%- else -%}
+                      {{ hero_product.price | money }}
+                    {%- endif -%}
+                  </span>
+                </span>
+              </div>
+            {%- endif -%}
+          </div>
+          {%- if specimen_number != blank or latin_caption != blank -%}
+            <figcaption class="bt-hero__caption">
+              {% render 'specimen-tag', number: specimen_number, latin: latin_caption %}
+            </figcaption>
+          {%- endif -%}
+        </figure>
+
+        <div class="bt-hero__body"{% if section.settings.enable_reveal %} data-bt-reveal="load" data-bt-reveal-delay="240"{% endif %}>
+          {%- if text != blank -%}
+            <p class="bt-hero__text">{{ text | escape }}</p>
+          {%- endif -%}
+          {%- if button_label != blank -%}
+            <a href="{{ button_link | default: '#' }}" class="bt-btn bt-btn--{{ button_style }} bt-btn--lg">
+              {{ button_label | escape }}
+            </a>
+          {%- endif -%}
+        </div>
       </div>
     </div>
-  </div>
-  {%- if section.blocks.size > 0 -%}
-    <div class="bt-hero__blocks{% unless section.settings.full_width %} bt-container{% endunless %}">
-      {% content_for "blocks" %}
-    </div>
-  {%- endif -%}
-</section>
+    {%- if section.blocks.size > 0 -%}
+      <div class="bt-hero__blocks{% unless section.settings.full_width %} bt-container{% endunless %}">
+        {% content_for "blocks" %}
+      </div>
+    {%- endif -%}
+  </section>
+{%- endif -%}
 
 {% stylesheet %}
   .bt-hero {
@@ -151,7 +271,214 @@
     padding-inline: var(--bt-page-gutter);
   }
 
-  /* ── Two-column editorial grid (~55/45) ── */
+  /* ═══════════════════════════════════════════
+     FULL-BLEED GLASS HERO (Organic Luxe flagship)
+     ═══════════════════════════════════════════ */
+  .bt-hero--full-bleed {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* Section color scheme paints the fallback field behind the photo and
+       drives scrim + glass tokens. */
+    background: var(--bt-color-bg);
+  }
+  .bt-hero--height-small { min-height: 62svh; }
+  .bt-hero--height-medium { min-height: 78svh; }
+  .bt-hero--height-large { min-height: 92svh; }
+
+  .bt-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .bt-hero__bg picture,
+  .bt-hero__bg .bt-hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bt-hero--full-bleed .bt-hero__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bt-hero--full-bleed .bt-hero__placeholder-svg {
+    width: 42%;
+    max-width: 420px;
+    opacity: 0.15;
+  }
+
+  /* Gradient scrim — fades the photo into the scheme bg at the bottom
+     (strength via section slider) plus a whisper at the top so sticky
+     chrome never fights the imagery. */
+  .bt-hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgb(var(--bt-color-bg-rgb) / calc(var(--bt-hero-scrim, 0.45) * 0.35)) 0%, rgb(var(--bt-color-bg-rgb) / 0) 22%),
+      linear-gradient(180deg, rgb(var(--bt-color-bg-rgb) / 0) 38%, rgb(var(--bt-color-bg-rgb) / var(--bt-hero-scrim, 0.45)) 100%);
+  }
+
+  .bt-hero__stage {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    padding-top: clamp(4rem, 10vh, 8rem);
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+  }
+
+  /* ── Liquid-glass panel ── */
+  .bt-hero__panel {
+    max-width: min(560px, 100%);
+    padding: clamp(1.5rem, 3vw, 2.75rem);
+    border-radius: var(--bt-radius-card);
+  }
+  /* Panel without the glass treatment (toggle off): bare type on scrim,
+     text still readable thanks to the gradient beneath. */
+  .bt-hero--full-bleed .bt-hero__panel:not(.bt-glass) {
+    color: var(--bt-color-text);
+    text-shadow: 0 1px 24px rgb(var(--bt-color-bg-rgb) / 0.5);
+  }
+  .bt-hero--panel-center .bt-hero__panel { margin-inline: auto; text-align: center; }
+  .bt-hero--panel-right .bt-hero__panel { margin-inline-start: auto; }
+  .bt-hero--panel-center .bt-hero__text { margin-inline: auto; }
+  .bt-hero--panel-center .bt-hero__specimen .bt-specimen-tag--plate { justify-content: center; }
+
+  .bt-hero--full-bleed .bt-hero__eyebrow {
+    margin: 0 0 var(--bt-space-sm);
+    /* Gold eyebrow: secondary-text resolves to the scheme accent when it
+       clears WCAG on the scheme bg — on the dark hero schemes this is the
+       antique gold. */
+    color: var(--bt-color-secondary-text);
+  }
+  .bt-glass .bt-hero__eyebrow {
+    /* Inside glass, contrast is against the frosted panel, not the scheme
+       bg — keep the gold but lift it toward the glass text on dark frost. */
+    color: color-mix(in srgb, var(--bt-color-secondary-text) 82%, var(--bt-glass-text));
+  }
+  .bt-hero--full-bleed .bt-hero__heading {
+    margin: 0 0 var(--bt-space-sm);
+    max-width: 14ch;
+    color: inherit;
+  }
+  .bt-hero--panel-center .bt-hero__heading { margin-inline: auto; }
+  .bt-hero__heading em {
+    letter-spacing: -0.01em;
+  }
+  .bt-hero--full-bleed .bt-hero__text {
+    font-size: calc(var(--bt-fs-body) * 1.0625);
+    line-height: var(--bt-lh-body);
+    color: var(--bt-glass-text-muted, var(--bt-color-text-muted));
+    margin: 0 0 var(--bt-space-lg);
+    max-width: 46ch;
+  }
+  .bt-hero--full-bleed .bt-hero__panel:not(.bt-glass) .bt-hero__text {
+    color: var(--bt-color-text);
+  }
+
+  /* Specimen caption row inside the panel — hairline follows the glass. */
+  .bt-hero__specimen {
+    margin-top: var(--bt-space-md);
+  }
+  .bt-hero__specimen .bt-specimen-tag--plate {
+    border-top-color: var(--bt-glass-hairline, var(--bt-hairline));
+  }
+  .bt-hero__specimen .bt-specimen-tag__latin {
+    color: var(--bt-glass-text-muted, var(--bt-color-text-muted));
+  }
+
+  /* ── Floating featured-product card — glass specimen chip ── */
+  .bt-hero--full-bleed .bt-hero__product-card {
+    position: absolute;
+    inset-inline-end: 0;
+    bottom: clamp(2rem, 6vh, 4rem);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: var(--bt-space-sm);
+    width: min(280px, 40%);
+    padding: var(--bt-space-xs);
+    border-radius: var(--bt-radius-card);
+    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-hero--panel-right .bt-hero__product-card {
+    inset-inline-end: auto;
+    inset-inline-start: 0;
+  }
+  .bt-hero--full-bleed .bt-hero__product-card:hover {
+    transform: translateY(-2px);
+  }
+  .bt-hero--full-bleed .bt-hero__product-card:focus-within {
+    outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
+    outline-offset: 5px;
+  }
+  .bt-hero__product-media {
+    flex-shrink: 0;
+    display: block;
+    width: 72px;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--bt-glass-hairline, var(--bt-hairline));
+    border-radius: calc(var(--bt-radius-card) * 0.6);
+    background: var(--bt-color-surface-hover);
+    overflow: hidden;
+  }
+  .bt-hero__product-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bt-hero__product-placeholder {
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+  }
+  .bt-hero__product-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .bt-hero__product-label {
+    color: var(--bt-glass-text-muted, var(--bt-color-text-muted));
+  }
+  .bt-hero__product-title {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body);
+    line-height: var(--bt-lh-heading);
+    color: var(--bt-glass-text, var(--bt-color-text));
+    text-decoration: none;
+  }
+  /* Stretched link: the whole card is clickable through this one anchor */
+  .bt-hero__product-title::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .bt-hero--full-bleed .bt-hero__product-card:hover .bt-hero__product-title {
+    color: var(--bt-color-secondary-text);
+  }
+  .bt-hero__product-price {
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-glass-text-muted, var(--bt-color-text-muted));
+  }
+  .bt-hero__product-price s {
+    opacity: 0.6;
+    margin-inline-end: 0.4em;
+  }
+
+  /* ═══════════════════════════════════════════
+     LEGACY SPLIT LAYOUTS (image_right / image_left)
+     Preserved from the specimen-plate hero.
+     ═══════════════════════════════════════════ */
   .bt-hero__grid {
     display: grid;
     grid-template-columns: 1.12fr 0.88fr;
@@ -201,18 +528,18 @@
     padding-inline-start: clamp(1.5rem, 3.5vw, 3.5rem);
   }
 
-  /* ── Type ── */
-  .bt-hero__eyebrow {
+  /* ── Type (split) ── */
+  .bt-hero--image_right .bt-hero__eyebrow,
+  .bt-hero--image_left .bt-hero__eyebrow {
     margin: 0 0 var(--bt-space-md);
   }
-  .bt-hero__heading {
+  .bt-hero--image_right .bt-hero__heading,
+  .bt-hero--image_left .bt-hero__heading {
     margin: 0;
     max-width: 12ch;
   }
-  .bt-hero__heading em {
-    letter-spacing: -0.01em;
-  }
-  .bt-hero__text {
+  .bt-hero--image_right .bt-hero__text,
+  .bt-hero--image_left .bt-hero__text {
     font-size: calc(var(--bt-fs-body) * 1.0625);
     line-height: var(--bt-lh-body);
     color: var(--bt-color-text-muted);
@@ -259,21 +586,21 @@
     border: 1px solid var(--bt-hairline);
     background: var(--bt-color-surface-hover);
   }
-  .bt-hero__img {
+  .bt-hero__media .bt-hero__img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  .bt-hero__placeholder {
+  .bt-hero__media .bt-hero__placeholder {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .bt-hero__placeholder-svg {
+  .bt-hero__media .bt-hero__placeholder-svg {
     width: 60%;
     max-width: 320px;
     opacity: 0.15;
@@ -282,8 +609,9 @@
     margin-top: var(--bt-space-sm);
   }
 
-  /* ── Floating featured-product card — specimen mini card, double hairline ── */
-  .bt-hero__product-card {
+  /* ── Floating featured-product card (split) — specimen mini card ── */
+  .bt-hero--image_right .bt-hero__product-card,
+  .bt-hero--image_left .bt-hero__product-card {
     position: absolute;
     inset-inline-end: calc(-1 * var(--bt-space-sm));
     bottom: var(--bt-space-md);
@@ -298,65 +626,22 @@
     box-shadow: 0 0 0 3px var(--bt-color-surface), 0 0 0 4px var(--bt-hairline), var(--bt-shadow-sm);
     transition: transform var(--bt-duration-base) var(--bt-ease-out);
   }
-  .bt-hero__product-card:hover {
+  .bt-hero--image_right .bt-hero__product-card:hover,
+  .bt-hero--image_left .bt-hero__product-card:hover {
     transform: translateY(-2px);
   }
-  .bt-hero__product-card:focus-within {
+  .bt-hero--image_right .bt-hero__product-card:focus-within,
+  .bt-hero--image_left .bt-hero__product-card:focus-within {
     outline: var(--bt-focus-ring-width) solid var(--bt-color-focus-ring);
     outline-offset: 5px;
   }
-  .bt-hero__product-media {
-    flex-shrink: 0;
-    display: block;
-    width: 72px;
-    aspect-ratio: 4 / 5;
-    border: 1px solid var(--bt-hairline);
-    background: var(--bt-color-surface-hover);
-    overflow: hidden;
+  .bt-hero--image_right .bt-hero__product-card .bt-hero__product-media,
+  .bt-hero--image_left .bt-hero__product-card .bt-hero__product-media {
+    border-radius: 0;
   }
-  .bt-hero__product-media img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .bt-hero__product-placeholder {
-    width: 100%;
-    height: 100%;
-    opacity: 0.2;
-  }
-  .bt-hero__product-body {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-  .bt-hero__product-label {
-    color: var(--bt-color-text-muted);
-  }
-  .bt-hero__product-title {
-    font-family: var(--bt-font-heading);
-    font-size: var(--bt-fs-body);
-    line-height: var(--bt-lh-heading);
-    color: var(--bt-color-text);
-    text-decoration: none;
-  }
-  /* Stretched link: the whole card is clickable through this one anchor */
-  .bt-hero__product-title::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-  .bt-hero__product-card:hover .bt-hero__product-title {
+  .bt-hero--image_right .bt-hero__product-card:hover .bt-hero__product-title,
+  .bt-hero--image_left .bt-hero__product-card:hover .bt-hero__product-title {
     color: var(--bt-color-primary);
-  }
-  .bt-hero__product-price {
-    font-size: var(--bt-fs-body-sm);
-    color: var(--bt-color-text-muted);
-  }
-  .bt-hero__product-price s {
-    opacity: 0.6;
-    margin-inline-end: 0.4em;
   }
 
   /* ── Optional theme/app blocks row ── */
@@ -368,9 +653,62 @@
   .bt-hero--full .bt-hero__blocks {
     padding-inline: var(--bt-page-gutter);
   }
+  .bt-hero--full-bleed .bt-hero__blocks {
+    position: relative;
+    z-index: 2;
+    border-top-color: rgb(var(--bt-color-text-rgb) / 0.25);
+  }
 
-  /* ── Mobile: stacked, no overlap — eyebrow → headline → plate → copy → CTA ── */
+  /* ── Mobile: glass drops to a solid card, panel centers, type clamps ── */
   @media (max-width: 749px) {
+    .bt-hero--height-small { min-height: 56svh; }
+    .bt-hero--height-medium { min-height: 68svh; }
+    .bt-hero--height-large { min-height: 78svh; }
+
+    .bt-hero__stage {
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-end;
+      gap: var(--bt-space-sm);
+      padding-top: clamp(3rem, 8vh, 5rem);
+      padding-bottom: var(--bt-space-md);
+    }
+    /* Small screens: frosted panel becomes a solid translucent card —
+       blur on a full-width mobile panel is costly and the fallback is
+       already WCAG-safe (scheme bg at high opacity + scheme text). */
+    .bt-hero--full-bleed .bt-hero__panel.bt-glass {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: rgb(var(--bt-color-bg-rgb) / 0.78);
+      background-image: none;
+    }
+    .bt-hero--full-bleed .bt-hero__panel {
+      max-width: 100%;
+      margin-inline: 0;
+      text-align: left;
+      padding: var(--bt-space-lg);
+    }
+    .bt-hero--full-bleed .bt-hero__heading {
+      max-width: 16ch;
+    }
+    .bt-hero--full-bleed .bt-hero__product-card {
+      position: relative;
+      inset-inline-end: auto;
+      bottom: auto;
+      width: 100%;
+      max-width: 100%;
+    }
+    .bt-hero--full-bleed .bt-hero__product-card.bt-glass {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: rgb(var(--bt-color-bg-rgb) / 0.78);
+      background-image: none;
+    }
+    .bt-hero--full-bleed .bt-hero__product-card:hover {
+      transform: none;
+    }
+
+    /* Split layouts: stacked, no overlap — eyebrow → headline → plate → copy → CTA */
     .bt-hero__grid,
     .bt-hero--image_left .bt-hero__grid {
       display: flex;
@@ -385,11 +723,13 @@
     .bt-hero--image_left .bt-hero__body {
       padding-inline: 0;
     }
-    .bt-hero__heading {
+    .bt-hero--image_right .bt-hero__heading,
+    .bt-hero--image_left .bt-hero__heading {
       max-width: 16ch;
     }
     /* Featured-product card leaves the float and joins the flow under the image */
-    .bt-hero__product-card {
+    .bt-hero--image_right .bt-hero__product-card,
+    .bt-hero--image_left .bt-hero__product-card {
       position: relative;
       inset-inline-end: auto;
       bottom: auto;
@@ -397,7 +737,8 @@
       margin-top: var(--bt-space-sm);
       box-shadow: none;
     }
-    .bt-hero__product-card:hover {
+    .bt-hero--image_right .bt-hero__product-card:hover,
+    .bt-hero--image_left .bt-hero__product-card:hover {
       transform: none;
     }
   }
@@ -409,22 +750,29 @@
   "tag": "section",
   "blocks": [{ "type": "@theme" }, { "type": "@app" }],
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-3" },
     {
       "type": "select",
       "id": "layout",
       "label": "t:sections.hero.settings.layout.label",
       "options": [
-        { "value": "image_right", "label": "t:sections.hero.settings.layout.options__1.label" },
-        { "value": "image_left", "label": "t:sections.hero.settings.layout.options__2.label" }
+        { "value": "full_bleed", "label": "t:sections.hero.settings.layout.options__1.label" },
+        { "value": "image_right", "label": "t:sections.hero.settings.layout.options__2.label" },
+        { "value": "image_left", "label": "t:sections.hero.settings.layout.options__3.label" }
       ],
-      "default": "image_right"
+      "default": "full_bleed"
     },
     {
-      "type": "checkbox",
-      "id": "full_width",
-      "label": "t:sections.hero.settings.full_width.label",
-      "default": false
+      "type": "select",
+      "id": "height",
+      "label": "t:sections.hero.settings.height.label",
+      "options": [
+        { "value": "small", "label": "t:sections.hero.settings.height.options__1.label" },
+        { "value": "medium", "label": "t:sections.hero.settings.height.options__2.label" },
+        { "value": "large", "label": "t:sections.hero.settings.height.options__3.label" }
+      ],
+      "default": "large",
+      "info": "t:sections.hero.settings.height.info"
     },
     {
       "type": "image_picker",
@@ -438,9 +786,40 @@
       "info": "t:sections.hero.settings.image_mobile.info"
     },
     {
+      "type": "range",
+      "id": "scrim_strength",
+      "label": "t:sections.hero.settings.scrim_strength.label",
+      "info": "t:sections.hero.settings.scrim_strength.info",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 45,
+      "unit": "%"
+    },
+    {
+      "type": "checkbox",
+      "id": "glass_panel",
+      "label": "t:sections.hero.settings.glass_panel.label",
+      "info": "t:sections.hero.settings.glass_panel.info",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "panel_position",
+      "label": "t:sections.hero.settings.panel_position.label",
+      "options": [
+        { "value": "left", "label": "t:sections.hero.settings.panel_position.options__1.label" },
+        { "value": "center", "label": "t:sections.hero.settings.panel_position.options__2.label" },
+        { "value": "right", "label": "t:sections.hero.settings.panel_position.options__3.label" }
+      ],
+      "default": "left",
+      "info": "t:sections.hero.settings.panel_position.info"
+    },
+    {
       "type": "select",
       "id": "image_ratio",
       "label": "t:sections.hero.settings.image_ratio.label",
+      "info": "t:sections.hero.settings.image_ratio.info",
       "options": [
         { "value": "4-5", "label": "t:sections.hero.settings.image_ratio.options__1.label" },
         { "value": "3-4", "label": "t:sections.hero.settings.image_ratio.options__2.label" },
@@ -494,10 +873,18 @@
       "id": "button_style",
       "label": "t:sections.hero.settings.button_style.label",
       "options": [
-        { "value": "primary", "label": "t:sections.hero.settings.button_style.options__1.label" },
-        { "value": "outline", "label": "t:sections.hero.settings.button_style.options__2.label" }
+        { "value": "gold", "label": "t:sections.hero.settings.button_style.options__1.label" },
+        { "value": "primary", "label": "t:sections.hero.settings.button_style.options__2.label" },
+        { "value": "outline", "label": "t:sections.hero.settings.button_style.options__3.label" }
       ],
-      "default": "primary"
+      "default": "gold"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.hero.settings.full_width.label",
+      "info": "t:sections.hero.settings.full_width.info",
+      "default": false
     },
     {
       "type": "checkbox",

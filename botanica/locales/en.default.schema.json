@@ -963,15 +963,27 @@
         "layout": {
           "label": "Layout",
           "options__1": {
-            "label": "Image right"
+            "label": "Full-bleed glass"
           },
           "options__2": {
+            "label": "Image right"
+          },
+          "options__3": {
             "label": "Image left"
           }
         },
-        "full_width": {
-          "label": "Full width",
-          "info": "Stretch the composition to the viewport edges instead of the page container"
+        "height": {
+          "label": "Section height",
+          "info": "Full-bleed layout only",
+          "options__1": {
+            "label": "Small"
+          },
+          "options__2": {
+            "label": "Medium"
+          },
+          "options__3": {
+            "label": "Large"
+          }
         },
         "image": {
           "label": "Desktop image"
@@ -980,8 +992,30 @@
           "label": "Mobile image",
           "info": "Displayed on screens under 750px"
         },
+        "scrim_strength": {
+          "label": "Scrim strength",
+          "info": "Gradient veil over the photo behind the panel. Raise it if text feels hard to read."
+        },
+        "glass_panel": {
+          "label": "Frosted glass panel",
+          "info": "Full-bleed layout: content sits in a liquid-glass card. Off: type directly on the scrim."
+        },
+        "panel_position": {
+          "label": "Panel position",
+          "info": "Full-bleed layout, desktop. Mobile always stacks centered.",
+          "options__1": {
+            "label": "Bottom left"
+          },
+          "options__2": {
+            "label": "Bottom center"
+          },
+          "options__3": {
+            "label": "Bottom right"
+          }
+        },
         "image_ratio": {
           "label": "Image ratio",
+          "info": "Split layouts only",
           "options__1": {
             "label": "Portrait (4:5)"
           },
@@ -1023,23 +1057,30 @@
         "button_style": {
           "label": "Button style",
           "options__1": {
-            "label": "Primary"
+            "label": "Gold"
           },
           "options__2": {
+            "label": "Primary"
+          },
+          "options__3": {
             "label": "Outline"
           }
         },
+        "full_width": {
+          "label": "Full width",
+          "info": "Split layouts only. Stretch the composition to the viewport edges instead of the page container"
+        },
         "specimen_number": {
           "label": "Specimen number",
-          "info": "Shown under the image, e.g. “Nº 001”. Leave blank to hide."
+          "info": "Shown with the hero, e.g. “Nº 001”. Leave blank to hide."
         },
         "latin_caption": {
           "label": "Latin caption",
-          "info": "Serif italic caption under the image, e.g. “Monstera deliciosa”. Leave blank to hide."
+          "info": "Serif italic caption, e.g. “Monstera deliciosa”. Leave blank to hide."
         },
         "product": {
           "label": "Featured product",
-          "info": "Optional. Floats a specimen-style mini product card over the corner of the image."
+          "info": "Optional. Floats a specimen-style mini product card over the hero."
         },
         "product_label": {
           "label": "Product label",

@@ -1,6 +1,7 @@
 {% comment %}
-  sections/collection-list.liquid — Collection list grid
-  Merchants select up to 12 collections. Renders as 2-4 column grid with images.
+  sections/collection-list.liquid — Collection list grid (Organic Luxe)
+  Merchants select up to 12 collections. Image cards with a frosted-glass
+  label strip floating over the lower edge — no numbered newsprint rows.
   All-original. Zero Dawn code.
 {% endcomment %}
 {%- liquid
@@ -18,26 +19,30 @@
       <div class="bt-collection-list__grid bt-collection-list__grid--{{ columns }}-col">
         {%- for collection in section.settings.collections limit: collections_per_page -%}
           <div class="bt-collection-card">
-            <a href="{{ collection.url }}" class="bt-collection-card__link">
+            <a href="{{ collection.url }}" class="bt-collection-card__link" aria-label="{{ collection.title | escape }}">
               <div class="bt-collection-card__media">
                 {%- if collection.featured_image -%}
-                  {{ collection.featured_image | image_url: width: 600 | image_tag:
+                  {{ collection.featured_image | image_url: width: 800 | image_tag:
                     loading: 'lazy',
-                    widths: '300, 400, 500, 600',
+                    widths: '300, 400, 500, 600, 800',
                     sizes: '(min-width: 990px) 33vw, 50vw',
                     alt: collection.title
                   }}
                 {%- else -%}
                   {{ 'collection-1' | placeholder_svg_tag: 'bt-collection-card__placeholder' }}
                 {%- endif -%}
-              </div>
-              <div class="bt-collection-card__body">
-                <h3 class="bt-collection-card__title">{{ collection.title }}</h3>
-                {%- if show_count and collection.all_products_count > 0 -%}
-                  <span class="bt-collection-card__count">
-                    {{ 'collections.collection.product_count' | t: count: collection.all_products_count }}
+                <div class="bt-collection-card__scrim" aria-hidden="true"></div>
+                <div class="bt-collection-card__label bt-glass">
+                  <span class="bt-collection-card__label-text">
+                    <span class="bt-collection-card__title" role="heading" aria-level="3">{{ collection.title }}</span>
+                    {%- if show_count and collection.all_products_count > 0 -%}
+                      <span class="bt-collection-card__count">
+                        {{ 'collections.collection.product_count' | t: count: collection.all_products_count }}
+                      </span>
+                    {%- endif -%}
                   </span>
-                {%- endif -%}
+                  <svg class="bt-collection-card__arrow" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
               </div>
             </a>
           </div>
@@ -63,14 +68,27 @@
   .bt-collection-list__grid--2-col { grid-template-columns: repeat(2, 1fr); }
   .bt-collection-list__grid--3-col { grid-template-columns: repeat(3, 1fr); }
   .bt-collection-list__grid--4-col { grid-template-columns: repeat(4, 1fr); }
-  .bt-collection-card { border-radius: var(--bt-radius-card); overflow: hidden; }
+  .bt-collection-card {
+    border-radius: var(--bt-radius-card);
+    overflow: hidden;
+    box-shadow: var(--bt-shadow-card);
+    transition: transform 250ms var(--bt-ease-out),
+                box-shadow 250ms var(--bt-ease-out);
+  }
+  @media (hover: hover) {
+    .bt-collection-card:hover { box-shadow: var(--bt-shadow-card-hover); }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .bt-collection-card:hover { transform: translateY(-4px); }
+  }
   .bt-collection-card__link {
     display: block;
     text-decoration: none;
     color: inherit;
   }
   .bt-collection-card__media {
-    aspect-ratio: 1;
+    position: relative;
+    aspect-ratio: 4 / 5;
     overflow: hidden;
     background: var(--bt-color-surface);
     border-radius: var(--bt-radius-card);
@@ -79,29 +97,76 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+    transition: transform var(--bt-duration-slow) var(--bt-ease-out);
   }
-  .bt-collection-card:hover .bt-collection-card__media img {
-    transform: scale(1.05);
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .bt-collection-card:hover .bt-collection-card__media img {
+      transform: scale(1.05);
+    }
   }
-  .bt-collection-card__body {
-    padding: var(--bt-space-sm) 0;
-    text-align: center;
+  /* Quiet gradient under the label strip so the frost always has
+     something to separate from — scheme-agnostic black veil. */
+  .bt-collection-card__scrim {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 42%;
+    background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / 0.28));
+    pointer-events: none;
+  }
+  /* Frosted label strip — floats over the image's lower edge */
+  .bt-collection-card__label {
+    position: absolute;
+    inset-inline: var(--bt-space-xs);
+    bottom: var(--bt-space-xs);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-space-xs);
+    padding: var(--bt-space-xs) var(--bt-space-sm);
+    border-radius: calc(var(--bt-radius-card) * 0.65);
+  }
+  .bt-collection-card__label-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
   }
   .bt-collection-card__title {
     font-family: var(--bt-font-heading);
     font-size: var(--bt-fs-h4);
-    font-weight: var(--bt-fw-normal);
-    color: var(--bt-color-text);
+    font-weight: var(--bt-fw-medium);
+    color: var(--bt-glass-text);
     margin: 0;
+    line-height: var(--bt-lh-heading);
   }
   .bt-collection-card__count {
     font-size: var(--bt-fs-body-xs);
-    color: var(--bt-color-text-muted);
+    color: var(--bt-glass-text-muted);
+  }
+  .bt-collection-card__arrow {
+    flex-shrink: 0;
+    color: var(--bt-glass-text);
+    opacity: 0.75;
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out),
+                opacity var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .bt-collection-card:hover .bt-collection-card__arrow {
+      transform: translateX(3px);
+      opacity: 1;
+    }
   }
   .bt-collection-card__placeholder { width: 100%; height: 100%; background: var(--bt-color-surface); }
+  /* Mobile: frosted strip becomes a solid card chip (no backdrop cost) */
   @media (max-width: 749px) {
     .bt-collection-list__grid--3-col, .bt-collection-list__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+    .bt-collection-card__label.bt-glass {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: rgb(var(--bt-color-bg-rgb) / 0.85);
+      background-image: none;
+    }
   }
   @media (max-width: 479px) {
     .bt-collection-list__grid { grid-template-columns: 1fr; }

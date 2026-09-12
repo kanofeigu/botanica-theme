@@ -110,9 +110,9 @@ p {
   text-wrap: pretty;
 }
 
-/* Standardized micro-label / eyebrow: 12px Inter, uppercase, 0.14em tracking,
-   medium weight. .bt-micro-label is the canonical utility going forward;
-   .bt-eyebrow remains as the legacy alias used across current sections. */
+/* Standardized micro-label / eyebrow: 12px Montserrat, uppercase, 0.08em
+   tracking, medium weight. .bt-micro-label is the canonical utility going
+   forward; .bt-eyebrow remains as the legacy alias used across sections. */
 .bt-eyebrow,
 .bt-micro-label {
   display: inline-block;
@@ -274,6 +274,17 @@ body.bt-no-grain::after { content: none; }
   border: 1.5px solid var(--bt-color-primary);
 }
 .bt-btn--outline:hover { background: var(--bt-color-primary-tint); }
+
+/* Gold CTA — the Organic Luxe signature. Antique-gold accent fill with
+   the scheme's on-button label color (scheme-3 pairs gold #C9A227 with
+   warm black ≈ 7:1; light schemes pair deep gold #A16207 with white
+   ≈ 4.9:1). All channels are scheme tokens. */
+.bt-btn--gold {
+  background: var(--bt-color-secondary);
+  color: var(--bt-color-primary-contrast);
+}
+.bt-btn--gold:hover { background: var(--bt-color-secondary-hover); color: var(--bt-color-primary-contrast); }
+.bt-btn--gold:active { background: var(--bt-color-secondary-hover); }
 
 .bt-btn--lg { padding: 1em 2.5em; font-size: var(--bt-fs-body); }
 .bt-btn--block { width: 100%; }
