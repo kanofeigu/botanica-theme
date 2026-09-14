@@ -154,7 +154,7 @@
                 endif
               endif
               assign is_availability = false
-              if filter.type == 'boolean' and filter.values.first.param_name contains 'availability'
+              if filter.values.first.param_name contains 'availability'
                 assign is_availability = true
               endif
             -%}
@@ -282,9 +282,11 @@
               assign progress_pct = shown_count | times: 100.0 | divided_by: paginate.items | round
             -%}
             <div class="bt-collection-grid__loadmore" data-loadmore data-section-id="{{ section.id }}" data-next-page="{{ paginate.current_page | plus: 1 }}">
-              <button type="button" class="bt-btn bt-btn--outline bt-btn--lg bt-collection-grid__loadmore-btn bt-interactive bt-press" data-loadmore-btn hidden>
-                {{ 'collections.general.load_more' | t }}
-              </button>
+              {%- if paginate.next -%}
+                <button type="button" class="bt-btn bt-btn--outline bt-btn--lg bt-collection-grid__loadmore-btn bt-interactive bt-press" data-loadmore-btn hidden>
+                  {{ 'collections.general.load_more' | t }}
+                </button>
+              {%- endif -%}
               <p class="bt-collection-grid__showing">{{ 'collections.general.showing' | t: shown: shown_count, total: paginate.items }}</p>
               <div class="bt-collection-grid__progress" aria-hidden="true">
                 <span class="bt-collection-grid__progress-bar" style="width: {{ progress_pct }}%"></span>
@@ -1397,8 +1399,11 @@
     }
     .bt-collection-grid__toolbar-left {
       flex: 1;
-      justify-content: space-between;
+      min-width: 0;
     }
+    /* Save horizontal room: drop the "SORT BY:" prefix on phones */
+    .bt-sort__label-prefix { display: none; }
+    .bt-sort__button { padding-inline: 0.75em; }
     /* Mobile product grid: fixed two-up with tightened gutters. */
     .bt-collection-grid .bt-grid {
       gap: var(--bt-space-xs);
@@ -1421,6 +1426,8 @@
      content cross-fades + lifts slightly on arrival.
      ════════════════════════════════════════════ */
   .bt-collection-grid { position: relative; }
+  /* Tighten the seam under the compact collection band */
+  .bt-collection-grid.bt-section { padding-top: var(--bt-space-md); }
   .bt-collection-grid__main { position: relative; }
 
   /* Fade out: content dims + blurs slightly while loading */
