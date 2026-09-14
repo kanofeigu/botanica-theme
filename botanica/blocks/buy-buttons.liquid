@@ -174,6 +174,25 @@
     {%- endif -%}
   </div>
 
+  {%- comment %} Delivery estimate — server-rendered dates (no JS, no app):
+    "Order today — ships by X, arrives Y–Z". Days are merchant-tunable. {%- endcomment %}
+  {%- if block.settings.show_delivery_estimate -%}
+    {%- liquid
+      assign secs_day = 86400
+      assign now_ts = 'now' | date: '%s' | plus: 0
+      assign ship_offset = block.settings.delivery_ship_days | times: secs_day
+      assign arrive_min_offset = block.settings.delivery_arrive_min | times: secs_day
+      assign arrive_max_offset = block.settings.delivery_arrive_max | times: secs_day
+      assign ship_date = now_ts | plus: ship_offset | date: '%b %-d'
+      assign arrive_start = now_ts | plus: arrive_min_offset | date: '%b %-d'
+      assign arrive_end = now_ts | plus: arrive_max_offset | date: '%b %-d'
+    -%}
+    <p class="bt-buy-panel__delivery">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 8h13v9H1zM14 11h4l3 3v3h-7z"/><circle cx="6" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg>
+      <span>{{ 'products.product.delivery_estimate_html' | t: ship_date: ship_date, arrive_start: arrive_start, arrive_end: arrive_end }}</span>
+    </p>
+  {%- endif -%}
+
   {%- comment %} Shop Pay Installments banner — renders nothing when the
     product/cart is not eligible. Must stay inside the product form. {%- endcomment %}
   {%- if block.settings.show_payment_terms -%}
@@ -364,6 +383,37 @@
   }
   .bt-buy-panel__dynamic { min-height: 0; }
 
+  /* ── Delivery estimate line (under the CTA) ── */
+  .bt-buy-panel__delivery {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bt-space-2xs);
+    margin: 0;
+    padding-top: var(--bt-space-2xs);
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    text-align: center;
+  }
+  .bt-buy-panel__delivery svg { flex-shrink: 0; color: var(--bt-color-primary); }
+  .bt-buy-panel__delivery strong { color: var(--bt-color-text); font-weight: var(--bt-fw-semibold); }
+
+  /* ── ATC micro-interaction: press compress → success gold check → restore ── */
+  .bt-buy-panel__actions [data-atc-button] {
+    transition: transform 120ms var(--bt-ease-out),
+                background var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-buy-panel__actions [data-atc-button]:not([disabled]):active {
+    transform: scale(0.97);
+  }
+  .bt-buy-panel__actions [data-atc-button].bt-atc-success {
+    background: var(--bt-color-secondary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bt-buy-panel__actions [data-atc-button] { transition: none; }
+    .bt-buy-panel__actions [data-atc-button]:not([disabled]):active { transform: none; }
+  }
+
   /* ── Selling plans — purchase options (one-time + subscription) ── */
   .bt-buy-panel__plans {
     margin: 0;
@@ -507,6 +557,39 @@
       "id": "show_trust_badges",
       "label": "t:blocks.buy_buttons.settings.trust_badges.label",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_delivery_estimate",
+      "label": "t:blocks.buy_buttons.settings.delivery_estimate.label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "delivery_ship_days",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "default": 1,
+      "label": "t:blocks.buy_buttons.settings.delivery_ship_days.label"
+    },
+    {
+      "type": "range",
+      "id": "delivery_arrive_min",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 3,
+      "label": "t:blocks.buy_buttons.settings.delivery_arrive_min.label"
+    },
+    {
+      "type": "range",
+      "id": "delivery_arrive_max",
+      "min": 2,
+      "max": 14,
+      "step": 1,
+      "default": 6,
+      "label": "t:blocks.buy_buttons.settings.delivery_arrive_max.label"
     },
     {
       "type": "checkbox",

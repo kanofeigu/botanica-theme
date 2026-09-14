@@ -29,6 +29,42 @@
   </details>
 {%- endif -%}
 
+{% javascript %}
+  /* Smooth accordion open/close — height tween + soft content fade.
+     Delegated + guarded so it covers every .bt-collapsible on the page
+     (PDP specs, shipping, etc.) without duplicate listeners. */
+  (function () {
+    if (window._btCollapsibleAnim) return;
+    window._btCollapsibleAnim = true;
+    var reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    document.addEventListener('click', function (e) {
+      var summary = e.target.closest('.bt-collapsible__summary');
+      if (!summary) return;
+      var details = summary.parentElement;
+      if (!details || details.tagName !== 'DETAILS') return;
+      var content = details.querySelector('.bt-collapsible__content');
+      if (!content) return;
+      if (reduceMq.matches) return; /* native instant toggle */
+      e.preventDefault();
+      if (details.open) {
+        content.style.height = content.scrollHeight + 'px';
+        void content.offsetHeight;
+        content.style.height = '0px'; content.style.opacity = '0';
+        setTimeout(function () {
+          details.removeAttribute('open');
+          content.style.height = ''; content.style.opacity = '';
+        }, 240);
+      } else {
+        details.setAttribute('open', '');
+        content.style.height = '0px'; content.style.opacity = '0';
+        void content.offsetHeight;
+        content.style.height = content.scrollHeight + 'px'; content.style.opacity = '1';
+        setTimeout(function () { content.style.height = ''; }, 240);
+      }
+    });
+  })();
+{% endjavascript %}
+
 {% stylesheet %}
   .bt-collapsible {
     border: none;
@@ -82,8 +118,13 @@
     font-size: var(--bt-fs-body-sm);
     line-height: var(--bt-lh-relaxed);
     color: var(--bt-color-text-muted);
+    overflow: hidden;
+    transition: height 240ms var(--bt-ease-out), opacity 200ms var(--bt-ease-out);
   }
   .bt-collapsible__content p + p { margin-top: var(--bt-space-2xs); }
+  @media (prefers-reduced-motion: reduce) {
+    .bt-collapsible__content { transition: none; }
+  }
 {% endstylesheet %}
 
 {% schema %}

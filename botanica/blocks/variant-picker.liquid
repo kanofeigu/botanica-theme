@@ -235,6 +235,21 @@
     .bt-variant-option--swatch .bt-variant-option__label { min-width: 44px; }
   }
 
+  /* ── Selection pop (both modes): soft scale spring on the newly
+     selected option — transform only, replays whenever a new input
+     becomes checked because the selector starts matching again. ── */
+  @keyframes bt-variant-pop {
+    0%   { transform: scale(0.96); }
+    60%  { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  .bt-variant-option:has(input:checked) .bt-variant-option__label {
+    animation: bt-variant-pop 240ms var(--bt-ease-out);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bt-variant-option:has(input:checked) .bt-variant-option__label { animation: none; }
+  }
+
   /* ── Unavailable variant (both modes) ── */
   .bt-variant-option.is-unavailable .bt-variant-option__label {
     opacity: 0.4;

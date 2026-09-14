@@ -1766,6 +1766,18 @@
         "trust_badges": {
           "label": "Show trust badges"
         },
+        "delivery_estimate": {
+          "label": "Show delivery estimate"
+        },
+        "delivery_ship_days": {
+          "label": "Ships in (days)"
+        },
+        "delivery_arrive_min": {
+          "label": "Earliest arrival (days)"
+        },
+        "delivery_arrive_max": {
+          "label": "Latest arrival (days)"
+        },
         "gift_card_recipient": {
           "label": "Gift card recipient form",
           "info": "Only shown on gift card products. Lets buyers add recipient email, name, message, and send date."

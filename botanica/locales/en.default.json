@@ -206,6 +206,8 @@
       "title": "Product title",
       "unit_price_separator": "per",
       "add_to_cart": "Add to cart",
+      "added_short": "Added",
+      "delivery_estimate_html": "Order today — ships by <strong>{{ ship_date }}</strong>, arrives <strong>{{ arrive_start }} – {{ arrive_end }}</strong>",
       "purchase_options": "Purchase options",
       "one_time_purchase": "One-time purchase",
       "choose_options": "Choose options",

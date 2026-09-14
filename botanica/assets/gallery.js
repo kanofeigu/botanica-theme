@@ -13,6 +13,13 @@ class BtProductGallery extends HTMLElement {
       t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();this.switchTo(t)}});
     });
 
+    /* Prev/next stage arrows — same slide language as the PLP swap */
+    this.prevArrow=this.main.querySelector('[data-gallery-prev]');
+    this.nextArrow=this.main.querySelector('[data-gallery-next]');
+    if(this.prevArrow)this.prevArrow.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();this.stepSlide(-1)});
+    if(this.nextArrow)this.nextArrow.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();this.stepSlide(1)});
+    this.reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+
     /* 3D model support — Shopify platform loader (model-viewer-ui). */
     if(this.main.querySelector('[data-media-type="model"]')&&window.Shopify&&typeof window.Shopify.loadFeatures==='function'){
       window.Shopify.loadFeatures([{name:'model-viewer-ui',version:'1.0'}]);
@@ -62,20 +69,55 @@ class BtProductGallery extends HTMLElement {
   }
 
   showSlide(slide){
-    this.slides.forEach(s=>{
-      const on=s===slide;
-      s.classList.toggle('is-active',on);
-      if(on){
-        s.removeAttribute('hidden');
-      }else{
-        s.setAttribute('hidden','');
-        /* pause local video; restart-free stop for external iframes */
-        const v=s.querySelector('video');v&&typeof v.pause==='function'&&v.pause();
-        const f=s.querySelector('iframe');
-        if(f&&f.src){const src=f.src;f.src='';f.src=src}
-      }
-    });
+    const current=this.activeSlide();
+    if(current===slide)return;
+    const reduce=this.reducedMotion&&this.reducedMotion.matches;
+    const cleanup=(s)=>{
+      /* pause local video; restart-free stop for external iframes */
+      const v=s.querySelector('video');v&&typeof v.pause==='function'&&v.pause();
+      const f=s.querySelector('iframe');
+      if(f&&f.src){const src=f.src;f.src='';f.src=src}
+    };
+    if(reduce||!current){
+      /* Instant swap (reduced motion or first render) */
+      this.slides.forEach(s=>{
+        const on=s===slide;
+        s.classList.toggle('is-active',on);
+        if(on){s.removeAttribute('hidden')}else{s.setAttribute('hidden','');cleanup(s)}
+      });
+    }else{
+      /* Choreographed swap: old slides left + fades (fast, ease-in),
+         new fades + slides in from the right (ease-out) — same motion
+         language as the collection grid. Slides share grid-area 1/1 so
+         both can coexist during the crossfade. */
+      slide.removeAttribute('hidden');
+      void slide.offsetHeight; /* reflow so the enter animation starts */
+      slide.classList.add('is-active','is-entering');
+      current.classList.remove('is-active');
+      current.classList.add('is-exiting');
+      setTimeout(()=>{
+        current.classList.remove('is-exiting');
+        if(!current.classList.contains('is-active'))current.setAttribute('hidden','');
+        cleanup(current);
+      },190);
+      setTimeout(()=>slide.classList.remove('is-entering'),340);
+    }
     this.main.setAttribute('data-media-id',slide.dataset.mediaId||'');
+  }
+
+  /* Stage arrows: wrap around the slide list, keep thumbs in sync */
+  stepSlide(dir){
+    const n=this.slides.length;
+    if(n<=1)return;
+    const active=this.activeSlide();
+    const idx=Math.max(0,this.slides.indexOf(active));
+    const next=this.slides[(idx+dir+n)%n];
+    if(!next)return;
+    const thumb=this.thumbs.find(t=>t.dataset.mediaId===String(next.dataset.mediaId));
+    if(thumb){this.switchTo(thumb)}
+    else{
+      this.showSlide(next);
+    }
   }
 
   switchTo(thumb){

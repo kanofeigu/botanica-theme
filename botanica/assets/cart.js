@@ -76,6 +76,21 @@ function btEsc(str) {
         return res.json();
       })
       .then(function(data) {
+        /* PDP main ATC micro-feedback: press → gold check "Added" → restore.
+           (Quick-add has its own handler below; this is the product form.) */
+        if (btn && btn.hasAttribute('data-atc-button')) {
+          var label = btn.querySelector('[data-atc-label]');
+          var origHTML = label ? label.innerHTML : null;
+          btn.classList.add('bt-atc-success');
+          if (label) {
+            label.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>' +
+              (window.theme && window.theme.variantI18n && window.theme.variantI18n.addedShort || 'Added') + '</span>';
+          }
+          setTimeout(function () {
+            btn.classList.remove('bt-atc-success');
+            if (label && origHTML) label.innerHTML = origHTML;
+          }, 1600);
+        }
         document.dispatchEvent(new CustomEvent('cart:added', { detail: data }));
       })
       .catch(function() {
