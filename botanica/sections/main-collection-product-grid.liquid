@@ -338,6 +338,15 @@
       });
     }
 
+    /* Motion choreography constants (see ui-ux-pro-max guidance:
+       exit faster than enter, transform/opacity only, staggered) */
+    var EXIT_STAGGER = 20;    /* ms between old cards, reading order */
+    var EXIT_DURATION = 220;  /* ms per card (ease-in) */
+    var ENTER_STAGGER = 45;   /* ms between new cards */
+    var ENTER_DELAY_CAP = 450;/* cap so large pages don't feel endless */
+    var ENTER_DURATION = 340; /* ms per card (ease-out) */
+    var reduceMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     function ajaxNavigate(url, pushState) {
       if (ajaxing) return;
       ajaxing = true;
@@ -354,37 +363,80 @@
       document.querySelectorAll('[aria-expanded="true"]').forEach(function (b) {
         b.setAttribute('aria-expanded', 'false');
       });
-      /* fade out the grid content (not the whole grid, to avoid layout jump) */
-      grid.classList.add('bt-ajax-out');
+
+      var main = grid.querySelector('.bt-collection-grid__main');
+      var reduce = reduceMotionMq.matches;
+      var cards = main ? Array.prototype.slice.call(main.querySelectorAll('.bt-grid > *')) : [];
+
+      /* Lock current height so the swap can't collapse the page (CLS),
+         and block pointer input for the duration of the transition. */
+      if (main) {
+        main.style.minHeight = main.offsetHeight + 'px';
+        main.style.pointerEvents = 'none';
+      }
+
+      /* EXIT — old cards slide left + fade with a 20ms reading-order
+         stagger. The fetch runs in parallel; the swap waits for the exit. */
+      var exitMs = 0;
+      if (!reduce && cards.length) {
+        cards.forEach(function (card, i) {
+          card.style.transitionDelay = (i * EXIT_STAGGER) + 'ms';
+          card.classList.add('bt-card-exit');
+        });
+        exitMs = (cards.length - 1) * EXIT_STAGGER + EXIT_DURATION;
+      }
       document.body.classList.add('bt-ajax-loading');
-      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
-        .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
-        .then(function (html) {
+
+      var fetchPromise = fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); });
+      var exitPromise = new Promise(function (res) { setTimeout(res, exitMs); });
+
+      Promise.all([fetchPromise, exitPromise])
+        .then(function (results) {
+          var html = results[0];
           var doc = new DOMParser().parseFromString(html, 'text/html');
           var newGrid = doc.querySelector('.bt-collection-grid');
           var oldGrid = document.querySelector('.bt-collection-grid');
-          if (newGrid && oldGrid) {
-            /* swap innerHTML, then animate in */
-            oldGrid.innerHTML = newGrid.innerHTML;
-            if (pushState !== false) {
-              history.pushState({ btAjax: true, url: url }, '', url);
-            }
-            /* remove fade-out, trigger fade-up reveal */
-            oldGrid.classList.remove('bt-ajax-out');
-            oldGrid.classList.add('bt-ajax-in');
-            /* re-init interactive components on new DOM */
-            initAll();
-            /* scroll to top of grid if user had scrolled past it */
-            var rect = oldGrid.getBoundingClientRect();
-            if (rect.top < 0) {
-              oldGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-            /* clean up reveal class after animation */
-            setTimeout(function () { oldGrid.classList.remove('bt-ajax-in'); }, 420);
+          if (!newGrid || !oldGrid) { window.location.href = url; return; }
+
+          oldGrid.innerHTML = newGrid.innerHTML;
+          if (pushState !== false) {
+            history.pushState({ btAjax: true, url: url }, '', url);
           }
+
+          /* ENTER — new cards fade + slide in from the right, 45ms stagger.
+             Reduced motion: skip animation entirely, content is just there. */
+          var enterMs = 0;
+          if (!reduce) {
+            var fresh = oldGrid.querySelectorAll('.bt-grid > *');
+            fresh.forEach(function (c, i) {
+              c.style.animationDelay = Math.min(i * ENTER_STAGGER, ENTER_DELAY_CAP) + 'ms';
+            });
+            oldGrid.classList.add('bt-ajax-in');
+            enterMs = ENTER_DELAY_CAP + ENTER_DURATION + 60;
+          }
+
+          /* re-init interactive components on new DOM */
+          initAll();
+          /* scroll to top of grid if user had scrolled past it */
+          var rect = oldGrid.getBoundingClientRect();
+          if (rect.top < 0) {
+            oldGrid.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+          }
+
+          /* keep the pointer lock on the fresh grid until the enter
+             animation completes, then release everything */
+          var newMain = oldGrid.querySelector('.bt-collection-grid__main');
+          if (newMain) newMain.style.pointerEvents = 'none';
+          setTimeout(function () {
+            oldGrid.classList.remove('bt-ajax-in');
+            oldGrid.querySelectorAll('.bt-grid > *').forEach(function (c) { c.style.animationDelay = ''; });
+            if (newMain) newMain.style.pointerEvents = '';
+            ajaxing = false;
+            document.body.classList.remove('bt-ajax-loading');
+          }, enterMs);
         })
-        .catch(function () { window.location.href = url; })
-        .then(function () { ajaxing = false; document.body.classList.remove('bt-ajax-loading'); });
+        .catch(function () { window.location.href = url; });
     }
 
     function urlWithSort(sortVal) {
@@ -1421,23 +1473,27 @@
   }
 
   /* ════════════════════════════════════════════
-     AJAX TRANSITIONS — fade-out, then fade-up reveal.
-     No screen flash: the grid stays in place, only its
-     content cross-fades + lifts slightly on arrival.
+     AJAX TRANSITIONS — choreographed card swap.
+     EXIT: old cards slide left + fade (fast, ease-in, 20ms stagger).
+     ENTER: new cards slide in from the right + fade (ease-out, 45ms
+     stagger, delay set inline by JS). The main area is height-locked
+     by JS during the swap so the page never jumps (no CLS).
+     Toolbar / sidebar stay still — only the product grid moves.
      ════════════════════════════════════════════ */
   .bt-collection-grid { position: relative; }
   /* Tighten the seam under the compact collection band */
   .bt-collection-grid.bt-section { padding-top: var(--bt-space-md); }
   .bt-collection-grid__main { position: relative; }
 
-  /* Fade out: content dims + blurs slightly while loading */
-  .bt-collection-grid.bt-ajax-out .bt-collection-grid__main {
-    opacity: 0.35;
-    filter: blur(1px);
-    transition: opacity 180ms var(--bt-ease-out), filter 180ms var(--bt-ease-out);
+  /* EXIT — applied per card by JS (transition-delay carries the stagger) */
+  .bt-collection-grid .bt-grid > *.bt-card-exit {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 200ms ease-in, transform 200ms ease-in;
     pointer-events: none;
   }
-  /* Spinner centered on the main grid area */
+
+  /* Spinner centered on the main grid area while fetching */
   body.bt-ajax-loading .bt-collection-grid__main::after {
     content: '';
     position: absolute;
@@ -1452,30 +1508,21 @@
   }
   @keyframes bt-ajax-spin { to { transform: rotate(360deg); } }
 
-  /* Fade-up reveal: new content fades in + lifts 8px */
-  .bt-collection-grid.bt-ajax-in .bt-collection-grid__main {
-    animation: bt-ajax-reveal 380ms var(--bt-ease-out) both;
-  }
-  @keyframes bt-ajax-reveal {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  /* Stagger product cards for a graceful cascade feel */
+  /* ENTER — cards fade + slide from the right; JS sets animation-delay
+     inline (45ms stagger, capped) so any page size is covered. */
   .bt-collection-grid.bt-ajax-in .bt-grid > * {
-    animation: bt-ajax-card 380ms var(--bt-ease-out) both;
+    animation: bt-card-enter 320ms var(--bt-ease-out) both;
   }
+  @keyframes bt-card-enter {
+    from { opacity: 0; transform: translateX(12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Load-more appended cards: light fade + rise */
   @keyframes bt-ajax-card {
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(1) { animation-delay: 0ms; }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(2) { animation-delay: 40ms; }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(3) { animation-delay: 80ms; }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(4) { animation-delay: 120ms; }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(5) { animation-delay: 160ms; }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(6) { animation-delay: 200ms; }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(7) { animation-delay: 240ms; }
-  .bt-collection-grid.bt-ajax-in .bt-grid > *:nth-child(8) { animation-delay: 280ms; }
 
   @media (prefers-reduced-motion: reduce) {
     .bt-sort__menu,
@@ -1483,15 +1530,14 @@
     .bt-filter-group__chevron,
     .bt-sort__chevron,
     .bt-collection-grid__sidebar,
-    .bt-collection-grid__progress-bar {
+    .bt-collection-grid__progress-bar,
+    .bt-collection-grid .bt-grid > *.bt-card-exit {
       transition: none !important;
     }
     .bt-collection-grid__empty { animation: none; }
     body.bt-ajax-loading .bt-collection-grid__main::after { animation: none; }
-    .bt-collection-grid.bt-ajax-in .bt-collection-grid__main,
     .bt-collection-grid.bt-ajax-in .bt-grid > *,
     .bt-loadmore-item { animation: none !important; }
-    .bt-collection-grid.bt-ajax-out .bt-collection-grid__main { filter: none; transition: none; }
   }
 {% endstylesheet %}
 
