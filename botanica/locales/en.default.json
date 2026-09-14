@@ -126,6 +126,7 @@
   "accessibility": {
     "slide_n": "Slide {{ number }}",
     "remove_filter": "Remove filter: {{ label }}",
+    "filters_active": "Active filters",
     "skip_to_text": "Skip to content",
     "skip_to_product_info": "Skip to product information",
     "close": "Close",
@@ -336,12 +337,19 @@
     "general": {
       "title": "Collections",
       "view_all": "View all",
-      "no_matches": "No products match your filters. Try adjusting your selection."
+      "no_matches": "No products match your filters. Try adjusting your selection.",
+      "empty_title": "Nothing sprouting here",
+      "load_more": "Load more",
+      "showing": "Showing {{ shown }} of {{ total }} products"
     },
     "filters": {
       "title": "Filter",
       "title_tags": "Filter by",
       "clear_all": "Clear all",
+      "show_results": {
+        "one": "Show {{ count }} result",
+        "other": "Show {{ count }} results"
+      },
       "price_min": "Min price",
       "price_max": "Max price",
       "price_label": "Price",

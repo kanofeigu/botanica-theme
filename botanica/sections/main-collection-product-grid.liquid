@@ -1,10 +1,12 @@
 {% comment %}
   main-collection-product-grid.liquid — Sidebar-first filter experience.
-  Single source of truth: Shopify native `collection.filters` (supports
-  price_range / boolean / list). No duplicate top chip bar. Sort is a
-  custom popover dropdown with animation. Price filter is a dual-thumb
-  range slider (no number spiners). Sidebar groups animate open/close.
-  Zero Dawn code.
+  Sticky toolbar: filter toggle (desktop collapses sidebar / mobile opens
+  drawer) + prominent count + soft-pill sort popover. Active filter chips
+  row with per-value remove links + Clear all. Sidebar groups are animated
+  accordions (first two open by default); Availability renders as a toggle
+  switch; price uses soft-fill from/to inputs. Pagination is a "Load more"
+  button powered by the Section Rendering API (numbered pagination stays as
+  the no-JS fallback). Zero Dawn code.
 {% endcomment %}
 
 {%- liquid
@@ -39,56 +41,92 @@
 <div class="bt-collection-grid bt-section color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
 
-    {% comment %} ══════════════ TOOLBAR: count + sort (mobile filter trigger) ══════════════ {% endcomment %}
-    <div class="bt-collection-grid__toolbar">
-      <div class="bt-collection-grid__count">
-        <span>{{ 'collections.collection.product_count' | t: count: collection.products_count }}</span>
-        {%- if has_active_filters -%}
-          <span class="bt-collection-grid__filtered-badge">{{ active_filter_count }} {{ 'collections.filters.active' | t }}</span>
-        {%- endif -%}
-      </div>
-
-      <div class="bt-collection-grid__toolbar-actions">
+    {% comment %} ══════════════ STICKY TOOLBAR: filter toggle + count + sort ══════════════ {% endcomment %}
+    <div class="bt-collection-grid__toolbar" data-toolbar>
+      <div class="bt-collection-grid__toolbar-left">
         {%- if enable_filtering and has_modern_filters -%}
-          <button type="button" class="bt-collection-grid__filter-trigger" data-filter-toggle aria-label="{{ 'collections.filters.title' | t }}">
+          <button type="button" class="bt-collection-grid__filter-trigger bt-interactive" data-filter-toggle aria-expanded="true" aria-label="{{ 'collections.filters.title' | t }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
             <span>{{ 'collections.filters.title' | t }}</span>
             {%- if has_active_filters -%}<span class="bt-collection-grid__filter-count">{{ active_filter_count }}</span>{%- endif -%}
           </button>
         {%- endif -%}
-
-        {%- if enable_sorting -%}
-          <div class="bt-sort" data-sort>
-            <button type="button" class="bt-sort__button bt-interactive" data-sort-button aria-haspopup="listbox" aria-expanded="false" aria-label="{{ 'collections.sorting.title' | t }}">
-              <span class="bt-sort__label">
-                <span class="bt-sort__label-prefix">{{ 'collections.sorting.title' | t }}:</span>
-                <span class="bt-sort__label-value" data-sort-current>
-                  {%- liquid
-                    assign current_sort = collection.sort_by | default: collection.default_sort_by
-                    assign current_sort_name = current_sort
-                    for opt in collection.sort_options
-                      if opt.value == current_sort
-                        assign current_sort_name = opt.name
-                      endif
-                    endfor
-                  -%}
-                  {{ current_sort_name }}
-                </span>
-              </span>
-              <svg class="bt-sort__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="bt-sort__menu" data-sort-menu role="listbox" aria-label="{{ 'collections.sorting.title' | t }}" hidden>
-              {%- for option in collection.sort_options -%}
-                <a href="#" class="bt-sort__option{% if option.value == current_sort %} is-selected{% endif %}" role="option" {% if option.value == current_sort %}aria-selected="true"{% endif %} data-sort-option data-sort-value="{{ option.value }}">
-                  <span>{{ option.name }}</span>
-                  <svg class="bt-sort__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                </a>
-              {%- endfor -%}
-            </div>
-          </div>
-        {%- endif -%}
+        <p class="bt-collection-grid__count">
+          <strong class="bt-collection-grid__count-number">{{ collection.products_count }}</strong>
+          <span>{{ 'collections.collection.product_count' | t: count: collection.products_count | remove: collection.products_count | strip }}</span>
+          {%- if has_active_filters -%}
+            <span class="bt-collection-grid__filtered-badge">{{ active_filter_count }} {{ 'collections.filters.active' | t }}</span>
+          {%- endif -%}
+        </p>
       </div>
+
+      {%- if enable_sorting -%}
+        <div class="bt-sort" data-sort>
+          <button type="button" class="bt-sort__button bt-interactive" data-sort-button aria-haspopup="listbox" aria-expanded="false" aria-label="{{ 'collections.sorting.title' | t }}">
+            <span class="bt-sort__label">
+              <span class="bt-sort__label-prefix">{{ 'collections.sorting.title' | t }}:</span>
+              <span class="bt-sort__label-value" data-sort-current>
+                {%- liquid
+                  assign current_sort = collection.sort_by | default: collection.default_sort_by
+                  assign current_sort_name = current_sort
+                  for opt in collection.sort_options
+                    if opt.value == current_sort
+                      assign current_sort_name = opt.name
+                    endif
+                  endfor
+                -%}
+                {{ current_sort_name }}
+              </span>
+            </span>
+            <svg class="bt-sort__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="bt-sort__menu" data-sort-menu role="listbox" aria-label="{{ 'collections.sorting.title' | t }}" hidden>
+            {%- for option in collection.sort_options -%}
+              <a href="#" class="bt-sort__option{% if option.value == current_sort %} is-selected{% endif %}" role="option" {% if option.value == current_sort %}aria-selected="true"{% endif %} data-sort-option data-sort-value="{{ option.value }}">
+                <span>{{ option.name }}</span>
+                <svg class="bt-sort__check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
     </div>
+
+    {% comment %} ══════════════ ACTIVE FILTER CHIPS — one removable chip per applied value ══════════════ {% endcomment %}
+    {%- if has_active_filters -%}
+      <div class="bt-active-filters" role="list" aria-label="{{ 'accessibility.filters_active' | t }}">
+        {%- for filter in collection.filters -%}
+          {%- for value in filter.active_values -%}
+            <a class="bt-active-filters__chip bt-interactive bt-press" role="listitem" href="{{ value.url_to_remove | escape }}" aria-label="{{ 'accessibility.remove_filter' | t: label: value.label }}">
+              <span class="bt-active-filters__chip-label">{{ filter.label }}: {{ value.label }}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+            </a>
+          {%- endfor -%}
+          {%- if filter.type == 'price_range' and filter.min_value.value or filter.type == 'price_range' and filter.max_value.value -%}
+            {%- liquid
+              assign chip_price_lo = filter.min_value.value | money
+              assign chip_price_hi = filter.max_value.value | money
+            -%}
+            <a class="bt-active-filters__chip bt-active-filters__chip--gold bt-interactive bt-press" role="listitem" href="{{ filter.url_to_remove | escape }}" aria-label="{{ 'accessibility.remove_filter' | t: label: filter.label }}">
+              <span class="bt-active-filters__chip-label">
+                {{ filter.label }}:
+                {%- if filter.min_value.value and filter.max_value.value -%}
+                  {{ 'collections.filters.price_between_html' | t: lo: chip_price_lo, hi: chip_price_hi }}
+                {%- elsif filter.min_value.value -%}
+                  {{ 'collections.filters.price_over_html' | t: amount: chip_price_lo }}
+                {%- else -%}
+                  {{ 'collections.filters.price_under_html' | t: amount: chip_price_hi }}
+                {%- endif -%}
+              </span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+        <a href="{{ collection.url }}?sort_by={{ collection.sort_by | default: collection.default_sort_by }}" class="bt-active-filters__clear bt-interactive bt-press">
+          {{ 'collections.filters.clear_all' | t }}
+        </a>
+      </div>
+    {%- endif -%}
 
     {% comment %} ══════════════ MAIN LAYOUT ══════════════ {% endcomment %}
     <div class="bt-collection-grid__layout">
@@ -105,7 +143,22 @@
           </div>
 
           {%- for filter in collection.filters -%}
-            <details class="bt-filter-group" {% if filter.active_values.size > 0 or filter.type == 'price_range' and has_active_filters %}open{% endif %} data-filter-group>
+            {%- liquid
+              assign group_open = false
+              if forloop.index <= 2 or filter.active_values.size > 0
+                assign group_open = true
+              endif
+              if filter.type == 'price_range'
+                if filter.min_value.value or filter.max_value.value
+                  assign group_open = true
+                endif
+              endif
+              assign is_availability = false
+              if filter.type == 'boolean' and filter.values.first.param_name contains 'availability'
+                assign is_availability = true
+              endif
+            -%}
+            <details class="bt-filter-group" {% if group_open %}open{% endif %} data-filter-group>
               <summary class="bt-filter-group__summary bt-interactive">
                 <span>{{ filter.label }}</span>
                 <span class="bt-filter-group__summary-right">
@@ -118,7 +171,7 @@
                   {%- case filter.type -%}
                     {%- when 'boolean' or 'list' -%}
                       {%- for value in filter.values -%}
-                        <label class="bt-filter-checkbox bt-interactive{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                        <label class="bt-filter-checkbox bt-interactive{% if is_availability %} bt-filter-checkbox--switch{% endif %}{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
                           <input
                             type="checkbox"
                             name="{{ value.param_name }}"
@@ -190,6 +243,13 @@
           {%- endfor -%}
 
           {% content_for "blocks" %}
+
+          {% comment %} Mobile drawer footer — sticky "Show N results" bar {% endcomment %}
+          <div class="bt-collection-grid__sidebar-footer">
+            <button type="button" class="bt-btn bt-btn--primary bt-btn--block bt-interactive bt-press" data-filter-close>
+              {{ 'collections.filters.show_results' | t: count: collection.products_count }}
+            </button>
+          </div>
         </aside>
       {%- endif -%}
 
@@ -209,14 +269,29 @@
             </div>
           {%- else -%}
             <div class="bt-collection-grid__empty">
-              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--bt-color-border-medium)" stroke-width="1" aria-hidden="true"><path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12Z" opacity="0.4"/><circle cx="8" cy="9" r="1" fill="var(--bt-color-border-medium)"/><circle cx="16" cy="9" r="1" fill="var(--bt-color-border-medium)"/><path d="M8 14c.8 1.2 2.4 2 4 2s3.2-.8 4-2" stroke="var(--bt-color-border-medium)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--bt-color-secondary)" stroke-width="1" aria-hidden="true"><path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12Z" opacity="0.4"/><circle cx="8" cy="9" r="1" fill="var(--bt-color-secondary)"/><circle cx="16" cy="9" r="1" fill="var(--bt-color-secondary)"/><path d="M8 14c.8 1.2 2.4 2 4 2s3.2-.8 4-2" stroke="var(--bt-color-secondary)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <h2 class="bt-collection-grid__empty-title">{{ 'collections.general.empty_title' | t }}</h2>
               <p class="bt-collection-grid__empty-text">{{ 'collections.general.no_matches' | t }}</p>
-              <a href="{{ collection.url }}" class="bt-btn bt-btn--outline bt-interactive bt-press">{{ 'collections.filters.clear_all' | t }}</a>
+              <a href="{{ collection.url }}" class="bt-btn bt-btn--gold bt-interactive bt-press">{{ 'collections.filters.clear_all' | t }}</a>
             </div>
           {%- endif -%}
 
           {%- if paginate.pages > 1 -%}
-            <div class="bt-collection-grid__pagination">{% render 'pagination', paginate: paginate %}</div>
+            {%- liquid
+              assign shown_count = paginate.current_offset | plus: collection.products.size
+              assign progress_pct = shown_count | times: 100.0 | divided_by: paginate.items | round
+            -%}
+            <div class="bt-collection-grid__loadmore" data-loadmore data-section-id="{{ section.id }}" data-next-page="{{ paginate.current_page | plus: 1 }}">
+              <button type="button" class="bt-btn bt-btn--outline bt-btn--lg bt-collection-grid__loadmore-btn bt-interactive bt-press" data-loadmore-btn hidden>
+                {{ 'collections.general.load_more' | t }}
+              </button>
+              <p class="bt-collection-grid__showing">{{ 'collections.general.showing' | t: shown: shown_count, total: paginate.items }}</p>
+              <div class="bt-collection-grid__progress" aria-hidden="true">
+                <span class="bt-collection-grid__progress-bar" style="width: {{ progress_pct }}%"></span>
+              </div>
+            </div>
+            {% comment %} No-JS fallback: numbered pagination (hidden by JS when Load more activates) {% endcomment %}
+            <div class="bt-collection-grid__pagination" data-pagination>{% render 'pagination', paginate: paginate %}</div>
           {%- endif -%}
         {%- endpaginate -%}
       </div>
@@ -444,6 +519,68 @@
     }
 
     /* ════════════════════════════════════════════
+       LOAD MORE — Section Rendering API append.
+       Fetches ?page=N&section_id=…, appends the new cards, and swaps the
+       load-more block for the freshly rendered one (server already computed
+       the next page number, "Showing X of N" text and progress width).
+       Numbered pagination stays as the no-JS fallback.
+       ════════════════════════════════════════════ */
+    function initLoadMore() {
+      document.querySelectorAll('[data-loadmore]').forEach(function (wrap) {
+        if (wrap._btLoadmoreInit) return; wrap._btLoadmoreInit = true;
+        var btn = wrap.querySelector('[data-loadmore-btn]');
+        if (!btn) return;
+        var main = wrap.closest('.bt-collection-grid__main');
+        var pagination = main ? main.querySelector('[data-pagination]') : null;
+        /* JS is available: reveal Load more, hide numbered pagination */
+        btn.hidden = false;
+        if (pagination) pagination.hidden = true;
+        btn.addEventListener('click', function () {
+          if (btn.disabled) return;
+          var nextPage = wrap.getAttribute('data-next-page');
+          var sectionId = wrap.getAttribute('data-section-id');
+          var url = new URL(window.location.href);
+          url.searchParams.delete('page');
+          url.searchParams.set('page', nextPage);
+          url.searchParams.set('section_id', sectionId);
+          btn.disabled = true;
+          btn.classList.add('bt-btn--loading');
+          fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+            .then(function (html) {
+              var doc = new DOMParser().parseFromString(html, 'text/html');
+              var grid = main.querySelector('.bt-grid');
+              var newItems = doc.querySelectorAll('.bt-collection-grid .bt-grid > *');
+              if (grid && newItems.length) {
+                newItems.forEach(function (item) {
+                  item.classList.add('bt-loadmore-item');
+                  grid.appendChild(item);
+                });
+              }
+              var newWrap = doc.querySelector('[data-loadmore]');
+              var newPagination = doc.querySelector('[data-pagination]');
+              if (newWrap) {
+                wrap.replaceWith(newWrap);
+                if (pagination && newPagination) pagination.replaceWith(newPagination);
+                initLoadMore();
+              } else {
+                /* That was the last page — drop the block entirely */
+                wrap.remove();
+                if (pagination) pagination.remove();
+              }
+            })
+            .catch(function () {
+              /* graceful fallback: plain navigation to the target page */
+              var fallback = new URL(window.location.href);
+              fallback.searchParams.delete('page');
+              fallback.searchParams.set('page', nextPage);
+              window.location.href = fallback.toString();
+            });
+        });
+      });
+    }
+
+    /* ════════════════════════════════════════════
        AJAX NAVIGATION DELEGATION
        Intercept clicks on links + checkbox changes
        inside the collection grid → ajaxNavigate.
@@ -462,6 +599,8 @@
         if (link.hasAttribute('data-sort-value')) return;
         /* skip product links — navigate normally to PDP */
         if (href.indexOf('/products/') !== -1) return;
+        /* skip pagination links when Load more is active (hidden anyway) */
+        if (link.closest('[data-pagination]') && link.closest('[data-pagination]').hidden) return;
         e.preventDefault();
         ajaxNavigate(href);
       });
@@ -518,7 +657,8 @@
     }
 
     /* ════════════════════════════════════════════
-       MOBILE SIDEBAR
+       FILTER TOGGLE — desktop collapses the sidebar,
+       mobile opens the slide-in drawer.
        ════════════════════════════════════════════ */
     var mobileSidebarBound = false;
     function initMobileSidebar() {
@@ -529,16 +669,30 @@
         filterToggle._btMobileInit = true;
         filterToggle.addEventListener('click', function () {
           var sb = document.querySelector('[data-sidebar]');
-          if (!sb) return;
-          sb.classList.toggle('is-open');
-          document.body.classList.toggle('bt-filter-open');
+          var grid = document.querySelector('.bt-collection-grid');
+          if (!sb || !grid) return;
+          if (window.matchMedia('(min-width: 990px)').matches) {
+            /* Desktop: collapse/expand the sidebar column */
+            var collapsed = grid.classList.toggle('is-sidebar-collapsed');
+            filterToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+          } else {
+            /* Mobile: slide-in drawer */
+            sb.classList.toggle('is-open');
+            document.body.classList.toggle('bt-filter-open');
+          }
         });
       }
-      /* Outside-click closes the drawer: document listener registered once
+      /* Drawer footer + outside-click close: document listener registered once
          (guarded), elements re-resolved at event time so the single handler
          keeps working across AJAX grid rebuilds without stacking. */
       if (mobileSidebarBound) return; mobileSidebarBound = true;
       document.addEventListener('click', function (e) {
+        if (e.target.closest('[data-filter-close]')) {
+          var sb = document.querySelector('[data-sidebar]');
+          if (sb) sb.classList.remove('is-open');
+          document.body.classList.remove('bt-filter-open');
+          return;
+        }
         if (!document.body.classList.contains('bt-filter-open')) return;
         var sb = document.querySelector('[data-sidebar]');
         var tg = document.querySelector('[data-filter-toggle]');
@@ -557,6 +711,7 @@
       initPopovers();
       initDetails();
       initMobileSidebar();
+      initLoadMore();
     }
 
     initAll();
@@ -566,23 +721,45 @@
 
 {% stylesheet %}
   /* ════════════════════════════════════════════
-     TOOLBAR
+     STICKY TOOLBAR
      ════════════════════════════════════════════ */
   .bt-collection-grid__toolbar {
+    position: sticky;
+    top: 80px; /* clear the fixed header */
+    z-index: 30;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--bt-space-md);
-    margin-bottom: var(--bt-space-md);
-    padding-bottom: var(--bt-space-sm);
+    margin-bottom: var(--bt-space-sm);
+    padding-block: var(--bt-space-2xs);
+    background: rgba(var(--bt-color-bg-rgb), 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--bt-color-border-light);
   }
-  .bt-collection-grid__count {
-    font-size: var(--bt-fs-body-sm);
-    color: var(--bt-color-text-muted);
+  .bt-collection-grid__toolbar-left {
     display: flex;
     align-items: center;
-    gap: var(--bt-space-2xs);
+    gap: var(--bt-space-sm);
+    min-width: 0;
+  }
+  /* Prominent count: strong number + muted unit */
+  .bt-collection-grid__count {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35em;
+    margin: 0;
+    font-size: var(--bt-fs-body-sm);
+    color: var(--bt-color-text-muted);
+    white-space: nowrap;
+  }
+  .bt-collection-grid__count-number {
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body-lg);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    font-variant-numeric: oldstyle-nums;
   }
   .bt-collection-grid__filtered-badge {
     display: inline-flex;
@@ -594,13 +771,10 @@
     font-size: var(--bt-fs-body-xs);
     font-weight: var(--bt-fw-semibold);
   }
-  .bt-collection-grid__toolbar-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--bt-space-sm);
-  }
+  /* Filter toggle — soft pill, visible on all viewports
+     (desktop: collapses sidebar / mobile: opens drawer) */
   .bt-collection-grid__filter-trigger {
-    display: none;
+    display: inline-flex;
     align-items: center;
     gap: var(--bt-space-2xs);
     padding: 0.5em 1em;
@@ -619,6 +793,14 @@
     background: var(--bt-color-primary-tint);
     color: var(--bt-color-primary);
   }
+  .bt-collection-grid__filter-trigger[aria-expanded="false"] {
+    background: transparent;
+    color: var(--bt-color-text-muted);
+  }
+  .bt-collection-grid__filter-trigger[aria-expanded="false"]:hover {
+    background: var(--bt-color-primary-tint);
+    color: var(--bt-color-primary);
+  }
   .bt-collection-grid__filter-count {
     display: inline-flex;
     align-items: center;
@@ -631,6 +813,59 @@
     border-radius: var(--bt-radius-pill);
     font-size: 0.65rem;
     font-weight: var(--bt-fw-bold);
+  }
+
+  /* ════════════════════════════════════════════
+     ACTIVE FILTER CHIPS
+     ════════════════════════════════════════════ */
+  .bt-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    margin-bottom: var(--bt-space-md);
+  }
+  .bt-active-filters__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--bt-color-primary-tint);
+    color: var(--bt-color-primary);
+    border-radius: var(--bt-radius-pill);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    text-decoration: none;
+    transition: background var(--bt-duration-fast) var(--bt-ease-out),
+                color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-active-filters__chip svg { flex-shrink: 0; opacity: 0.7; }
+  .bt-active-filters__chip:hover {
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+  }
+  .bt-active-filters__chip--gold {
+    background: var(--bt-color-secondary-tint);
+    color: var(--bt-color-secondary);
+  }
+  .bt-active-filters__chip--gold:hover {
+    background: var(--bt-color-secondary);
+    color: var(--bt-color-primary-contrast);
+  }
+  .bt-active-filters__clear {
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bt-color-secondary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--bt-color-secondary-tint);
+    padding: 4px 6px;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-active-filters__clear:hover {
+    color: var(--bt-color-primary);
   }
 
   /* ════════════════════════════════════════════
@@ -754,15 +989,24 @@
     gap: var(--bt-space-xl);
     align-items: start;
     overflow-x: clip; /* prevent any horizontal scrollbar from child overflow */
+    transition: grid-template-columns var(--bt-duration-base) var(--bt-ease-out);
   }
   .bt-collection-grid__main { min-width: 0; }
+
+  /* Desktop sidebar collapse (toolbar filter toggle) */
+  .bt-collection-grid.is-sidebar-collapsed .bt-collection-grid__layout {
+    grid-template-columns: 1fr;
+  }
+  .bt-collection-grid.is-sidebar-collapsed .bt-collection-grid__sidebar {
+    display: none;
+  }
 
   /* ════════════════════════════════════════════
      SIDEBAR
      ════════════════════════════════════════════ */
   .bt-collection-grid__sidebar {
     position: sticky;
-    top: calc(var(--bt-space-md) + 80px);
+    top: calc(var(--bt-space-md) + 120px); /* below sticky toolbar */
     /* No max-height/overflow — let popover menus overflow freely,
        and avoid a horizontal scrollbar inside the sidebar. */
     padding-right: 2px;
@@ -796,6 +1040,9 @@
     color: var(--bt-color-secondary);
     background: var(--bt-color-secondary-tint);
   }
+
+  /* Mobile drawer footer — hidden on desktop */
+  .bt-collection-grid__sidebar-footer { display: none; }
 
   /* ── Filter group (animated details) ── */
   .bt-filter-group {
@@ -866,7 +1113,7 @@
     padding-bottom: var(--bt-space-3xs);
   }
 
-  /* ── Filter checkbox ── */
+  /* ── Filter checkbox: rounded box, deep-green fill + white check ── */
   .bt-filter-checkbox {
     display: flex;
     align-items: center;
@@ -895,7 +1142,7 @@
     align-items: center;
     justify-content: center;
     border: 1.5px solid var(--bt-color-border-medium);
-    border-radius: 4px;
+    border-radius: var(--bt-radius-sm);
     flex-shrink: 0;
     background: var(--bt-color-bg);
     transition: all var(--bt-duration-fast) var(--bt-ease-out);
@@ -929,7 +1176,39 @@
     font-variant-numeric: oldstyle-nums;
   }
 
-  /* Price range — native from/to inputs, merchant-configurable via Search & Discovery */
+  /* ── Availability as a toggle switch ── */
+  .bt-filter-checkbox--switch .bt-filter-checkbox__indicator {
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border: none;
+    border-radius: var(--bt-radius-pill);
+    background: var(--bt-color-border-medium);
+  }
+  .bt-filter-checkbox--switch .bt-filter-checkbox__indicator svg { display: none; }
+  .bt-filter-checkbox--switch .bt-filter-checkbox__indicator::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bt-color-bg);
+    box-shadow: var(--bt-shadow-sm);
+    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-filter-checkbox--switch:hover .bt-filter-checkbox__indicator {
+    background: var(--bt-color-text-muted);
+  }
+  .bt-filter-checkbox--switch input:checked + .bt-filter-checkbox__indicator {
+    background: var(--bt-color-primary);
+  }
+  .bt-filter-checkbox--switch input:checked + .bt-filter-checkbox__indicator::after {
+    transform: translateX(14px);
+  }
+
+  /* Price range — soft-fill from/to inputs */
   .bt-price-range {
     display: flex;
     align-items: flex-end;
@@ -1002,23 +1281,67 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--bt-space-md);
+    gap: var(--bt-space-sm);
     padding-block: var(--bt-space-3xl);
     text-align: center;
     animation: bt-reveal-fade var(--bt-duration-base) var(--bt-ease-out);
   }
+  .bt-collection-grid__empty-title {
+    margin: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+  }
   .bt-collection-grid__empty-text {
+    margin: 0 0 var(--bt-space-sm);
     color: var(--bt-color-text-muted);
     font-size: var(--bt-fs-body);
+    max-width: 42ch;
   }
 
   /* ════════════════════════════════════════════
-     PAGINATION
+     LOAD MORE + numbered-pagination fallback
      ════════════════════════════════════════════ */
+  .bt-collection-grid__loadmore {
+    margin-top: var(--bt-space-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--bt-space-xs);
+  }
+  .bt-collection-grid__showing {
+    margin: 0;
+    font-size: var(--bt-fs-body-xs);
+    color: var(--bt-color-text-muted);
+    letter-spacing: 0.02em;
+    font-variant-numeric: oldstyle-nums;
+  }
+  /* Gold progress hairline under the count */
+  .bt-collection-grid__progress {
+    width: min(220px, 60%);
+    height: 2px;
+    border-radius: var(--bt-radius-pill);
+    background: var(--bt-color-border-light);
+    overflow: hidden;
+  }
+  .bt-collection-grid__progress-bar {
+    display: block;
+    height: 100%;
+    background: var(--bt-color-secondary);
+    border-radius: inherit;
+    transition: width var(--bt-duration-slow, 400ms) var(--bt-ease-out);
+  }
   .bt-collection-grid__pagination {
     margin-top: var(--bt-space-xl);
     display: flex;
     justify-content: center;
+  }
+  .bt-collection-grid__pagination[hidden] { display: none; }
+
+  /* Appended cards fade up like the AJAX reveal */
+  .bt-loadmore-item {
+    animation: bt-ajax-card 380ms var(--bt-ease-out) both;
   }
 
   /* ════════════════════════════════════════════
@@ -1035,6 +1358,7 @@
       max-height: none;
       width: min(340px, 88vw);
       height: 100vh;
+      height: 100dvh;
       z-index: 100;
       background: var(--bt-color-bg);
       padding: var(--bt-space-lg) var(--bt-space-md) var(--bt-space-md);
@@ -1047,8 +1371,15 @@
     .bt-collection-grid__sidebar.is-open {
       transform: translateX(0);
     }
-    .bt-collection-grid__filter-trigger {
-      display: inline-flex;
+    /* Sticky "Show N results" bar pinned to the drawer bottom */
+    .bt-collection-grid__sidebar-footer {
+      display: block;
+      position: sticky;
+      bottom: calc(-1 * var(--bt-space-md));
+      margin: var(--bt-space-md) calc(-1 * var(--bt-space-md)) calc(-1 * var(--bt-space-md));
+      padding: var(--bt-space-sm) var(--bt-space-md);
+      background: var(--bt-color-bg);
+      border-top: 1px solid var(--bt-color-border-light);
     }
     body.bt-filter-open::before {
       content: '';
@@ -1061,15 +1392,13 @@
 
   @media (max-width: 749px) {
     .bt-collection-grid__toolbar {
-      flex-wrap: wrap;
+      top: 64px;
       gap: var(--bt-space-xs);
     }
-    .bt-collection-grid__toolbar-actions {
-      width: 100%;
+    .bt-collection-grid__toolbar-left {
+      flex: 1;
       justify-content: space-between;
     }
-    /* sort menu positioning handled by JS portal on all viewports */
-
     /* Mobile product grid: fixed two-up with tightened gutters. */
     .bt-collection-grid .bt-grid {
       gap: var(--bt-space-xs);
@@ -1086,7 +1415,6 @@
     }
   }
 
-  /* Reduced motion: disable animations */
   /* ════════════════════════════════════════════
      AJAX TRANSITIONS — fade-out, then fade-up reveal.
      No screen flash: the grid stays in place, only its
@@ -1147,13 +1475,15 @@
     .bt-filter-group__content,
     .bt-filter-group__chevron,
     .bt-sort__chevron,
-    .bt-collection-grid__sidebar {
+    .bt-collection-grid__sidebar,
+    .bt-collection-grid__progress-bar {
       transition: none !important;
     }
     .bt-collection-grid__empty { animation: none; }
     body.bt-ajax-loading .bt-collection-grid__main::after { animation: none; }
     .bt-collection-grid.bt-ajax-in .bt-collection-grid__main,
-    .bt-collection-grid.bt-ajax-in .bt-grid > * { animation: none !important; }
+    .bt-collection-grid.bt-ajax-in .bt-grid > *,
+    .bt-loadmore-item { animation: none !important; }
     .bt-collection-grid.bt-ajax-out .bt-collection-grid__main { filter: none; transition: none; }
   }
 {% endstylesheet %}

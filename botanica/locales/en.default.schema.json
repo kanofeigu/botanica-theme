@@ -656,6 +656,13 @@
         "show_image": {
           "label": "Show collection image"
         },
+        "image_style": {
+          "label": "Image style",
+          "options": {
+            "compact": "Compact plate",
+            "full": "Full plate"
+          }
+        },
         "show_description": {
           "label": "Show collection description"
         },
