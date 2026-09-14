@@ -20,6 +20,17 @@ class BtProductGallery extends HTMLElement {
     if(this.nextArrow)this.nextArrow.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();this.stepSlide(1)});
     this.reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    /* Warm up lazy slide images while idle: hidden (display:none) slides
+       never lazy-load, so the first switch would flash a blank plate. */
+    const warm=()=>{
+      this.slides.forEach(s=>{
+        const img=s.querySelector('img[loading="lazy"]');
+        if(img)img.loading='eager';
+      });
+    };
+    if('requestIdleCallback' in window)requestIdleCallback(warm,{timeout:2500});
+    else setTimeout(warm,1800);
+
     /* 3D model support — Shopify platform loader (model-viewer-ui). */
     if(this.main.querySelector('[data-media-type="model"]')&&window.Shopify&&typeof window.Shopify.loadFeatures==='function'){
       window.Shopify.loadFeatures([{name:'model-viewer-ui',version:'1.0'}]);
