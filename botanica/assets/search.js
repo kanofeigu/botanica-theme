@@ -71,10 +71,15 @@ class BtPredictiveSearch extends HTMLElement {
       const title=this.esc(p.title);
       const img=p.featured_image?(typeof p.featured_image==='string'?p.featured_image:(p.featured_image.url||'')):'';
       const price=this.formatPrice(p.price);
-      return '<li class="bt-predictive-item"><a href="'+this.esc(p.url)+'">'
+      return '<li class="bt-predictive-item bt-predictive-item--enter"><a href="'+this.esc(p.url)+'">'
         +(img?'<img src="'+this.esc(img)+'" alt="'+title+'" loading="lazy" width="48" height="48">':'')
         +'<div><span>'+title+'</span>'+(price?'<span>'+price+'</span>':'')+'</div></a></li>';
     }).join('');
+    /* Staggered fade-rise entrance (same motion language as the PLP grid);
+     * CSS kills the animation entirely under prefers-reduced-motion. */
+    Array.prototype.forEach.call(this.results.querySelectorAll('.bt-predictive-item--enter'),(li,i)=>{
+      li.style.animationDelay=(i*45)+'ms';
+    });
     this.results.hidden=false;
   }
 }

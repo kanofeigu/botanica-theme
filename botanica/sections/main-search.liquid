@@ -92,6 +92,42 @@
               </button>
             {%- endif -%}
           </div>
+
+          {% comment %} Active filter chips — same visual language as the PLP {% endcomment %}
+          {%- if show_filters and has_active_filters -%}
+            <div class="bt-active-filters" role="list" aria-label="{{ 'accessibility.filters_active' | t }}">
+              {%- for filter in search.filters -%}
+                {%- for value in filter.active_values -%}
+                  <a class="bt-active-filters__chip bt-interactive bt-press" role="listitem" href="{{ value.url_to_remove | escape }}" aria-label="{{ 'accessibility.remove_filter' | t: label: value.label }}">
+                    <span class="bt-active-filters__chip-label">{{ filter.label }}: {{ value.label }}</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+                  </a>
+                {%- endfor -%}
+                {%- if filter.type == 'price_range' and filter.min_value.value or filter.type == 'price_range' and filter.max_value.value -%}
+                  {%- liquid
+                    assign search_chip_lo = filter.min_value.value | money
+                    assign search_chip_hi = filter.max_value.value | money
+                  -%}
+                  <a class="bt-active-filters__chip bt-active-filters__chip--gold bt-interactive bt-press" role="listitem" href="{{ filter.url_to_remove | escape }}" aria-label="{{ 'accessibility.remove_filter' | t: label: filter.label }}">
+                    <span class="bt-active-filters__chip-label">
+                      {{ filter.label }}:
+                      {%- if filter.min_value.value and filter.max_value.value -%}
+                        {{ 'collections.filters.price_between_html' | t: lo: search_chip_lo, hi: search_chip_hi }}
+                      {%- elsif filter.min_value.value -%}
+                        {{ 'collections.filters.price_over_html' | t: amount: search_chip_lo }}
+                      {%- else -%}
+                        {{ 'collections.filters.price_under_html' | t: amount: search_chip_hi }}
+                      {%- endif -%}
+                    </span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+                  </a>
+                {%- endif -%}
+              {%- endfor -%}
+              <a href="{{ routes.search_url }}?q={{ search.terms | url_encode }}&type={{ current_scope }}" class="bt-active-filters__clear bt-interactive bt-press">
+                {{ 'collections.filters.clear_all' | t }}
+              </a>
+            </div>
+          {%- endif -%}
           {%- if search.results.size > 0 -%}
             <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
               {%- for item in search.results -%}
@@ -119,7 +155,23 @@
               <div class="bt-search__pagination">{% render 'pagination', paginate: paginate %}</div>
             {%- endif -%}
           {%- else -%}
-            <p class="bt-text-center">{{ 'general.search.no_results' | t }}</p>
+            <div class="bt-search__empty">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--bt-color-secondary)" stroke-width="1" aria-hidden="true"><path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12Z" opacity="0.4"/><path d="M12 6v12" stroke-linecap="round" opacity="0.4"/></svg>
+              <h2 class="bt-search__empty-title">{{ 'general.search.no_results_title' | t }}</h2>
+              <p class="bt-search__empty-text">{{ 'general.search.no_results' | t: terms: search.terms }}</p>
+            </div>
+            {%- comment %} No-results fallback: surface popular products so the
+              journey never dead-ends (Baymard: always offer a path forward). {%- endcomment %}
+            {%- if collections.all.products.size > 0 -%}
+              <div class="bt-search__reco">
+                <h3 class="bt-search__reco-title">{{ 'general.search.recommended_title' | t }}</h3>
+                <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
+                  {%- for product in collections.all.products limit: 4 -%}
+                    {% render 'card-product', product: product, show_secondary_image: false, image_ratio: settings.card_image_aspect_ratio, show_sale_badge: settings.show_sale_badge, show_sold_out_badge: settings.show_sold_out_badge, show_care_badge: settings.show_care_badge, show_light_badge: settings.show_light_badge, specimen_frame: section.settings.enable_specimen_frame %}
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endif -%}
           {%- endif -%}
         </div>
       </div>
@@ -448,6 +500,87 @@
   }
 
   .bt-search__pagination { margin-top: var(--bt-space-xl); display: flex; justify-content: center; }
+
+  /* ── Active filter chips (same language as the PLP chips row) ── */
+  .bt-search .bt-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--bt-space-2xs);
+    margin-bottom: var(--bt-space-md);
+  }
+  .bt-search .bt-active-filters__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--bt-color-primary-tint);
+    color: var(--bt-color-primary);
+    border-radius: var(--bt-radius-pill);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    text-decoration: none;
+    transition: background var(--bt-duration-fast) var(--bt-ease-out),
+                color var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-search .bt-active-filters__chip svg { flex-shrink: 0; opacity: 0.7; }
+  .bt-search .bt-active-filters__chip:hover {
+    background: var(--bt-color-primary);
+    color: var(--bt-color-primary-contrast);
+  }
+  .bt-search .bt-active-filters__chip--gold {
+    background: var(--bt-color-secondary-tint);
+    color: var(--bt-color-secondary);
+  }
+  .bt-search .bt-active-filters__chip--gold:hover {
+    background: var(--bt-color-secondary);
+    color: var(--bt-color-primary-contrast);
+  }
+  .bt-search .bt-active-filters__clear {
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bt-color-secondary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--bt-color-secondary-tint);
+    padding: 4px 6px;
+    transition: color var(--bt-duration-fast);
+  }
+  .bt-search .bt-active-filters__clear:hover { color: var(--bt-color-primary); }
+
+  /* ── Empty state + recommendations ── */
+  .bt-search__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--bt-space-sm);
+    padding-block: var(--bt-space-2xl) var(--bt-space-xl);
+    text-align: center;
+  }
+  .bt-search__empty-title {
+    margin: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h2);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+  }
+  .bt-search__empty-text {
+    margin: 0;
+    max-width: 48ch;
+    color: var(--bt-color-text-muted);
+    font-size: var(--bt-fs-body);
+  }
+  .bt-search__reco { padding-bottom: var(--bt-space-xl); }
+  .bt-search__reco-title {
+    margin: 0 0 var(--bt-space-md);
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h3);
+    font-weight: var(--bt-fw-normal);
+    color: var(--bt-color-text);
+    text-align: center;
+  }
 
   @media (max-width: 989px) {
     .bt-search__layout--filters { grid-template-columns: 1fr; }

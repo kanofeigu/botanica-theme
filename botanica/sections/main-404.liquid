@@ -1,14 +1,147 @@
-{% comment %} main-404.liquid — Original 404 page. Zero Dawn code. {% endcomment %}
+{% comment %} main-404.liquid — Botanical creative empty state: gold line-art
+  leaf, Cormorant display heading, quick exits to popular collections
+  (image cards with glass labels), gentle staggered entrance. Zero Dawn code. {% endcomment %}
 <div class="bt-section bt-404 bt-text-center color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
-  <div class="bt-container">
-    <h1 class="bt-h1">{{ 'general.404.title' | t }}</h1>
-    <p style="margin-block: var(--bt-space-sm) var(--bt-space-lg); color: var(--bt-color-text-muted);">{{ 'general.404.subtext' | t }}</p>
-    <a href="{{ routes.root_url }}" class="bt-btn bt-btn--primary">{{ 'general.404.link' | t }}</a>
+  <div class="bt-container bt-404__inner">
+    <svg class="bt-404__leaf bt-404__anim" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="var(--bt-color-secondary)" stroke-width="1" aria-hidden="true">
+      <path d="M12 2C8 6 4 10 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-4-4-8-8-12Z" opacity="0.5"/>
+      <path d="M12 6v13M12 10l-3-2M12 13l3-2.5" stroke-linecap="round" opacity="0.5"/>
+    </svg>
+    <h1 class="bt-404__title bt-404__anim">{{ 'general.404.title' | t }}</h1>
+    <p class="bt-404__subtext bt-404__anim">{{ 'general.404.subtext' | t }}</p>
+    <div class="bt-404__actions bt-404__anim">
+      <a href="{{ routes.root_url }}" class="bt-btn bt-btn--primary bt-interactive bt-press">{{ 'general.404.link' | t }}</a>
+      <a href="{{ routes.search_url }}" class="bt-btn bt-btn--outline bt-interactive bt-press">{{ 'general.search.search' | t }}</a>
+    </div>
+
+    {%- comment %} Quick exits: first 3 collections that have an image {% endcomment %}
+    {%- assign shown = 0 -%}
+    {%- capture collection_cards -%}
+      {%- for collection in collections -%}
+        {%- if collection.image and shown < 3 -%}
+          {%- assign shown = shown | plus: 1 -%}
+          <a href="{{ collection.url }}" class="bt-404__card bt-interactive">
+            {{ collection.image | image_url: width: 480 | image_tag: loading: 'lazy', widths: '240, 360, 480', sizes: '(min-width: 750px) 220px, 30vw', alt: collection.title, class: 'bt-404__card-image' }}
+            <span class="bt-404__card-label">{{ collection.title }}</span>
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if shown > 0 -%}
+      <div class="bt-404__collections bt-404__anim">
+        <h2 class="bt-404__collections-title">{{ 'general.404.collections_title' | t }}</h2>
+        <div class="bt-404__cards">{{ collection_cards }}</div>
+      </div>
+    {%- endif -%}
   </div>
 </div>
 
 {% stylesheet %}
   .bt-404 { padding-block: var(--bt-space-2xl); }
+  .bt-404__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .bt-404__leaf { margin-bottom: var(--bt-space-sm); }
+  .bt-404__title {
+    margin: 0;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-display);
+    font-weight: var(--bt-fw-normal);
+    line-height: 1.1;
+    color: var(--bt-color-text);
+  }
+  .bt-404__subtext {
+    margin-block: var(--bt-space-sm) var(--bt-space-md);
+    max-width: 46ch;
+    color: var(--bt-color-text-muted);
+    font-size: var(--bt-fs-body);
+  }
+  .bt-404__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--bt-space-xs);
+  }
+
+  /* ── Popular collections quick exits ── */
+  .bt-404__collections {
+    margin-top: var(--bt-space-2xl);
+    width: 100%;
+  }
+  .bt-404__collections-title {
+    margin: 0 0 var(--bt-space-md);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--bt-color-text-muted);
+    font-family: var(--bt-font-body);
+  }
+  .bt-404__cards {
+    display: flex;
+    justify-content: center;
+    gap: var(--bt-space-sm);
+    flex-wrap: wrap;
+  }
+  .bt-404__card {
+    position: relative;
+    width: 200px;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--bt-radius-card);
+    overflow: hidden;
+    box-shadow: var(--bt-shadow-md);
+    text-decoration: none;
+    transition: transform var(--bt-duration-base) var(--bt-ease-out),
+                box-shadow var(--bt-duration-base) var(--bt-ease-out);
+  }
+  .bt-404__card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--bt-shadow-lg);
+  }
+  .bt-404__card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bt-404__card-label {
+    position: absolute;
+    left: var(--bt-space-xs);
+    bottom: var(--bt-space-xs);
+    padding: 4px 12px;
+    background: rgba(var(--bt-color-bg-rgb), 0.85);
+    backdrop-filter: blur(3px);
+    border-radius: var(--bt-radius-tag);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--bt-color-text);
+  }
+
+  /* ── Staggered entrance (page load) — fade + rise, transform/opacity only ── */
+  .bt-404__anim {
+    animation: bt-404-in 480ms var(--bt-ease-out) both;
+  }
+  .bt-404__anim:nth-child(1) { animation-delay: 0ms; }
+  .bt-404__anim:nth-child(2) { animation-delay: 80ms; }
+  .bt-404__anim:nth-child(3) { animation-delay: 160ms; }
+  .bt-404__anim:nth-child(4) { animation-delay: 240ms; }
+  .bt-404__anim:nth-child(5) { animation-delay: 320ms; }
+  @keyframes bt-404-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 749px) {
+    .bt-404__title { font-size: var(--bt-fs-h1); }
+    .bt-404__card { width: min(160px, 42vw); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bt-404__anim { animation: none; }
+    .bt-404__card { transition: none; }
+  }
 {% endstylesheet %}
 
 {% schema %}

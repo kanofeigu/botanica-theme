@@ -24,9 +24,10 @@
   "general": {
     "meta_description_fallback": "Curated indoor plants with expert care guides — easy-care, pet-safe and statement plants shipped with a happy-plant guarantee.",
     "404": {
-      "title": "Page not found",
-      "subtext": "We couldn't find the page you were looking for.",
-      "link": "Back to homepage"
+      "title": "This page hasn't sprouted yet",
+      "subtext": "The link you followed may have been pruned, or the page never took root. Let's get you back to the greenhouse.",
+      "link": "Back to homepage",
+      "collections_title": "Popular collections"
     },
     "password_page": {
       "login_form_heading": "Enter store using password:",
@@ -76,6 +77,8 @@
       "placeholder": "Search our store",
       "reset": "Clear search term",
       "no_results": "No results found. Try a different search term.",
+      "no_results_title": "Nothing sprouted for that search",
+      "recommended_title": "Popular right now",
       "results_with_count": {
         "one": "{{ count }} result for \"{{ terms }}\"",
         "other": "{{ count }} results for \"{{ terms }}\""
