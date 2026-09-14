@@ -530,13 +530,13 @@
     function initLoadMore() {
       document.querySelectorAll('[data-loadmore]').forEach(function (wrap) {
         if (wrap._btLoadmoreInit) return; wrap._btLoadmoreInit = true;
-        var btn = wrap.querySelector('[data-loadmore-btn]');
-        if (!btn) return;
         var main = wrap.closest('.bt-collection-grid__main');
         var pagination = main ? main.querySelector('[data-pagination]') : null;
-        /* JS is available: reveal Load more, hide numbered pagination */
-        btn.hidden = false;
+        /* JS is available: hide numbered pagination (Load more takes over) */
         if (pagination) pagination.hidden = true;
+        var btn = wrap.querySelector('[data-loadmore-btn]');
+        if (!btn) return; /* last page: keep "Showing X of N" + full progress, no button */
+        btn.hidden = false;
         btn.addEventListener('click', function () {
           if (btn.disabled) return;
           var nextPage = wrap.getAttribute('data-next-page');
