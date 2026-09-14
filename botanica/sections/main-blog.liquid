@@ -197,12 +197,15 @@
     transform: translateX(3px);
   }
 
-  /* ── Featured first article: horizontal magazine plate ── */
+  /* ── Featured first article: horizontal magazine plate ──
+     .bt-card base sets display:flex (equal specificity, and section
+     stylesheets can lose source-order ties) — the two-class selector
+     keeps the grid declaration safe. */
   .bt-blog-card--featured {
     grid-column: 1 / -1;
   }
   @media (min-width: 750px) {
-    .bt-blog-card--featured {
+    .bt-card.bt-blog-card--featured {
       display: grid;
       grid-template-columns: 1.15fr 1fr;
       align-items: stretch;
