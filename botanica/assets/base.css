@@ -658,6 +658,51 @@ body.bt-no-grain::after { content: none; }
   }
 }
 
+/* ═══════════════════════════════════════════
+   PAGE ENTRANCE — one orchestrated fade+rise of
+   the main region per navigation (320ms, 10px).
+   Deliberately NOT per-section: sections animate
+   their own grids; the page itself arrives once.
+
+   fill-mode `backwards` (not `both`): the transform
+   must leave the computed style when the animation
+   ends, or #MainContent would keep a containing
+   block and position:fixed descendants (article
+   progress bar) would stop tracking the viewport.
+
+   Lives in base.css (render-blocking) — in the
+   deferred effects.css this would flash visible
+   content and then animate it.
+   ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  #MainContent {
+    animation: bt-page-enter 320ms var(--bt-ease-out) backwards;
+  }
+}
+@keyframes bt-page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════
+   IMAGE SHIMMER — scheme-colored skeleton behind
+   any image still fetching. bt-reveal.js tags
+   incomplete imgs with .bt-img-wait; the image
+   pixels paint over the background when ready.
+   Animation gated to no-preference; reduced-motion
+   users get the static surface wash. Render-blocking
+   file so the shimmer is there before the bytes.
+   ═══════════════════════════════════════════ */
+img.bt-img-wait {
+  background: linear-gradient(90deg, var(--bt-color-surface) 25%, var(--bt-color-surface-hover) 50%, var(--bt-color-surface) 75%);
+  background-size: 200% 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  img.bt-img-wait {
+    animation: bt-shimmer 1.5s ease-in-out infinite;
+  }
+}
+
 /* ── Cart drawer ── */
 .bt-cart-drawer { display: none; }
 .bt-cart-drawer[open] { display: block; }

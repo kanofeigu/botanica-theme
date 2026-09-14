@@ -17,6 +17,23 @@
 (function () {
   'use strict';
 
+  /* ═══════════════════════════════════════════
+     IMAGE SHIMMER (motion-agnostic — runs for
+     everyone; the CSS decides whether the wash
+     animates). Any img still fetching when this
+     deferred script runs gets .bt-img-wait; the
+     class drops on load/error so the gradient
+     never lingers under transparent PNG/SVG art.
+     ═══════════════════════════════════════════ */
+  function tagImg(img) {
+    if (img.complete) return;
+    img.classList.add('bt-img-wait');
+    var clear = function () { img.classList.remove('bt-img-wait'); };
+    img.addEventListener('load', clear, { once: true });
+    img.addEventListener('error', clear, { once: true });
+  }
+  document.querySelectorAll('img').forEach(tagImg);
+
   /* Bail conditions — page stays fully visible. */
   if (!('IntersectionObserver' in window)) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

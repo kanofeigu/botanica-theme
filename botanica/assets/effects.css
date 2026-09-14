@@ -316,6 +316,60 @@
   color: var(--bt-color-primary);
 }
 
+/* ── Unified underline slide-in — nav / footer / mega links ──
+   One motion everywhere: 1.5px bar sweeps left→right on hover or
+   focus, retracts right→left on leave (exit reads faster because
+   the same 300ms plays against a disappearing target). Applied to
+   existing components from here so the sections stay untouched;
+   each component keeps its own color/bg hover, this only adds the
+   traveling underline. Reduced-motion users keep plain color hover. */
+@media (prefers-reduced-motion: no-preference) {
+  .bt-header__link,
+  .bt-footer__link,
+  .bt-mega__flyout-link,
+  .bt-blog-card__read {
+    position: relative;
+  }
+  .bt-header__link::after,
+  .bt-footer__link::after,
+  .bt-mega__flyout-link::after,
+  .bt-blog-card__read::after {
+    content: '';
+    position: absolute;
+    left: var(--bt-space-sm);
+    right: var(--bt-space-sm);
+    bottom: 2px;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--bt-duration-base) var(--bt-ease-out);
+    pointer-events: none;
+  }
+  /* Footer links have no horizontal padding — full-width bar */
+  .bt-footer__link::after,
+  .bt-blog-card__read::after {
+    left: 0;
+    right: 0;
+  }
+  .bt-header__link:hover::after,
+  .bt-header__link:focus-visible::after,
+  .bt-header__link--active::after,
+  .bt-footer__link:hover::after,
+  .bt-footer__link:focus-visible::after,
+  .bt-mega__flyout-link:hover::after,
+  .bt-mega__flyout-link:focus-visible::after,
+  .bt-blog-card__read:hover::after,
+  .bt-blog-card__read:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  /* The active nav item keeps its bar at rest — orientation cue. */
+  .bt-header__link--active::after {
+    transform: scaleX(1);
+  }
+}
+
 /* ── Image lift (subtle scale + shadow on hover) ── */
 .bt-lift {
   transition: transform var(--bt-duration-base) var(--bt-ease-out),

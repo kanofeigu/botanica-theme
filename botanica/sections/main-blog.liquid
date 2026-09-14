@@ -1,30 +1,48 @@
-{% comment %} main-blog.liquid — Editorial blog listing. Cover images, tag badges. Zero Dawn code. {% endcomment %}
+{% comment %} main-blog.liquid — Editorial blog listing. Magazine layout: first
+   article features full-width (media left / body right), the rest fall into the
+   card grid. Tag filter pills + staggered grid entrance share the collection
+   page's motion language (exit faster than enter, transform/opacity only).
+   Zero Dawn code. {% endcomment %}
 <div class="bt-section bt-blog color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }}>
   <div class="bt-container">
     <h1 class="bt-blog__title bt-h1 bt-sr-only">{{ blog.title }}</h1>
 
     {%- if blog.all_tags.size > 0 -%}
-      <div class="bt-blog__tags">
-        <a href="{{ blog.url }}" class="bt-badge{% unless current_tags %} bt-badge--primary{% else %} bt-badge--outline{% endunless %}">{{ 'blogs.article.view_all' | t }}</a>
+      <nav class="bt-blog__tags" aria-label="{{ 'blogs.article.filter_by_tag' | t }}">
+        <a href="{{ blog.url }}" class="bt-blog__pill{% unless current_tags %} bt-blog__pill--active{% endunless %}"{% unless current_tags %} aria-current="true"{% endunless %}>{{ 'blogs.article.view_all' | t }}</a>
         {%- for tag in blog.all_tags -%}
-          <a href="{{ blog.url }}/tagged/{{ tag | handleize }}" class="bt-badge{% if current_tags contains tag %} bt-badge--primary{% else %} bt-badge--outline{% endif %}">{{ tag }}</a>
+          <a href="{{ blog.url }}/tagged/{{ tag | handleize }}" class="bt-blog__pill{% if current_tags contains tag %} bt-blog__pill--active{% endif %}"{% if current_tags contains tag %} aria-current="true"{% endif %}>{{ tag }}</a>
         {%- endfor -%}
-      </div>
+      </nav>
     {%- endif -%}
 
     {%- paginate blog.articles by section.settings.articles_per_page -%}
-      <div class="bt-grid bt-grid--{{ section.settings.columns_desktop }}">
+      <div class="bt-blog__grid bt-grid bt-grid--{{ section.settings.columns_desktop }}">
         {%- for article in blog.articles -%}
-          <article class="bt-card bt-blog-card">
+          {%- assign featured = false -%}
+          {%- if section.settings.feature_first_article and forloop.first -%}
+            {%- assign featured = true -%}
+          {%- endif -%}
+          <article class="bt-card bt-blog-card{% if featured %} bt-blog-card--featured{% endif %}">
             <div class="bt-card__media bt-blog-card__media">
-              <a href="{{ article.url }}" aria-label="{{ article.title | escape }}">
+              <a href="{{ article.url }}" aria-label="{{ article.title | escape }}" tabindex="-1">
                 {%- if article.image -%}
-                  {{ article.image | image_url: width: 800 | image_tag:
-                    loading: 'lazy',
-                    widths: '300, 400, 600, 800',
-                    sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
-                    alt: article.title | escape
-                  }}
+                  {%- if featured -%}
+                    {{ article.image | image_url: width: 1200 | image_tag:
+                      loading: 'eager',
+                      fetchpriority: 'high',
+                      widths: '400, 600, 800, 1000, 1200',
+                      sizes: '(min-width: 990px) 55vw, 100vw',
+                      alt: article.title | escape
+                    }}
+                  {%- else -%}
+                    {{ article.image | image_url: width: 800 | image_tag:
+                      loading: 'lazy',
+                      widths: '300, 400, 600, 800',
+                      sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                      alt: article.title | escape
+                    }}
+                  {%- endif -%}
                 {%- else -%}
                   {%- assign cover_idx = forloop.index0 | modulo: 3 -%}
                   {%- if cover_idx == 0 -%}
@@ -42,12 +60,16 @@
             </div>
             <div class="bt-card__body">
               <p class="bt-eyebrow">{{ article.published_at | date: '%B %d, %Y' }}</p>
-              <h2 class="bt-card__title">
+              <h2 class="bt-card__title{% if featured %} bt-blog-card__title--featured{% endif %}">
                 <a href="{{ article.url }}">{{ article.title }}</a>
               </h2>
               {%- if article.excerpt_or_content.size > 0 -%}
                 <p class="bt-blog-card__excerpt">{{ article.excerpt_or_content | strip_html | truncatewords: 25 }}</p>
               {%- endif -%}
+              <a href="{{ article.url }}" class="bt-blog-card__read" aria-label="{{ 'blogs.article.read_more_title' | t: title: article.title | escape }}">
+                {{- 'blogs.article.read_more' | t -}}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
             </div>
           </article>
         {%- endfor -%}
@@ -69,6 +91,12 @@
     color: var(--bt-color-text-muted);
     opacity: 1;
   }
+
+  /* ── Tag filter pills ──
+     Pill-shaped (friendlier than the square specimen bt-badge), active pill
+     takes the scheme primary fill. Pills stagger-fade in on page load — the
+     same entrance the grid uses, so a tag switch reads as one choreographed
+     re-layout even though Shopify routing reloads the page. */
   .bt-blog__tags {
     display: flex;
     flex-wrap: wrap;
@@ -76,15 +104,49 @@
     gap: var(--bt-space-2xs);
     margin-bottom: var(--bt-space-xl);
   }
-  .bt-blog__tags .bt-badge {
+  .bt-blog__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45em 1.1em;
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     text-decoration: none;
-    transition: all var(--bt-duration-fast);
+    border-radius: var(--bt-radius-pill);
+    color: var(--bt-color-text-muted);
+    border: 1px solid var(--bt-color-border-medium);
+    background: transparent;
+    transition: color var(--bt-duration-fast) var(--bt-ease-out),
+                background var(--bt-duration-fast) var(--bt-ease-out),
+                border-color var(--bt-duration-fast) var(--bt-ease-out);
   }
+  .bt-blog__pill:hover,
+  .bt-blog__pill:focus-visible {
+    color: var(--bt-color-primary);
+    border-color: var(--bt-color-primary);
+    background: var(--bt-color-primary-tint);
+  }
+  .bt-blog__pill--active,
+  .bt-blog__pill--active:hover {
+    color: var(--bt-color-primary-contrast);
+    background: var(--bt-color-primary);
+    border-color: var(--bt-color-primary);
+  }
+  .bt-blog__pill:active {
+    transform: scale(0.96);
+  }
+
+  /* ── Card media ── */
   .bt-blog-card__media {
     aspect-ratio: 8 / 5;
     position: relative;
     overflow: hidden;
     background: var(--bt-color-surface);
+  }
+  .bt-blog-card__media > a {
+    display: block;
+    height: 100%;
   }
   .bt-blog-card__media img {
     width: 100%;
@@ -112,6 +174,84 @@
     color: var(--bt-color-text-muted);
     line-height: var(--bt-lh-body);
   }
+
+  /* Gold read link — the Organic Luxe sign-off on every card. */
+  .bt-blog-card__read {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--bt-space-3xs);
+    font-size: var(--bt-fs-body-xs);
+    font-weight: var(--bt-fw-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--bt-color-secondary-text);
+    text-decoration: none;
+    align-self: flex-start;
+  }
+  .bt-blog-card__read svg {
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-blog-card__read:hover svg,
+  .bt-blog-card__read:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  /* ── Featured first article: horizontal magazine plate ── */
+  .bt-blog-card--featured {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 750px) {
+    .bt-blog-card--featured {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      align-items: stretch;
+    }
+    .bt-blog-card--featured .bt-blog-card__media {
+      aspect-ratio: auto;
+      min-height: 320px;
+    }
+    .bt-blog-card--featured .bt-card__body {
+      justify-content: center;
+      padding: var(--bt-space-lg);
+      gap: var(--bt-space-2xs);
+    }
+    .bt-blog-card__title--featured {
+      font-size: var(--bt-fs-h2);
+    }
+    .bt-blog-card--featured .bt-blog-card__excerpt {
+      font-size: var(--bt-fs-body);
+    }
+  }
+
+  /* ── Grid + pills entrance stagger ──
+     Same language as the collection grid: 320ms ease-out, 45ms step, capped.
+     Tag pills lead (they're the controls), cards follow. Keyframes redeclared
+     here because section stylesheets only ship with their own section. */
+  @media (prefers-reduced-motion: no-preference) {
+    .bt-blog__pill,
+    .bt-blog__grid > * {
+      animation: bt-blog-card-in 320ms var(--bt-ease-out) both;
+    }
+    .bt-blog__pill:nth-child(2) { animation-delay: 30ms; }
+    .bt-blog__pill:nth-child(3) { animation-delay: 60ms; }
+    .bt-blog__pill:nth-child(4) { animation-delay: 90ms; }
+    .bt-blog__pill:nth-child(5) { animation-delay: 120ms; }
+    .bt-blog__pill:nth-child(n+6) { animation-delay: 150ms; }
+    .bt-blog__grid > :nth-child(1) { animation-delay: 60ms; }
+    .bt-blog__grid > :nth-child(2) { animation-delay: 105ms; }
+    .bt-blog__grid > :nth-child(3) { animation-delay: 150ms; }
+    .bt-blog__grid > :nth-child(4) { animation-delay: 195ms; }
+    .bt-blog__grid > :nth-child(5) { animation-delay: 240ms; }
+    .bt-blog__grid > :nth-child(6) { animation-delay: 285ms; }
+    .bt-blog__grid > :nth-child(7) { animation-delay: 330ms; }
+    .bt-blog__grid > :nth-child(n+8) { animation-delay: 375ms; }
+  }
+  @keyframes bt-blog-card-in {
+    from { opacity: 0; transform: translateX(12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
   .bt-blog__pagination {
     display: flex;
     justify-content: center;
@@ -119,6 +259,7 @@
   }
   @media (max-width: 749px) {
     .bt-blog-card__media { aspect-ratio: 8 / 5; }
+    .bt-blog__tags { justify-content: flex-start; }
   }
 {% endstylesheet %}
 
@@ -126,6 +267,7 @@
 { "name": "t:sections.main_blog.name", "settings": [
   { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
   { "type": "range", "id": "articles_per_page", "min":3,"max":12,"step":3,"default":6,"label":"t:sections.main_blog.settings.articles_per_page.label" },
-  { "type": "range", "id": "columns_desktop", "min":1,"max":4,"step":1,"default":3,"label":"t:sections.main_blog.settings.columns_desktop.label" }
+  { "type": "range", "id": "columns_desktop", "min":1,"max":4,"step":1,"default":3,"label":"t:sections.main_blog.settings.columns_desktop.label" },
+  { "type": "checkbox", "id": "feature_first_article", "default": true, "label":"t:sections.main_blog.settings.feature_first_article.label" }
 ], "presets": [{ "name": "t:sections.main_blog.name" }] }
 {% endschema %}

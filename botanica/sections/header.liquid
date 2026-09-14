@@ -457,6 +457,54 @@
   }
 
   /* ================================================================
+     MEGA PROMO PARALLAX
+     Pointer-tracked drift on promo-card images: the image is rendered
+     at scale(1.08) so a ±6px translate never exposes an edge. Eased
+     toward the target in rAF (no jump on fast moves). Disabled for
+     reduced motion and coarse pointers (touch has no hover drift).
+     ================================================================ */
+
+  var fineMotion = window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+    && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (fineMotion) {
+    header.querySelectorAll('.bt-mega__promo').forEach(function(card) {
+      var media = card.querySelector('.bt-mega__promo-media img');
+      if (!media) return;
+      var raf = 0, tx = 0, ty = 0, cx = 0, cy = 0;
+
+      function frame() {
+        // ease current toward target ~18% per frame ≈ 200ms settle
+        cx += (tx - cx) * 0.18;
+        cy += (ty - cy) * 0.18;
+        media.style.transform = 'translate(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px) scale(1.08)';
+        if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          raf = 0;
+        }
+      }
+      function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+
+      card.addEventListener('pointermove', function(e) {
+        var r = card.getBoundingClientRect();
+        // -1..1 across the card, then cap the drift at 6px
+        tx = ((e.clientX - r.left) / r.width - 0.5) * -12;
+        ty = ((e.clientY - r.top) / r.height - 0.5) * -12;
+        kick();
+      });
+      card.addEventListener('pointerleave', function() {
+        tx = 0; ty = 0;
+        kick();
+      });
+      // Parallax drives transform inline — disable the CSS hover zoom on
+      // this card so the two never fight (inline style wins anyway, but
+      // the transition on transform would fight the rAF writes).
+      card.classList.add('bt-mega__promo--parallax');
+    });
+  }
+
+  /* ================================================================
      MOBILE DRAWER
      ================================================================ */
 
@@ -519,18 +567,18 @@
      header's height — so sticking the <header> itself never engages. The
      wrapper rule is emitted inline (see markup) only when sticky is on. */
 
-  /* Scrolled state (sticky only): hairline deepens + faint shadow lift;
-     background gains a blur veil where supported. Class toggled by the
-     header script (rAF-throttled scroll listener). */
+  /* Scrolled state (sticky only): hairline deepens, card-level shadow lift,
+     and a blur veil where supported — the "glass settles onto the page"
+     moment. Class toggled by the header script (rAF-throttled listener). */
   .bt-header--sticky.is-scrolled {
     border-bottom-color: var(--bt-color-border-medium);
-    box-shadow: var(--bt-shadow-sm);
+    box-shadow: var(--bt-shadow-card);
   }
   @supports (backdrop-filter: blur(8px)) {
     .bt-header--sticky.is-scrolled {
-      background-color: color-mix(in srgb, var(--bt-color-bg) 90%, transparent);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
+      background-color: color-mix(in srgb, var(--bt-color-bg) 88%, transparent);
+      -webkit-backdrop-filter: blur(12px) saturate(1.4);
+      backdrop-filter: blur(12px) saturate(1.4);
     }
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -637,17 +685,53 @@
     box-shadow: var(--bt-shadow-lg);
     z-index: 1;
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-4px);
     pointer-events: none;
-    transition: opacity var(--bt-duration-fast) var(--bt-ease-out),
-                transform var(--bt-duration-fast) var(--bt-ease-out);
+    /* Exit is the resting-state transition: 120ms ease-in — panels should
+       leave faster than they arrive (motion-language contract). */
+    transition: opacity 120ms ease-in,
+                transform 120ms ease-in;
   }
   .bt-mega--open {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    /* Enter: 180ms ease-out, slightly slower and softer than the exit. */
+    transition: opacity 180ms var(--bt-ease-out),
+                transform 180ms var(--bt-ease-out);
   }
   [hidden] { display: none !important; }
+
+  /* Menu items stagger in behind the panel: 30ms steps, capped at 6 —
+     the same arrival rhythm as the collection grid, scaled down for menus.
+     Animations live under .bt-mega--open so they re-run on every open
+     (panel is display:none while closed, which resets them). */
+  @media (prefers-reduced-motion: no-preference) {
+    .bt-mega--open .bt-mega__nav > li,
+    .bt-mega--open .bt-mega__flyout-list > li,
+    .bt-mega--open .bt-mega__promo-col > * {
+      animation: bt-mega-item-in 200ms var(--bt-ease-out) both;
+    }
+    .bt-mega--open .bt-mega__nav > li:nth-child(2),
+    .bt-mega--open .bt-mega__flyout-list > li:nth-child(2),
+    .bt-mega--open .bt-mega__promo-col > :nth-child(2) { animation-delay: 30ms; }
+    .bt-mega--open .bt-mega__nav > li:nth-child(3),
+    .bt-mega--open .bt-mega__flyout-list > li:nth-child(3),
+    .bt-mega--open .bt-mega__promo-col > :nth-child(3) { animation-delay: 60ms; }
+    .bt-mega--open .bt-mega__nav > li:nth-child(4),
+    .bt-mega--open .bt-mega__flyout-list > li:nth-child(4),
+    .bt-mega--open .bt-mega__promo-col > :nth-child(4) { animation-delay: 90ms; }
+    .bt-mega--open .bt-mega__nav > li:nth-child(5),
+    .bt-mega--open .bt-mega__flyout-list > li:nth-child(5),
+    .bt-mega--open .bt-mega__promo-col > :nth-child(5) { animation-delay: 120ms; }
+    .bt-mega--open .bt-mega__nav > li:nth-child(n+6),
+    .bt-mega--open .bt-mega__flyout-list > li:nth-child(n+6),
+    .bt-mega--open .bt-mega__promo-col > :nth-child(n+6) { animation-delay: 150ms; }
+  }
+  @keyframes bt-mega-item-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
   /* ── Grid: 3-col with promo, 2-col without ── */
   .bt-mega__inner {
@@ -860,6 +944,17 @@
     .bt-mega__promo:hover .bt-mega__promo-media img,
     .bt-mega__promo:focus-within .bt-mega__promo-media img {
       transform: scale(1.04);
+    }
+    /* Pointer-parallax cards: the rAF lerp already smooths every frame
+       (including the drift back to rest on pointer-leave), so any CSS
+       transition on transform would double-smooth and smear — remove it.
+       Base scale(1.08) gives the ±6px drift its headroom. */
+    .bt-mega__promo--parallax .bt-mega__promo-media img,
+    .bt-mega__promo--parallax:hover .bt-mega__promo-media img,
+    .bt-mega__promo--parallax:focus-within .bt-mega__promo-media img {
+      transform: scale(1.08);
+      transition: none;
+      will-change: transform;
     }
   }
   /* Serif heading used by the mega-links / mega-collections blocks */

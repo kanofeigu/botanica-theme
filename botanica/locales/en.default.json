@@ -178,6 +178,8 @@
     "article": {
       "blog": "Blog",
       "read_more_title": "Read more: {{ title }}",
+      "read_more": "Read article",
+      "filter_by_tag": "Filter articles by tag",
       "comments": {
         "one": "{{ count }} comment",
         "other": "{{ count }} comments"
@@ -192,6 +194,7 @@
       "view_all": "Read all articles",
       "previous_article": "Previous article",
       "next_article": "Next article",
+      "continue_reading": "Continue reading",
       "title": "Article title",
       "excerpt": "Article excerpt",
       "by_author": "By {{ author }}",

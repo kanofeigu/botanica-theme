@@ -719,6 +719,9 @@
         },
         "columns_desktop": {
           "label": "Columns"
+        },
+        "feature_first_article": {
+          "label": "Feature first article"
         }
       }
     },

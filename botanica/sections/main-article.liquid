@@ -120,11 +120,14 @@
             <ol class="bt-comment-list">
               {%- for comment in article.comments -%}
                 <li class="bt-comment" id="comment-{{ comment.id }}">
-                  <p class="bt-comment__content">{{ comment.content }}</p>
-                  <footer class="bt-comment__meta">
-                    <span class="bt-comment__author">{{ comment.author }}</span>
-                    <time class="bt-comment__date" datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">{{ comment.created_at | date: '%B %d, %Y' }}</time>
-                  </footer>
+                  <div class="bt-comment__avatar" aria-hidden="true">{{ comment.author | strip | slice: 0, 1 | upcase }}</div>
+                  <div class="bt-comment__main">
+                    <p class="bt-comment__content">{{ comment.content }}</p>
+                    <footer class="bt-comment__meta">
+                      <span class="bt-comment__author">{{ comment.author }}</span>
+                      <time class="bt-comment__date" datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">{{ comment.created_at | date: '%B %d, %Y' }}</time>
+                    </footer>
+                  </div>
                 </li>
               {%- endfor -%}
             </ol>
@@ -206,21 +209,54 @@
   </div>
 </article>
 
-{% comment %} ═══════ Previous / Next ═══════ {% endcomment %}
+{% comment %} ═══════ Previous / Next — "Continue reading" cards ═══════ {% endcomment %}
 {%- if blog.next_article or blog.previous_article -%}
-<div class="bt-section bt-article__siblings">
+<div class="bt-section bt-article__siblings color-{{ section.settings.color_scheme }}">
   <div class="bt-container">
+    <p class="bt-article__siblings-heading bt-eyebrow">{{ 'blogs.article.continue_reading' | t }}</p>
     <div class="bt-article__siblings-grid">
       {%- if blog.previous_article -%}
         <a href="{{ blog.previous_article.url }}" class="bt-article__sibling bt-interactive">
-          <span class="bt-eyebrow">{{ 'blogs.article.previous_article' | t }}</span>
-          <span class="bt-article__sibling-title">{{ blog.previous_article.title }}</span>
+          {%- if blog.previous_article.image -%}
+            <span class="bt-article__sibling-media">
+              {{ blog.previous_article.image | image_url: width: 400 | image_tag:
+                loading: 'lazy',
+                widths: '200, 300, 400',
+                sizes: '(min-width: 750px) 220px, 40vw',
+                alt: blog.previous_article.title | escape
+              }}
+            </span>
+          {%- endif -%}
+          <span class="bt-article__sibling-body">
+            <span class="bt-eyebrow">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              {{ 'blogs.article.previous_article' | t }}
+            </span>
+            <span class="bt-article__sibling-title">{{ blog.previous_article.title }}</span>
+          </span>
         </a>
+      {%- else -%}
+        <span class="bt-article__sibling bt-article__sibling--empty" aria-hidden="true"></span>
       {%- endif -%}
       {%- if blog.next_article -%}
         <a href="{{ blog.next_article.url }}" class="bt-article__sibling bt-article__sibling--next bt-interactive">
-          <span class="bt-eyebrow">{{ 'blogs.article.next_article' | t }}</span>
-          <span class="bt-article__sibling-title">{{ blog.next_article.title }}</span>
+          {%- if blog.next_article.image -%}
+            <span class="bt-article__sibling-media">
+              {{ blog.next_article.image | image_url: width: 400 | image_tag:
+                loading: 'lazy',
+                widths: '200, 300, 400',
+                sizes: '(min-width: 750px) 220px, 40vw',
+                alt: blog.next_article.title | escape
+              }}
+            </span>
+          {%- endif -%}
+          <span class="bt-article__sibling-body">
+            <span class="bt-eyebrow">
+              {{ 'blogs.article.next_article' | t }}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+            <span class="bt-article__sibling-title">{{ blog.next_article.title }}</span>
+          </span>
         </a>
       {%- endif -%}
     </div>
@@ -229,17 +265,31 @@
 {%- endif -%}
 
 {% javascript %}
-  /* ═══════ Reading progress bar ═══════ */
+  /* ═══════ Reading progress bar ═══════
+     transform: scaleX (GPU-composited, zero layout) instead of width.
+     rAF-throttled: one style write per frame max. Reduced motion still
+     gets the bar — it's information, not decoration — but the fill
+     snaps instead of easing. */
   (function () {
     var bar = document.querySelector('[data-progress-bar]');
     if (!bar) return;
     var fill = bar.querySelector('[data-progress-fill]');
-    window.addEventListener('scroll', function () {
+    if (!fill) return;
+    var ticking = false;
+    var update = function () {
       var scrollTop = window.scrollY;
       var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      var pct = docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0;
-      if (fill) fill.style.width = pct + '%';
+      var ratio = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+      fill.style.transform = 'scaleX(' + ratio + ')';
+      ticking = false;
+    };
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
     }, { passive: true });
+    update();
   })();
 
   /* ═══════ TOC generation (sidebar layout) ═══════ */
@@ -331,6 +381,29 @@
   .bt-article__body {
     font-size: var(--bt-fs-body); line-height: var(--bt-lh-relaxed); color: var(--bt-color-text);
   }
+  /* Reading measure: 65–75ch is the Baymard comfort zone. --bt-content-max
+     is 65ch; paragraphs inherit the cap from base.css, body block keeps the
+     column itself from stretching wider on sidebar/magazine grids. */
+  .bt-article__body > * { max-width: var(--bt-content-max); }
+  .bt-article__body > blockquote,
+  .bt-article__body > img,
+  .bt-article__body > figure { max-width: none; }
+  /* Lead paragraph: first paragraph of the piece set in larger serif — the
+     editorial "standfirst". Substack & sidebar only; magazine already has
+     the drop cap, and the two devices would fight. Skip paragraphs that
+     lead with an image. */
+  .bt-article--substack .bt-article__body > p:first-of-type:not(:has(> img:first-child)),
+  .bt-article--sidebar .bt-article__body > p:first-of-type:not(:has(> img:first-child)) {
+    font-family: var(--bt-font-heading);
+    font-size: calc(var(--bt-fs-body) * 1.3);
+    line-height: 1.55;
+    color: var(--bt-color-text);
+    margin-bottom: var(--bt-space-lg);
+  }
+  .bt-article--substack .bt-article__body > p:first-of-type:not(:has(> img:first-child))::first-line,
+  .bt-article--sidebar .bt-article__body > p:first-of-type:not(:has(> img:first-child))::first-line {
+    font-weight: var(--bt-fw-medium);
+  }
   .bt-article__body h2 {
     font-family: var(--bt-font-heading); font-size: var(--bt-fs-h2); font-weight: var(--bt-fw-normal);
     margin: var(--bt-space-xl) 0 var(--bt-space-sm); color: var(--bt-color-text); scroll-margin-top: var(--bt-space-xl);
@@ -342,13 +415,44 @@
   .bt-article__body p { margin-bottom: var(--bt-space-md); text-wrap: pretty; }
   .bt-article__body ul, .bt-article__body ol { margin: 0 0 var(--bt-space-md); padding-inline-start: 1.5em; }
   .bt-article__body li { margin-bottom: var(--bt-space-2xs); }
+  /* Pull quote — the magazine breakout is the loud variant; this is the
+     quiet one: oversized serif, hanging gold quote mark, no box. */
   .bt-article__body blockquote {
-    margin: var(--bt-space-lg) 0; padding: var(--bt-space-sm) var(--bt-space-md);
-    border-left: 3px solid var(--bt-color-secondary); background: var(--bt-color-surface);
-    border-radius: 0 var(--bt-radius-sm) var(--bt-radius-sm) 0;
-    font-style: italic; color: var(--bt-color-text-muted);
+    position: relative;
+    margin: var(--bt-space-lg) 0;
+    padding: var(--bt-space-xs) var(--bt-space-md) var(--bt-space-xs) calc(var(--bt-space-md) + 14px);
+    border: none;
+    background: transparent;
+    font-family: var(--bt-font-heading);
+    font-size: calc(var(--bt-fs-body) * 1.25);
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--bt-color-text);
   }
-  .bt-article__body img { border-radius: var(--bt-radius-card); margin: var(--bt-space-lg) 0; max-width: 100%; }
+  .bt-article__body blockquote::before {
+    content: '\201C';
+    position: absolute;
+    left: 0;
+    top: calc(var(--bt-space-xs) * -1);
+    font-family: var(--bt-font-heading);
+    font-size: 3em;
+    line-height: 1;
+    font-style: normal;
+    color: var(--bt-color-secondary);
+    opacity: 0.55;
+  }
+  .bt-article__body blockquote cite,
+  .bt-article__body blockquote footer {
+    display: block;
+    margin-top: var(--bt-space-2xs);
+    font-family: var(--bt-font-body);
+    font-size: var(--bt-fs-body-xs);
+    font-style: normal;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--bt-color-text-muted);
+  }
+  .bt-article__body img { border-radius: var(--bt-radius-card); margin: var(--bt-space-lg) 0; max-width: 100%; box-shadow: var(--bt-shadow-card); }
 
   /* Footer */
   .bt-article__footer { margin-top: var(--bt-space-xl); padding-top: var(--bt-space-md); border-top: 1px solid var(--bt-color-border-light); }
@@ -371,9 +475,16 @@
   }
   .bt-article__share-link.is-copied .bt-article__copied-tip { opacity: 1; }
 
-  /* Progress bar */
+  /* Progress bar — gold fill, transform-driven (see JS). The fill sits at
+     scaleX(0) at rest; the scroll listener writes scaleX(ratio) per frame. */
   .bt-article__progress { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 1000; background: var(--bt-color-border-light); }
-  .bt-article__progress-fill { height: 100%; background: var(--bt-color-primary); width: 0%; transition: width 100ms linear; }
+  .bt-article__progress-fill {
+    height: 100%; width: 100%;
+    background: var(--bt-color-secondary);
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: transform;
+  }
 
   /* Comments */
   .bt-article__comments { margin-top: var(--bt-space-xl); padding-top: var(--bt-space-md); border-top: 1px solid var(--bt-color-border-light); }
@@ -382,7 +493,18 @@
     color: var(--bt-color-text); margin: 0 0 var(--bt-space-md);
   }
   .bt-comment-list { list-style: none; margin: 0 0 var(--bt-space-lg); padding: 0; display: flex; flex-direction: column; gap: var(--bt-space-md); }
-  .bt-comment { padding: var(--bt-space-sm); background: var(--bt-color-surface-raised, var(--bt-color-surface)); border-radius: var(--bt-radius-card); box-shadow: var(--bt-shadow-card); }
+  .bt-comment { display: flex; gap: var(--bt-space-sm); padding: var(--bt-space-sm); background: var(--bt-color-surface-raised, var(--bt-color-surface)); border-radius: var(--bt-radius-card); box-shadow: var(--bt-shadow-card); }
+  .bt-comment__avatar {
+    width: 40px; height: 40px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: var(--bt-color-secondary-tint);
+    color: var(--bt-color-secondary-text);
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-body);
+    font-weight: var(--bt-fw-semibold);
+  }
+  .bt-comment__main { min-width: 0; }
   .bt-comment__content { margin: 0 0 var(--bt-space-2xs); font-size: var(--bt-fs-body); line-height: var(--bt-lh-relaxed); color: var(--bt-color-text); }
   .bt-comment__meta { display: flex; align-items: baseline; gap: var(--bt-space-2xs); font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); }
   .bt-comment__author { font-weight: var(--bt-fw-semibold); color: var(--bt-color-text); }
@@ -393,13 +515,47 @@
   .bt-comment-form__moderated { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); margin: 0; }
   .bt-comment-form .bt-btn { align-self: flex-start; }
 
-  /* Siblings */
+  /* Siblings — "Continue reading" nav cards: soft-raised cards with a
+     thumbnail, arrow eyebrows pointing in the travel direction. */
   .bt-article__siblings { background: var(--bt-color-surface); border-top: 1px solid var(--bt-color-border-light); }
-  .bt-article__siblings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-space-lg); }
-  .bt-article__sibling { display: flex; flex-direction: column; gap: var(--bt-space-3xs); text-decoration: none; color: var(--bt-color-text); padding: var(--bt-space-sm) 0; }
-  .bt-article__sibling--next { text-align: right; align-items: flex-end; }
-  .bt-article__sibling-title { font-family: var(--bt-font-heading); font-size: var(--bt-fs-h4); font-weight: var(--bt-fw-medium); transition: color var(--bt-duration-fast); }
+  .bt-article__siblings-heading {
+    display: block;
+    text-align: center;
+    margin-bottom: var(--bt-space-md);
+  }
+  .bt-article__siblings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-space-md); }
+  .bt-article__sibling {
+    display: flex; align-items: center; gap: var(--bt-space-sm);
+    padding: var(--bt-space-xs);
+    background: var(--bt-color-surface-raised, var(--bt-color-bg));
+    border-radius: var(--bt-radius-card);
+    box-shadow: var(--bt-shadow-card);
+    text-decoration: none; color: var(--bt-color-text);
+  }
+  @media (hover: hover) {
+    .bt-article__sibling:hover { box-shadow: var(--bt-shadow-card-hover); }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .bt-article__sibling:hover { transform: translateY(-3px); }
+  }
+  .bt-article__sibling--next { flex-direction: row-reverse; text-align: right; }
+  .bt-article__sibling--next .bt-article__sibling-body { align-items: flex-end; }
+  .bt-article__sibling-media {
+    width: 96px; aspect-ratio: 1; flex-shrink: 0;
+    border-radius: var(--bt-radius-sm);
+    overflow: hidden; background: var(--bt-color-surface);
+  }
+  .bt-article__sibling-media img { width: 100%; height: 100%; object-fit: cover; }
+  .bt-article__sibling-body { display: flex; flex-direction: column; gap: var(--bt-space-3xs); min-width: 0; }
+  .bt-article__sibling .bt-eyebrow { display: inline-flex; align-items: center; gap: 5px; }
+  .bt-article__sibling-title {
+    font-family: var(--bt-font-heading); font-size: var(--bt-fs-h4); font-weight: var(--bt-fw-medium);
+    line-height: var(--bt-lh-heading);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    transition: color var(--bt-duration-fast);
+  }
   .bt-article__sibling:hover .bt-article__sibling-title { color: var(--bt-color-primary); }
+  .bt-article__sibling--empty { visibility: hidden; }
 
   /* ═══════════════════════════════════
      STYLE 1: SUBSTACK CLEAN
@@ -427,6 +583,12 @@
   }
   .bt-article--magazine .bt-article__hero--breakout img { max-height: 550px; width: 100%; object-fit: cover; }
   .bt-article--magazine .bt-article__body { font-size: calc(var(--bt-fs-body) * 1.05); line-height: 1.75; }
+  /* Measure-capped children (65ch) sit narrower than the 800px column —
+     center them so centered headings/quotes keep their axis. Paragraphs
+     that carry a breakout image keep the full column: the img's own
+     breakout margins are computed against the 800px column. */
+  .bt-article--magazine .bt-article__body > * { margin-inline: auto; }
+  .bt-article--magazine .bt-article__body > p:has(img) { max-width: none; margin-inline: 0; }
   .bt-article--magazine .bt-article__body p { margin-bottom: var(--bt-space-md); }
   .bt-article--magazine .bt-article__body h2 {
     text-align: center; font-size: var(--bt-fs-h2); padding-top: var(--bt-space-sm);
@@ -439,6 +601,8 @@
     font-size: var(--bt-fs-h3); font-style: normal; text-align: center;
     width: calc(100vw - 40px);
   }
+  /* Magazine quotes are the loud variant — no hanging quote mark there. */
+  .bt-article--magazine .bt-article__body blockquote::before { content: none; }
   .bt-article--magazine .bt-article__body img {
     border-radius: 0; margin-inline: calc(-50vw + 400px); width: calc(100vw - 40px);
     max-width: none;
@@ -487,7 +651,9 @@
     .bt-article--magazine .bt-article__hero--breakout { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; }
     .bt-article--magazine .bt-article__body blockquote { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; padding: var(--bt-space-md) var(--bt-space-sm); font-size: var(--bt-fs-h4); }
     .bt-article--magazine .bt-article__body img { margin-inline: calc(var(--bt-page-gutter) * -1); width: auto; }
-    .bt-article__siblings-grid { grid-template-columns: 1fr; gap: 0; }
+    .bt-article__siblings-grid { grid-template-columns: 1fr; gap: var(--bt-space-sm); }
+    .bt-article__sibling--next { flex-direction: row; text-align: left; }
+    .bt-article__sibling--next .bt-article__sibling-body { align-items: flex-start; }
     .bt-comment-form__row { grid-template-columns: 1fr; }
   }
 {% endstylesheet %}
