@@ -732,6 +732,13 @@ body.bt-no-grain::after { content: none; }
 .bt-predictive-item a:hover, .bt-predictive-item a:focus { background: var(--bt-color-surface-hover); }
 .bt-predictive-item img { width: 48px; height: 48px; object-fit: cover; border-radius: var(--bt-radius-sm); flex-shrink: 0; }
 .bt-predictive-item span { font-size: var(--bt-fs-body-sm); }
+/* Title above price inside the item body */
+.bt-predictive-item div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bt-predictive-item div span + span {
+  font-size: var(--bt-fs-body-xs);
+  color: var(--bt-color-text-muted);
+  font-variant-numeric: oldstyle-nums;
+}
 
 /* Staggered fade-rise entrance for freshly rendered results
    (delay is set inline per item from search.js) */
