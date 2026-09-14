@@ -1,9 +1,3 @@
-/*
- * NOTE: theme_documentation_url / theme_support_url currently point at the
- * public GitHub repository as a placeholder. BEFORE launching on the Theme
- * Store, replace both with the official documentation site and support
- * channel (e.g. a dedicated help center / support email portal).
- */
 [
   {
     "name": "theme_info",

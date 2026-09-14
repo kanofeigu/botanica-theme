@@ -12,6 +12,8 @@ listings/
 SUBMISSION.md
 release-notes.md
 
-# Demo-store settings: never overwrite the merchant's live settings on push.
-# (ZIP submission still includes this file; only theme push skips it.)
-config/settings_data.json
+# NOTE: config/settings_data.json is NOT ignored here — pushing it is what
+# installs presets (Theme styles) and color schemes on a theme. When pushing
+# to the LIVE theme with merchant-edited settings, pass
+# `--ignore config/settings_data.json` explicitly so merchant settings and
+# section customizations are never overwritten.

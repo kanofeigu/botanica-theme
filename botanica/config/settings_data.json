@@ -1,5 +1,93 @@
 {
-  "current": "Atrium",
+  "current": {
+    "logo_width": 120,
+    "heading_font": "cormorant_n5",
+    "body_font": "montserrat_n4",
+    "body_scale": 100,
+    "max_width": 1300,
+    "grid_horizontal_spacing": 24,
+    "grid_vertical_spacing": 24,
+    "button_style": "solid",
+    "button_corner_radius": 4,
+    "inputs_corner_radius": 4,
+    "card_corner_radius": 14,
+    "card_image_aspect_ratio": "1-1",
+    "show_sale_badge": true,
+    "show_sold_out_badge": true,
+    "predictive_search_enabled": true,
+    "cart_type": "drawer",
+    "show_free_shipping_bar": true,
+    "free_shipping_threshold": "50",
+    "show_currency_code": true,
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#FAF9F6",
+          "background_gradient": "",
+          "text": "#1C1917",
+          "button": "#22432F",
+          "button_label": "#FFFFFF",
+          "accent": "#A16207",
+          "shadow": "#1C1917"
+        }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#FFFFFF",
+          "background_gradient": "",
+          "text": "#1C1917",
+          "button": "#22432F",
+          "button_label": "#FFFFFF",
+          "accent": "#A16207",
+          "shadow": "#1C1917"
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#1E2B22",
+          "background_gradient": "",
+          "text": "#F5F2E9",
+          "button": "#C9A227",
+          "button_label": "#1C1917",
+          "accent": "#C9A227",
+          "shadow": "#F5F2E9"
+        }
+      },
+      "scheme-4": {
+        "settings": {
+          "background": "#F2ECDD",
+          "background_gradient": "",
+          "text": "#1C1917",
+          "button": "#22432F",
+          "button_label": "#FFFFFF",
+          "accent": "#8A5C06",
+          "shadow": "#1C1917"
+        }
+      },
+      "scheme-5": {
+        "settings": {
+          "background": "#121810",
+          "background_gradient": "",
+          "text": "#F5F2E9",
+          "button": "#C9A227",
+          "button_label": "#1C1917",
+          "accent": "#C9A227",
+          "shadow": "#F5F2E9"
+        }
+      },
+      "scheme-6": {
+        "settings": {
+          "background": "#22432F",
+          "background_gradient": "",
+          "text": "#F5F2E9",
+          "button": "#C9A227",
+          "button_label": "#1C1917",
+          "accent": "#E6C96A",
+          "shadow": "#F5F2E9"
+        }
+      }
+    }
+  },
   "presets": {
     "Terracotta": {
       "logo_width": 120,
