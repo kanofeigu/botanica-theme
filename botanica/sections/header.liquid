@@ -298,6 +298,11 @@
   var activePanel = null;
   var activeTrigger = null;
   var closeTimer = 0;
+  /* Set while Esc-moved focus lands on the trigger: that programmatic
+     focus must NOT reopen the panel it just closed (focus management
+     requires focus on the trigger after Esc; the focus handler below
+     would otherwise immediately re-open the menu). */
+  var suppressFocusOpen = false;
 
   function openPanel(trigger, panel) {
     clearTimeout(closeTimer);
@@ -401,13 +406,16 @@
     item.addEventListener('mouseenter', function() { openPanel(trigger, panel); });
     item.addEventListener('mouseleave', scheduleClose);
 
-    trigger.addEventListener('focus', function() { openPanel(trigger, panel); });
+    trigger.addEventListener('focus', function() {
+      if (suppressFocusOpen) { suppressFocusOpen = false; return; }
+      openPanel(trigger, panel);
+    });
     item.addEventListener('focusout', function(e) {
       if (!item.contains(e.relatedTarget)) scheduleClose();
     });
 
     item.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') { closeAll(); trigger.focus(); }
+      if (e.key === 'Escape') { closeAll(); suppressFocusOpen = true; trigger.focus(); }
     });
 
     // Flyout hover — attach to sidebar items inside this panel
