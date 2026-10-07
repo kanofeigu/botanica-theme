@@ -84,6 +84,10 @@
   .bt-featured-collection__view-all:hover svg {
     transform: translateX(4px);
   }
+  /* Touch target: the quiet text link reaches 44px tall on phones (WCAG 2.5.8) */
+  @media (max-width: 749px) {
+    .bt-featured-collection__view-all { min-height: 44px; }
+  }
   .bt-featured-collection__grid {
     display: grid;
     gap: var(--bt-grid-gap);

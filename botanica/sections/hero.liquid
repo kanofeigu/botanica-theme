@@ -647,38 +647,64 @@
     border-top: 1px solid var(--bt-hairline);
   }
 
-  /* ── Mobile: glass drops to a solid card, panel centers, type clamps ── */
+  /* ── Mobile: bottom-scrim composition — bare type over a deepened
+     gradient, left-aligned, one thumb-reachable CTA. The glass/solid panel
+     (a desktop editorial device) dissolves so the photo carries the fold. ── */
   @media (max-width: 749px) {
-    .bt-hero--height-small { min-height: 56svh; }
-    .bt-hero--height-medium { min-height: 68svh; }
-    .bt-hero--height-large { min-height: 78svh; }
+    /* Shorter than desktop: a phone viewport must show content past the fold */
+    .bt-hero--height-small { min-height: 40svh; }
+    .bt-hero--height-medium { min-height: 50svh; }
+    .bt-hero--height-large { min-height: 60svh; }
+
+    /* Deepen the lower gradient — type now sits directly on the photo */
+    .bt-hero--full-bleed .bt-hero__scrim {
+      background:
+        linear-gradient(180deg, rgba(var(--bt-color-bg-rgb), 0.18) 0%, rgba(var(--bt-color-bg-rgb), 0) 26%),
+        linear-gradient(180deg, rgba(var(--bt-color-bg-rgb), 0) 28%, rgba(var(--bt-color-bg-rgb), min(0.85, calc(var(--bt-hero-scrim, 0.45) + 0.25))) 100%);
+    }
 
     .bt-hero__stage {
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-end;
       gap: var(--bt-space-sm);
-      padding-top: clamp(3rem, 8vh, 5rem);
+      padding-top: clamp(2rem, 6vh, 3.5rem);
       padding-bottom: var(--bt-space-md);
     }
-    /* Small screens: frosted panel becomes a solid translucent card —
-       blur on a full-width mobile panel is costly and the fallback is
-       already WCAG-safe (scheme bg at high opacity + scheme text). */
+
+    /* Panel dissolves: no glass blur, no solid card — bare type on the scrim */
+    .bt-hero--full-bleed .bt-hero__panel,
     .bt-hero--full-bleed .bt-hero__panel.bt-glass {
+      background: none;
+      background-image: none;
+      border: none;
+      box-shadow: none;
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
-      background: rgba(var(--bt-color-bg-rgb), 0.86);
-      background-image: none;
-    }
-    .bt-hero--full-bleed .bt-hero__panel {
       max-width: 100%;
       margin-inline: 0;
       text-align: left;
-      padding: var(--bt-space-lg);
+      padding: 0;
+      color: var(--bt-color-text);
+      text-shadow: 0 1px 24px rgba(var(--bt-color-bg-rgb), 0.55);
     }
+    .bt-hero--full-bleed .bt-hero__eyebrow { margin-bottom: var(--bt-space-2xs); }
     .bt-hero--full-bleed .bt-hero__heading {
       max-width: 16ch;
+      text-wrap: balance;
     }
+    .bt-hero--full-bleed .bt-hero__text {
+      color: var(--bt-color-text);
+      margin-bottom: var(--bt-space-md);
+    }
+    /* Single thumb-reachable CTA */
+    .bt-hero--full-bleed .bt-hero__panel .bt-btn {
+      width: 100%;
+      justify-content: center;
+      min-height: 48px;
+    }
+    /* Editorial specimen caption (Nº 001 / latin name) is desktop furniture */
+    .bt-hero--full-bleed .bt-hero__specimen { display: none; }
     .bt-hero--full-bleed .bt-hero__product-card {
       position: relative;
       inset-inline-end: auto;

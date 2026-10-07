@@ -24,13 +24,13 @@
       "type": "hero",
       "settings": {
         "layout": "split",
+        "image": "shopify://shop_images/botanica-hero-home.png",
         "eyebrow": "Issue 01 — Field guide",
         "heading": "Bring the outside in",
         "text": "Curated indoor plants selected for their beauty, resilience, and ability to transform any space into a living sanctuary.",
         "button_label": "Explore the collection",
         "button_link": "/collections/all",
-        "mobile_overlay": true,
-        "image": "shopify://shop_images/botanica-hero-home.png"
+        "mobile_overlay": true
       }
     },
     "rich-text-intro": {
@@ -181,10 +181,10 @@
       ],
       "settings": {
         "layout": "text_first",
+        "image": "shopify://shop_images/botanica-care-guide.png",
         "image_aspect": "4-5",
         "padding_top": 40,
-        "padding_bottom": 40,
-        "image": "shopify://shop_images/botanica-care-guide.png"
+        "padding_bottom": 40
       }
     },
     "plant-spotlight": {
@@ -348,57 +348,6 @@
         "padding_bottom": 40
       }
     },
-    "size-guide": {
-      "type": "size-guide",
-      "blocks": {
-        "mini": {
-          "type": "size-card",
-          "settings": {
-            "title": "Mini",
-            "height_cm": 15,
-            "pot_cm": 8,
-            "description": "Palm-sized. Desks, nightstands, and tiny corners"
-          }
-        },
-        "desk": {
-          "type": "size-card",
-          "settings": {
-            "title": "Desk",
-            "height_cm": 35,
-            "pot_cm": 14,
-            "description": "Windowsills, bookshelves, and side tables"
-          }
-        },
-        "floor": {
-          "type": "size-card",
-          "settings": {
-            "title": "Floor",
-            "height_cm": 75,
-            "pot_cm": 22,
-            "description": "Next to sofas, armchairs, and consoles"
-          }
-        },
-        "statement": {
-          "type": "size-card",
-          "settings": {
-            "title": "Statement",
-            "height_cm": 130,
-            "pot_cm": 36,
-            "description": "Room corners, entryways, and double-height spaces"
-          }
-        }
-      },
-      "block_order": [
-        "mini",
-        "desk",
-        "floor",
-        "statement"
-      ],
-      "settings": {
-        "heading": "Find your size",
-        "description": "From windowsill companions to living room centerpieces — every plant has its place."
-      }
-    },
     "care-blog-teaser": {
       "type": "care-blog-teaser",
       "blocks": {
@@ -437,6 +386,7 @@
       ],
       "settings": {
         "heading": "The Field Journal",
+        "blog": "plant-care-journal-1",
         "use_manual": false,
         "show_excerpt": true,
         "show_date": true,
@@ -491,7 +441,6 @@
     "image-with-text",
     "plant-spotlight",
     "multicolumn",
-    "size-guide",
     "care-blog-teaser",
     "rich-text-closing",
     "newsletter",

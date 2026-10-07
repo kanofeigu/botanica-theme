@@ -148,4 +148,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  /* Mobile: breadcrumbs consume the PDP's most valuable first-viewport
+     pixels without aiding one-thumb navigation — hide the whole trail.
+     (JSON-LD above still ships, so SEO breadcrumbs are unaffected.) */
+  @media (max-width: 749px) {
+    .bt-breadcrumbs {
+      display: none;
+    }
+  }
 {% endstylesheet %}

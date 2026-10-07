@@ -55,6 +55,12 @@
   .bt-qty__btn:hover { background: var(--bt-color-bg); color: var(--bt-color-primary); box-shadow: var(--bt-shadow-sm); }
   .bt-qty__input { width: 44px; height: 40px; border: none; text-align: center; font-size: var(--bt-fs-body); font-weight: var(--bt-fw-semibold); font-family: var(--bt-font-body); color: var(--bt-color-text); background: transparent; -moz-appearance: textfield; }
   .bt-qty__input::-webkit-inner-spin-button, .bt-qty__input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  /* Touch targets: stepper hit area 40px → 44px on phones (WCAG 2.5.8) */
+  @media (max-width: 749px) {
+    .bt-qty__btn { width: 44px; height: 44px; }
+    .bt-qty__input { height: 44px; }
+  }
 {% endstylesheet %}
 
 {% schema %}

@@ -97,6 +97,10 @@
     transition: color var(--bt-duration-fast) var(--bt-ease-out);
   }
   .bt-size-guide-link__btn:hover { color: var(--bt-color-text); }
+  /* Touch target: quiet text link reaches 44px tall on phones (WCAG 2.5.8) */
+  @media (max-width: 749px) {
+    .bt-size-guide-link__btn { min-height: 44px; }
+  }
   .bt-size-guide__inner {
     max-width: min(560px, 92vw);
     margin: auto;

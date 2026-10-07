@@ -160,18 +160,38 @@
     }
   }
   .bt-collection-card__placeholder { width: 100%; height: 100%; background: var(--bt-color-surface); }
-  /* Mobile: frosted strip becomes a solid card chip (no backdrop cost) */
+  /* Mobile: the stacked grid becomes an edge-to-edge horizontal rail with a
+     peek of the next card — swipe affordance replaces five ~600px-tall
+     stacked cards that stretched the home page to ~16 screens. */
   @media (max-width: 749px) {
-    .bt-collection-list__grid--3-col, .bt-collection-list__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+    .bt-collection-list__grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      /* Bleed to the viewport edge; gutter padding keeps the first card
+         aligned with the rest of the page. */
+      margin-inline: calc(-1 * var(--bt-page-gutter));
+      padding-inline: var(--bt-page-gutter);
+      scroll-padding-inline: var(--bt-page-gutter);
+      -webkit-overflow-scrolling: touch;
+    }
+    .bt-collection-list__grid::-webkit-scrollbar { display: none; }
+    .bt-collection-card {
+      flex: 0 0 min(72vw, 300px);
+      scroll-snap-align: start;
+    }
+    .bt-collection-card__title { font-size: var(--bt-fs-body); }
+    /* Frosted strip becomes a solid card chip (no backdrop cost) */
     .bt-collection-card__label.bt-glass {
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
       background: rgb(var(--bt-color-bg-rgb) / 0.85);
       background-image: none;
     }
-  }
-  @media (max-width: 479px) {
-    .bt-collection-list__grid { grid-template-columns: 1fr; }
+    /* Compress merchant section padding (inline style) for mobile rhythm */
+    .bt-collection-list.bt-section { padding-top: 32px !important; padding-bottom: 32px !important; }
+    .bt-collection-list__heading { margin-bottom: var(--bt-space-md); }
   }
 {% endstylesheet %}
 

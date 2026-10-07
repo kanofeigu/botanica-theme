@@ -68,7 +68,27 @@
     to { opacity: 1; transform: translateY(0); }
   }
   @media (max-width: 749px) {
-    .bt-shop-by-care__grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
+    /* Stacked tall cards become an edge-to-edge horizontal rail with a
+       peek of the next card (same pattern as the category rail). */
+    .bt-shop-by-care__grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      max-width: none;
+      margin-inline: calc(-1 * var(--bt-page-gutter));
+      padding-inline: var(--bt-page-gutter);
+      scroll-padding-inline: var(--bt-page-gutter);
+      -webkit-overflow-scrolling: touch;
+    }
+    .bt-shop-by-care__grid::-webkit-scrollbar { display: none; }
+    .bt-shop-by-care__grid > * {
+      flex: 0 0 min(78vw, 320px);
+      scroll-snap-align: start;
+    }
+    /* Compress merchant section padding (inline style) for mobile rhythm */
+    .bt-shop-by-care.bt-section { padding-top: 32px !important; padding-bottom: 32px !important; }
+    .bt-shop-by-care__desc { margin-bottom: var(--bt-space-md); }
   }
 {% endstylesheet %}
 

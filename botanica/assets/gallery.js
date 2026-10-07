@@ -20,6 +20,38 @@ class BtProductGallery extends HTMLElement {
     if(this.nextArrow)this.nextArrow.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();this.stepSlide(1)});
     this.reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    /* Dot pagination (mobile pattern — rendered next to the thumb strip,
+       CSS decides which one is visible). Clicking a dot reuses the same
+       media-id resolution as variant switches. */
+    this.dots=Array.from(this.querySelectorAll('[data-gallery-dot]'));
+    this.dots.forEach(d=>{
+      d.addEventListener('click',()=>this.goToMediaId(d.dataset.mediaId));
+    });
+
+    /* ── Touch swipe: horizontal flicks step the same slide engine the
+       arrows drive (CSS hides arrows/thumbs on phones; dots stay in sync
+       via showSlide). touch-action:pan-y in the section stylesheet keeps
+       vertical page scroll native, so a horizontal-dominated gesture is
+       unambiguous. lastSwipe arms a short window during which the
+       tap-to-zoom click handler ignores the gesture's trailing click. ── */
+    this.lastSwipe=0;
+    let tsX=0,tsY=0,swiping=false;
+    this.main.addEventListener('touchstart',e=>{
+      tsX=e.touches[0].clientX;tsY=e.touches[0].clientY;swiping=false;
+    },{passive:true});
+    this.main.addEventListener('touchmove',e=>{
+      const dx=e.touches[0].clientX-tsX,dy=e.touches[0].clientY-tsY;
+      if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.2)swiping=true;
+    },{passive:true});
+    this.main.addEventListener('touchend',e=>{
+      if(!swiping||this.slides.length<=1)return;
+      const dx=e.changedTouches[0].clientX-tsX;
+      if(Math.abs(dx)>40){
+        this.stepSlide(dx<0?1:-1);
+        this.lastSwipe=Date.now();
+      }
+    },{passive:true});
+
     /* Warm up lazy slide images while idle: hidden (display:none) slides
        never lazy-load, so the first switch would flash a blank plate. */
     const warm=()=>{
@@ -54,6 +86,8 @@ class BtProductGallery extends HTMLElement {
     /* Clicking the main stage opens zoom too (guarded to image slides inside openZoom) */
     this.main.addEventListener('click',(e)=>{
       if(e.target.closest('[data-zoom-open]'))return;
+      /* A tap that ended a swipe gesture must not open the lightbox */
+      if(this.lastSwipe&&Date.now()-this.lastSwipe<400)return;
       this.openZoom();
     });
 
@@ -114,6 +148,17 @@ class BtProductGallery extends HTMLElement {
       setTimeout(()=>slide.classList.remove('is-entering'),340);
     }
     this.main.setAttribute('data-media-id',slide.dataset.mediaId||'');
+    /* Keep mobile dot pagination in sync */
+    if(this.dots)this.dots.forEach(d=>d.classList.toggle('is-active',d.dataset.mediaId===String(slide.dataset.mediaId)));
+  }
+
+  /* Resolve a media id through the thumb strip when present (keeps thumb
+     active states in sync), otherwise drive the slide directly. */
+  goToMediaId(id){
+    const thumb=this.thumbs.find(t=>t.dataset.mediaId===String(id));
+    if(thumb){this.switchTo(thumb);return}
+    const slide=this.slides.find(s=>s.dataset.mediaId===String(id));
+    if(slide)this.showSlide(slide);
   }
 
   /* Stage arrows: wrap around the slide list, keep thumbs in sync */

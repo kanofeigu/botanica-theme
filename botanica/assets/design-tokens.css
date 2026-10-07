@@ -111,16 +111,21 @@
   --bt-fw-semibold: 600;
   --bt-fw-bold: 700;
 
-  /* ── Spacing ── */
+  /* ── Spacing ──
+     Small steps (3xs–sm) stay fixed — gaps that tiny shouldn't shrink.
+     md→3xl are FLUID: each holds its legacy px value at a 1440px viewport
+     and eases down to a tighter floor at 390px, so every component that
+     consumes the scale breathes proportionally on any screen width
+     (no breakpoint step-jumps). Formula: clamp(floor, intercept + slope). */
   --bt-space-3xs: 4px;
   --bt-space-2xs: 8px;
   --bt-space-xs: 12px;
   --bt-space-sm: 16px;
-  --bt-space-md: 24px;
-  --bt-space-lg: 32px;
-  --bt-space-xl: 48px;
-  --bt-space-2xl: 64px;
-  --bt-space-3xl: 80px;
+  --bt-space-md: clamp(1.25rem, 1.157rem + 0.381vw, 1.5rem);   /* 24px @1440 → 20px @390 */
+  --bt-space-lg: clamp(1.5rem, 1.314rem + 0.762vw, 2rem);      /* 32px @1440 → 24px @390 */
+  --bt-space-xl: clamp(2rem, 1.629rem + 1.524vw, 3rem);        /* 48px @1440 → 32px @390 */
+  --bt-space-2xl: clamp(2.5rem, 1.943rem + 2.286vw, 4rem);     /* 64px @1440 → 40px @390 */
+  --bt-space-3xl: clamp(3rem, 2.257rem + 3.048vw, 5rem);       /* 80px @1440 → 48px @390 */
   --bt-space-section: clamp(2.5rem, 6vw, 5rem);
   /* Editorial section rhythm: a generous 80–120px vertical band on desktop,
      proportionally tighter on mobile (56px floor). New/rebuilt sections
@@ -193,9 +198,9 @@
   --bt-hairline: rgba(var(--bt-color-text-rgb), 0.14);
 
   /* ── Layout ── */
-  --bt-max-width: 1300px;
+  --bt-max-width: 1300px; /* cap stays fixed: line-length ceiling, not a scaling value */
   --bt-page-gutter: clamp(1rem, 4vw, 2.5rem);
-  --bt-grid-gap: 24px;
+  --bt-grid-gap: clamp(1rem, 0.814rem + 0.762vw, 1.5rem); /* 24px @1440 → 16px @390 */
   --bt-content-max: 65ch;
 
   /* ── Z-index scale ── */

@@ -857,10 +857,12 @@
           "name": "Question",
           "settings": {
             "question": {
-              "label": "Question"
+              "label": "Question",
+              "default": "How do I know when to water my plant?"
             },
             "answer": {
-              "label": "Answer"
+              "label": "Answer",
+              "default": "<p>Stick your finger about 2 inches into the soil. If it feels dry, it's time to water. Most indoor plants prefer to dry out slightly between waterings.</p>"
             }
           }
         }
@@ -1544,7 +1546,8 @@
       "name": "Rich text",
       "settings": {
         "text": {
-          "label": "Rich text content"
+          "label": "Rich text content",
+          "default": "<p>Rich text content goes here.</p>"
         }
       }
     },
@@ -1827,25 +1830,32 @@
       "name": "Care panel",
       "settings": {
         "panel_title": {
-          "label": "Panel title"
+          "label": "Panel title",
+          "default": "Care at a glance"
         },
         "care_light": {
-          "label": "Light"
+          "label": "Light",
+          "default": "Bright, indirect"
         },
         "care_water": {
-          "label": "Water"
+          "label": "Water",
+          "default": "When top 2cm dry"
         },
         "care_humidity": {
-          "label": "Humidity"
+          "label": "Humidity",
+          "default": "50–60%"
         },
         "care_size": {
-          "label": "Mature size"
+          "label": "Mature size",
+          "default": "Up to 120cm indoors"
         },
         "care_toxicity": {
-          "label": "Toxicity"
+          "label": "Toxicity",
+          "default": "Mild — keep from pets"
         },
         "care_food": {
-          "label": "Food"
+          "label": "Food",
+          "default": "Monthly in growing season"
         }
       }
     },

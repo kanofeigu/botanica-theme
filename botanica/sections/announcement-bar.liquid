@@ -235,6 +235,14 @@
     outline-offset: var(--bt-focus-ring-offset);
   }
 
+  /* Touch targets: arrows grow to a 44px hit area on phones (WCAG 2.5.8) */
+  @media (max-width: 749px) {
+    .bt-announcement-bar__arrow {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
   /* Reduced motion: no fade, JS also skips autoplay */
   @media (prefers-reduced-motion: reduce) {
     .bt-announcement-bar__message {

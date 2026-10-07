@@ -115,7 +115,7 @@ Rationale:
 - Original Skeleton codebase — zero Dawn/Horizon derivation, fully 2026-compliant
 - 9 custom sections + 20+ theme blocks for unlimited layout combinations
 - Care-guide commerce features not found in any current Theme Store plant theme
-- Full i18n with en/fr/zh-CN curated translations
+- Full i18n via `t:` translation keys (English locale included; merchants can add more languages)
 
 Competitive reference:
 - Generic Skeleton remixes: $120–$180

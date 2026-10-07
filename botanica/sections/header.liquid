@@ -1185,6 +1185,32 @@
     .bt-mega {
       display: none !important;
     }
+    /* Touch targets: 40px → 44px (WCAG 2.5.8) */
+    .bt-header__icon-btn {
+      width: 44px;
+      height: 44px;
+    }
+    /* Logo link: padding grows the hit area to 44px tall */
+    .bt-header__logo {
+      padding-block: 12px;
+    }
+
+    /* Drawer: chunkier 48px rows with hairline separators between topics —
+       one glance separates destinations, one thumb reaches them. */
+    .bt-header__drawer-links > li {
+      border-bottom: 1px solid var(--bt-color-border-light);
+    }
+    .bt-header__drawer-group { border-bottom: none; }
+    .bt-header__drawer-link,
+    .bt-header__drawer-summary {
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      padding-block: 6px;
+    }
+    .bt-header__drawer-link--top {
+      font-size: calc(var(--bt-fs-body) * 1.0625);
+    }
   }
 
   /* Desktop: show nav, hide hamburger */

@@ -1456,6 +1456,13 @@
     /* Save horizontal room: drop the "SORT BY:" prefix on phones */
     .bt-sort__label-prefix { display: none; }
     .bt-sort__button { padding-inline: 0.75em; }
+    /* Touch targets: filter & sort pills reach 44px on phones (WCAG 2.5.8) */
+    .bt-collection-grid__filter-trigger,
+    .bt-sort__button { min-height: 44px; }
+    /* Drawer facet rows: the label is the tap target (input is sr-only) */
+    .bt-filter-checkbox { min-height: 44px; }
+    /* Price fields: 44px tall, 16px text stops iOS auto-zoom */
+    .bt-price-range__input { min-height: 44px; font-size: 1rem; }
     /* Mobile product grid: fixed two-up with tightened gutters. */
     .bt-collection-grid .bt-grid {
       gap: var(--bt-space-xs);

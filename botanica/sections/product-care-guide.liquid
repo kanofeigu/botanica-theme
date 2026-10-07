@@ -25,7 +25,51 @@
           <h2 class="bt-care-guide__heading">{{ section.settings.heading | escape }}</h2>
         {%- endif -%}
         {%- if section.settings.body != blank -%}
-          <div class="bt-care-guide__body bt-rich-text">{{ section.settings.body }}</div>
+          {%- comment -%} Topic accordion: merchant richtext uses h3 per care
+               topic (Light / Water / …). Split on those headings so each
+               topic becomes an OPEN <details> — desktop (and no-JS) reads
+               the long article flat; the script below collapses the topics
+               on phones. Falls back to the flat body when no h3 structure
+               exists. (CSS-forcing a closed <details> open does not paint
+               its content in modern browsers.) {%- endcomment -%}
+          {%- if section.settings.body contains '<h3>' -%}
+            {%- assign chunks = section.settings.body | split: '<h3>' -%}
+            {%- assign intro = chunks[0] | strip -%}
+            {%- if intro != '' -%}
+              <div class="bt-care-guide__body bt-rich-text">{{ intro }}</div>
+            {%- endif -%}
+            <div class="bt-care-guide__topics">
+              {%- for chunk in chunks offset: 1 -%}
+                {%- assign parts = chunk | split: '</h3>' -%}
+                {%- if parts.size == 2 -%}
+                  <details class="bt-care-guide__topic" open>
+                    <summary class="bt-care-guide__topic-summary">
+                      <span class="bt-care-guide__topic-title">{{ parts[0] | strip_html | strip }}</span>
+                      <svg class="bt-care-guide__topic-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                    </summary>
+                    <div class="bt-care-guide__topic-body bt-rich-text">{{ parts[1] }}</div>
+                  </details>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            {% comment %} Collapse topics on phones only; desktop keeps the
+                 flat long-article layout. Synchronous — runs before first
+                 paint, no flash of expanded topics on mobile. {% endcomment %}
+            <script>
+              (function () {
+                var mq = window.matchMedia('(max-width: 749px)');
+                function syncCareTopics() {
+                  document.querySelectorAll('.bt-care-guide__topic').forEach(function (topic) {
+                    topic.open = !mq.matches;
+                  });
+                }
+                syncCareTopics();
+                mq.addEventListener('change', syncCareTopics);
+              })();
+            </script>
+          {%- else -%}
+            <div class="bt-care-guide__body bt-rich-text">{{ section.settings.body }}</div>
+          {%- endif -%}
         {%- endif -%}
       </div>
     </div>
@@ -70,8 +114,56 @@
   .bt-care-guide__body p { margin: 0 0 var(--bt-space-2xs); }
   .bt-care-guide__body ul, .bt-care-guide__body ol { margin: 0 0 var(--bt-space-2xs); padding-left: 1.25em; }
   .bt-care-guide__body li { margin-bottom: var(--bt-space-3xs); }
+  /* ── Topic accordions: collapsed rows on phones (the flat version read as
+     a text wall); topics render open so desktop/no-JS show the full article. ── */
+  .bt-care-guide__topics {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--bt-space-sm);
+  }
+  .bt-care-guide__topic {
+    border-bottom: 1px solid var(--bt-hairline);
+  }
+  .bt-care-guide__topic:first-child {
+    border-top: 1px solid var(--bt-hairline);
+  }
+  .bt-care-guide__topic-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-space-sm);
+    min-height: 48px;
+    padding-block: var(--bt-space-2xs);
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--bt-font-heading);
+    font-size: var(--bt-fs-h4);
+    font-weight: var(--bt-fw-semibold);
+    color: var(--bt-color-text);
+    user-select: none;
+  }
+  .bt-care-guide__topic-summary::-webkit-details-marker { display: none; }
+  .bt-care-guide__topic-chevron {
+    flex-shrink: 0;
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-care-guide__topic[open] .bt-care-guide__topic-chevron { transform: rotate(180deg); }
+  .bt-care-guide__topic-body { padding-bottom: var(--bt-space-sm); }
+  .bt-care-guide__topic-body > :first-child { margin-top: 0; }
+
   @media (min-width: 750px) {
     .bt-care-guide__inner { grid-template-columns: 2fr 3fr; align-items: start; gap: var(--bt-space-lg); }
+    /* Desktop: topics ship open (JS closes them on phones), so here we just
+       strip the accordion chrome — borders, chevron, summary affordances. */
+    .bt-care-guide__topics { margin-top: 0; }
+    .bt-care-guide__topic { border: none; }
+    .bt-care-guide__topic-body { padding-bottom: 0; }
+    .bt-care-guide__topic-summary { pointer-events: none; cursor: default; min-height: 0; padding-block: 0; }
+    .bt-care-guide__topic-chevron { display: none; }
+  }
+  /* Mobile: compress merchant section padding (inline style) for a tighter page rhythm */
+  @media (max-width: 749px) {
+    .bt-care-guide { padding-top: 28px !important; padding-bottom: 28px !important; }
   }
 {% endstylesheet %}
 

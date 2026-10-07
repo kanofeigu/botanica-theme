@@ -485,6 +485,11 @@
   .bt-search .bt-price-range__input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   .bt-search .bt-price-range__sep { padding-bottom: 8px; font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); flex-shrink: 0; }
 
+  /* Price fields on phones: 44px tall, 16px text stops iOS auto-zoom */
+  @media (max-width: 749px) {
+    .bt-search .bt-price-range__input { min-height: 44px; font-size: 1rem; }
+  }
+
   /* ── Object-type badge on non-product result cards ── */
   .bt-search__type-badge {
     display: inline-block;

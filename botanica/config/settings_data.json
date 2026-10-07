@@ -107,7 +107,6 @@
       "predictive_search_enabled": true,
       "cart_type": "drawer",
       "show_free_shipping_bar": true,
-      "free_shipping_threshold": "75",
       "show_currency_code": true,
       "color_schemes": {
         "scheme-1": {
@@ -196,7 +195,6 @@
       "predictive_search_enabled": true,
       "cart_type": "drawer",
       "show_free_shipping_bar": true,
-      "free_shipping_threshold": "60",
       "show_currency_code": true,
       "color_schemes": {
         "scheme-1": {
@@ -267,7 +265,7 @@
         }
       }
     },
-    "Atrium": {
+    "Verdant": {
       "logo_width": 120,
       "heading_font": "cormorant_n5",
       "body_font": "montserrat_n4",
@@ -285,7 +283,6 @@
       "predictive_search_enabled": true,
       "cart_type": "drawer",
       "show_free_shipping_bar": true,
-      "free_shipping_threshold": "50",
       "show_currency_code": true,
       "color_schemes": {
         "scheme-1": {

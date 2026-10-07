@@ -14,14 +14,22 @@
               {%- endif -%}
             </div>
           {%- when 'links' -%}
-            <div class="bt-footer__col" {{ block.shopify_attributes }}>
-              <h3 class="bt-footer__col-title">{{ block.settings.title }}</h3>
+            {% comment %} Links column renders as an OPEN <details>: desktop
+                 (and no-JS) shows the link list natively; the script after
+                 the footer closes it on phones, where it becomes a
+                 thumb-friendly accordion. (CSS-forcing a closed <details>
+                 open does not paint its content in modern browsers.) {% endcomment %}
+            <details class="bt-footer__col bt-footer__col--accordion" {{ block.shopify_attributes }} open>
+              <summary class="bt-footer__col-summary">
+                <h3 class="bt-footer__col-title">{{ block.settings.title }}</h3>
+                <svg class="bt-footer__col-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </summary>
               <ul class="bt-footer__links">
                 {%- for link in block.settings.menu.links -%}
                   <li><a href="{{ link.url }}" class="bt-footer__link">{{ link.title }}</a></li>
                 {%- endfor -%}
               </ul>
-            </div>
+            </details>
           {%- when 'newsletter' -%}
             <div class="bt-footer__col" {{ block.shopify_attributes }}>
               <h3 class="bt-footer__col-title">{{ block.settings.title }}</h3>
@@ -141,6 +149,22 @@
   </div>
 </footer>
 
+{% comment %} Phones: collapse link columns into accordions; desktop keeps
+     them open. Runs synchronously right after the markup (no flash of
+     expanded content) and stays in sync across viewport changes. {% endcomment %}
+<script>
+  (function () {
+    var mq = window.matchMedia('(max-width: 749px)');
+    function syncFooterAccordion() {
+      document.querySelectorAll('.bt-footer__col--accordion').forEach(function (col) {
+        col.open = !mq.matches;
+      });
+    }
+    syncFooterAccordion();
+    mq.addEventListener('change', syncFooterAccordion);
+  })();
+</script>
+
 {% stylesheet %}
   /* Deep-field footer: same scheme background as the newsletter section
      above it, no hairline seam — the two read as one continuous field. */
@@ -179,6 +203,42 @@
   .bt-footer__copyright { font-size: var(--bt-fs-body-xs); color: var(--bt-color-text-muted); text-align: center; }
   .bt-footer__copyright a { color: var(--bt-color-text-muted); }
   @media (min-width: 750px) { .bt-footer__bottom { flex-direction: row; justify-content: space-between; } }
+
+  /* Links accordion: the <details> ships open (desktop/no-JS show the list
+     natively); JS collapses it on phones. Desktop just hides the affordance. */
+  .bt-footer__col-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-space-sm);
+    list-style: none;
+  }
+  .bt-footer__col-summary::-webkit-details-marker { display: none; }
+  .bt-footer__col-chevron {
+    flex-shrink: 0;
+    color: var(--bt-color-text-muted);
+    transition: transform var(--bt-duration-fast) var(--bt-ease-out);
+  }
+  .bt-footer__col--accordion[open] .bt-footer__col-chevron { transform: rotate(180deg); }
+  @media (min-width: 750px) {
+    .bt-footer__col-summary { pointer-events: none; }
+    .bt-footer__col-chevron { display: none; }
+  }
+
+  /* Touch targets: footer links & social icons reach 44px on phones (WCAG 2.5.8) */
+  @media (max-width: 749px) {
+    .bt-footer { padding-block: var(--bt-space-lg) var(--bt-space-md); }
+    .bt-footer__grid { margin-bottom: var(--bt-space-lg); }
+    /* Accordion rows: hairline-separated, 48px summary hit area */
+    .bt-footer__col--accordion { border-bottom: 1px solid var(--bt-hairline); }
+    .bt-footer__col-summary { min-height: 48px; cursor: pointer; }
+    .bt-footer__col--accordion .bt-footer__col-title { margin: 0; }
+    .bt-footer__col--accordion .bt-footer__links { padding-bottom: var(--bt-space-xs); }
+    .bt-footer__link { display: block; padding-block: 12px; }
+    .bt-footer__links { gap: 0; }
+    .bt-footer__social-link { width: 44px; height: 44px; }
+    .bt-footer__copyright a { display: inline-block; padding-block: 14px; }
+  }
 {% endstylesheet %}
 
 {% schema %}

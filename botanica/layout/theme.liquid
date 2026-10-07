@@ -232,7 +232,9 @@
       --bt-font-body: {{ settings.body_font.family }}, {{ settings.body_font.fallback_families }};
       --bt-fs-body: {{ settings.body_scale | divided_by: 100.0 }}rem;
       --bt-max-width: {{ settings.max_width }}px;
-      --bt-grid-gap: {{ settings.grid_horizontal_spacing }}px;
+      /* Fluid grid gap: merchant setting = desktop (1440px) value, easing
+         down to ~2/3 of it at 390px — mirrors the design-tokens fallback. */
+      --bt-grid-gap: clamp({{ settings.grid_horizontal_spacing | times: 0.667 | round: 0 }}px, {{ settings.grid_horizontal_spacing | times: 0.543 | round: 1 }}px + {{ settings.grid_horizontal_spacing | times: 0.0317 | round: 3 }}vw, {{ settings.grid_horizontal_spacing }}px);
       --bt-radius-btn: {{ settings.button_corner_radius }}px;
       --bt-radius-input: {{ settings.inputs_corner_radius }}px;
       --bt-radius-card: {{ settings.card_corner_radius }}px;
@@ -469,5 +471,8 @@
     <script src="{{ 'search.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
   <script src="{{ 'sticky-atc.js' | asset_url }}" defer="defer"></script>
+  {%- comment -%} SVG icon sprite — one hidden document, referenced via
+      <use href="#bt-icon-*"> by every icon snippet. {%- endcomment -%}
+  {% render 'bt-icon-sprite' %}
 </body>
 </html>

@@ -192,9 +192,9 @@
     .bt-ambience .bt-vine--right { width: 60px; transform: translateX(20px); }
     .bt-ambience .bt-bg-botanical--left,
     .bt-ambience .bt-bg-botanical--right { width: 80px; }
-    /* Halve the leaf count on mobile (4 rendered → 2 visible) */
-    .bt-ambience .bt-leaf--2,
-    .bt-ambience .bt-leaf--4 { display: none; }
+    /* Falling leaves read as stray artifacts ("ghost blobs") drifting over
+       phone content — disable the effect entirely under 750px. */
+    .bt-ambience .bt-falling-leaves { display: none; }
     .bt-ambience .bt-spore--5,
     .bt-ambience .bt-spore--7,
     .bt-ambience .bt-spore--9,
