@@ -11,8 +11,8 @@ Editorial "plant encyclopedia" aesthetic — not a Dawn derivative.
 
 | Branch | State | Purpose |
 |---|---|---|
-| `main` | ✅ synced @ `c1aa150` | Default branch — always mirrors the latest stable work |
-| `product` | ✅ synced @ `c1aa150` | Active development branch; merged into `main` at each milestone |
+| `main` | ✅ in sync | Default branch — always mirrors the latest stable work |
+| `product` | ✅ in sync | Active development branch; merged into `main` at each milestone |
 | `product-data` | archived | Store data tooling (metafield scripts, audits) |
 | `redesign/*` | archived | Historical layout exploration branches |
 
