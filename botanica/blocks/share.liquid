@@ -41,6 +41,10 @@
   .bt-share__link:focus-visible {
     background: var(--bt-color-surface, #FAF7EF);
   }
+  /* Phones: 36px icons grow to a 44px thumb target */
+  @media (max-width: 749px) {
+    .bt-share__link { width: 44px; height: 44px; }
+  }
 {% endstylesheet %}
 
 {% schema %}

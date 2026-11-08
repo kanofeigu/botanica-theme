@@ -189,6 +189,9 @@
   .bt-care-blog__card .bt-card__body { padding: var(--bt-space-sm); }
   @media (max-width: 749px) {
     .bt-care-blog__grid { grid-template-columns: 1fr; }
+    /* Compact outline button still needs a 44px thumb target (the .bt-btn--sm
+       sizing lives in base.css, hence the two-class selector here) */
+    .bt-btn.bt-care-blog__view-all { min-height: 44px; }
   }
 {% endstylesheet %}
 

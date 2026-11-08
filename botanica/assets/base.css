@@ -749,6 +749,19 @@ img.bt-img-wait {
 .bt-cart-drawer__note { display: flex; flex-direction: column; gap: var(--bt-space-2xs); }
 .bt-cart-drawer__note-label { font-size: var(--bt-fs-body-sm); color: var(--bt-color-text-muted); cursor: pointer; }
 .bt-cart-drawer__note-input { width: 100%; padding: 0.5em 0.75em; font-size: var(--bt-fs-body-sm); resize: none; }
+/* Phones: 16px minimum on the gift-note textarea — anything smaller makes
+   iOS Safari zoom the whole page when the field receives focus. */
+@media (max-width: 749px) {
+  .bt-cart-drawer__note-input { font-size: var(--bt-fs-body); }
+  /* Thumb-sized qty stepper and remove action inside the drawer (WCAG 2.5.8).
+     Mirrors the 44px control size already used on the cart page. */
+  .bt-cart-drawer .bt-qty-stepper__btn { width: 44px; height: 44px; }
+  .bt-cart-drawer .bt-qty-stepper__value { min-width: 32px; height: 44px; }
+  .bt-cart-drawer__item-remove { width: 44px; height: 44px; }
+  /* Narrow drawer columns: let the line price drop below the stepper
+     instead of forcing the row wider than the item body. */
+  .bt-cart-drawer__item-qty-row { flex-wrap: wrap; row-gap: var(--bt-space-3xs); }
+}
 
 /* Upsell */
 .bt-cart-drawer__upsell { margin-top: var(--bt-space-lg); padding-top: var(--bt-space-sm); border-top: 1px solid var(--bt-color-border-light); }

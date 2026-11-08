@@ -419,6 +419,10 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      /* Tap area reaches 44px without altering the card rhythm: padding
+         grows the link box, the matching negative margin keeps spacing. */
+      padding-block: 13px;
+      margin-block: -13px;
     }
     .bt-card__latin {
       font-size: var(--bt-fs-body-xs);

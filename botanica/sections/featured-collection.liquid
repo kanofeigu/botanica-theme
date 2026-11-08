@@ -93,17 +93,22 @@
     gap: var(--bt-grid-gap);
   }
   /* Cards render inside a wrapper div (reveal-stagger hooks) — keep
-     equal-height stretching identical to bare grid-item cards. */
+     equal-height stretching identical to bare grid-item cards.
+     min-width:0 stops long unbreakable card content (chips row) from
+     forcing the 1fr tracks wider than the container — that produced a
+     15px horizontal page scroll on phones. */
   .bt-featured-collection__grid > div {
     display: flex;
     flex-direction: column;
+    min-width: 0;
   }
   .bt-featured-collection__grid > div > .bt-card {
     flex: 1;
+    min-width: 0;
   }
-  .bt-featured-collection__grid--2-col { grid-template-columns: repeat(2, 1fr); }
-  .bt-featured-collection__grid--3-col { grid-template-columns: repeat(3, 1fr); }
-  .bt-featured-collection__grid--4-col { grid-template-columns: repeat(4, 1fr); }
+  .bt-featured-collection__grid--2-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bt-featured-collection__grid--3-col { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bt-featured-collection__grid--4-col { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
   /* ── Editorial layout (default): the first product becomes an oversized
      feature card spanning 2×2 cells of the uniform grid — asymmetric
@@ -129,7 +134,7 @@
        the desktop column count. */
     .bt-featured-collection__grid--2-col,
     .bt-featured-collection__grid--3-col,
-    .bt-featured-collection__grid--4-col { grid-template-columns: repeat(2, 1fr); }
+    .bt-featured-collection__grid--4-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .bt-featured-collection__grid { gap: var(--bt-space-xs); }
 
     /* Editorial on mobile: the feature card takes the full row of the
