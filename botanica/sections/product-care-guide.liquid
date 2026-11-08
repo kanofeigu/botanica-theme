@@ -6,7 +6,7 @@
 {% endcomment %}
 {%- if section.settings.body != blank or section.settings.heading != blank -%}
   <section class="bt-care-guide color-{{ section.settings.color_scheme }}" {{ section.shopify_attributes }} style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
-    <div class="bt-container bt-care-guide__inner">
+    <div class="bt-container bt-care-guide__inner{% if section.settings.image == blank %} bt-care-guide__inner--text-only{% endif %}">
       {%- if section.settings.image != blank -%}
         <div class="bt-care-guide__media">
           {{ section.settings.image | image_url: width: 900 | image_tag:
@@ -18,58 +18,64 @@
         </div>
       {%- endif -%}
       <div class="bt-care-guide__content">
-        {%- if section.settings.eyebrow != blank -%}
-          <p class="bt-care-guide__eyebrow bt-eyebrow">{{ section.settings.eyebrow | escape }}</p>
-        {%- endif -%}
-        {%- if section.settings.heading != blank -%}
-          <h2 class="bt-care-guide__heading">{{ section.settings.heading | escape }}</h2>
-        {%- endif -%}
-        {%- if section.settings.body != blank -%}
-          {%- comment -%} Topic accordion: merchant richtext uses h3 per care
-               topic (Light / Water / …). Split on those headings so each
-               topic becomes an OPEN <details> — desktop (and no-JS) reads
-               the long article flat; the script below collapses the topics
-               on phones. Falls back to the flat body when no h3 structure
-               exists. (CSS-forcing a closed <details> open does not paint
-               its content in modern browsers.) {%- endcomment -%}
-          {%- if section.settings.body contains '<h3>' -%}
-            {%- assign chunks = section.settings.body | split: '<h3>' -%}
-            {%- assign intro = chunks[0] | strip -%}
-            {%- if intro != '' -%}
-              <div class="bt-care-guide__body bt-rich-text">{{ intro }}</div>
-            {%- endif -%}
-            <div class="bt-care-guide__topics">
-              {%- for chunk in chunks offset: 1 -%}
-                {%- assign parts = chunk | split: '</h3>' -%}
-                {%- if parts.size == 2 -%}
-                  <details class="bt-care-guide__topic" open>
-                    <summary class="bt-care-guide__topic-summary">
-                      <span class="bt-care-guide__topic-title">{{ parts[0] | strip_html | strip }}</span>
-                      <svg class="bt-care-guide__topic-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-                    </summary>
-                    <div class="bt-care-guide__topic-body bt-rich-text">{{ parts[1] }}</div>
-                  </details>
-                {%- endif -%}
-              {%- endfor -%}
-            </div>
-            {% comment %} Collapse topics on phones only; desktop keeps the
-                 flat long-article layout. Synchronous — runs before first
-                 paint, no flash of expanded topics on mobile. {% endcomment %}
-            <script>
-              (function () {
-                var mq = window.matchMedia('(max-width: 749px)');
-                function syncCareTopics() {
-                  document.querySelectorAll('.bt-care-guide__topic').forEach(function (topic) {
-                    topic.open = !mq.matches;
-                  });
-                }
-                syncCareTopics();
-                mq.addEventListener('change', syncCareTopics);
-              })();
-            </script>
-          {%- else -%}
-            <div class="bt-care-guide__body bt-rich-text">{{ section.settings.body }}</div>
+        {%- comment -%} Topic accordion: merchant richtext uses h3 per care
+             topic (Light / Water / …). Split on those headings so each
+             topic becomes an OPEN <details> — desktop (and no-JS) reads
+             the long article flat; the script below collapses the topics
+             on phones. Falls back to the flat body when no h3 structure
+             exists. (CSS-forcing a closed <details> open does not paint
+             its content in modern browsers.) {%- endcomment -%}
+        {%- assign chunks = section.settings.body | split: '<h3>' -%}
+        {%- assign has_topics = false -%}
+        {%- if section.settings.body contains '<h3>' -%}{%- assign has_topics = true -%}{%- endif -%}
+        <div class="bt-care-guide__lead">
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="bt-care-guide__eyebrow bt-eyebrow">{{ section.settings.eyebrow | escape }}</p>
           {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="bt-care-guide__heading">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.body != blank -%}
+            {%- if has_topics -%}
+              {%- assign intro = chunks[0] | strip -%}
+              {%- if intro != '' -%}
+                <div class="bt-care-guide__body bt-rich-text">{{ intro }}</div>
+              {%- endif -%}
+            {%- else -%}
+              <div class="bt-care-guide__body bt-rich-text">{{ section.settings.body }}</div>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+        {%- if has_topics -%}
+          <div class="bt-care-guide__topics">
+            {%- for chunk in chunks offset: 1 -%}
+              {%- assign parts = chunk | split: '</h3>' -%}
+              {%- if parts.size == 2 -%}
+                <details class="bt-care-guide__topic" open>
+                  <summary class="bt-care-guide__topic-summary">
+                    <span class="bt-care-guide__topic-title">{{ parts[0] | strip_html | strip }}</span>
+                    <svg class="bt-care-guide__topic-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                  </summary>
+                  <div class="bt-care-guide__topic-body bt-rich-text">{{ parts[1] }}</div>
+                </details>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {% comment %} Collapse topics on phones only; desktop keeps the
+               flat long-article layout. Synchronous — runs before first
+               paint, no flash of expanded topics on mobile. {% endcomment %}
+          <script>
+            (function () {
+              var mq = window.matchMedia('(max-width: 749px)');
+              function syncCareTopics() {
+                document.querySelectorAll('.bt-care-guide__topic').forEach(function (topic) {
+                  topic.open = !mq.matches;
+                });
+              }
+              syncCareTopics();
+              mq.addEventListener('change', syncCareTopics);
+            })();
+          </script>
         {%- endif -%}
       </div>
     </div>
@@ -90,6 +96,7 @@
   }
   .bt-care-guide__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .bt-care-guide__content { max-width: 72ch; }
+  .bt-care-guide__lead { max-width: 52ch; }
   .bt-care-guide__eyebrow { margin-bottom: var(--bt-space-2xs); }
   .bt-care-guide__heading {
     font-family: var(--bt-font-heading);
@@ -153,13 +160,67 @@
 
   @media (min-width: 750px) {
     .bt-care-guide__inner { grid-template-columns: 2fr 3fr; align-items: start; gap: var(--bt-space-lg); }
+    /* Text-only (no companion image): the content is the only column, so let
+       it span the container instead of being trapped in the 2fr track. */
+    .bt-care-guide__inner--text-only { grid-template-columns: 1fr; }
     /* Desktop: topics ship open (JS closes them on phones), so here we just
        strip the accordion chrome — borders, chevron, summary affordances. */
     .bt-care-guide__topics { margin-top: 0; }
     .bt-care-guide__topic { border: none; }
+    .bt-care-guide__topic + .bt-care-guide__topic { margin-top: var(--bt-space-md); }
     .bt-care-guide__topic-body { padding-bottom: 0; }
     .bt-care-guide__topic-summary { pointer-events: none; cursor: default; min-height: 0; padding-block: 0; }
     .bt-care-guide__topic-chevron { display: none; }
+  }
+  /* Wide desktop: editorial article — heading band across the top, numbered
+     care topics in a 2-col (3-col on very wide) grid. A sticky side column
+     was tried first, but with no intro copy it left a large empty track. */
+  @media (min-width: 990px) {
+    .bt-care-guide__inner--text-only .bt-care-guide__content {
+      max-width: none;
+    }
+    .bt-care-guide__inner--text-only .bt-care-guide__lead {
+      max-width: 62ch;
+      margin-bottom: var(--bt-space-xl);
+    }
+    .bt-care-guide__inner--text-only .bt-care-guide__heading {
+      font-size: clamp(2rem, 2.4vw, 2.8rem);
+      margin-bottom: var(--bt-space-sm);
+    }
+    .bt-care-guide__inner--text-only .bt-care-guide__topics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--bt-space-xl) var(--bt-space-xl);
+      counter-reset: care-topic;
+    }
+    .bt-care-guide__inner--text-only .bt-care-guide__topic {
+      padding-top: var(--bt-space-sm);
+      border-top: 1px solid var(--bt-hairline);
+      counter-increment: care-topic;
+    }
+    .bt-care-guide__inner--text-only .bt-care-guide__topic + .bt-care-guide__topic { margin-top: 0; }
+    .bt-care-guide__inner--text-only .bt-care-guide__topic-summary {
+      justify-content: flex-start;
+      gap: var(--bt-space-2xs);
+      margin-bottom: var(--bt-space-2xs);
+    }
+    .bt-care-guide__inner--text-only .bt-care-guide__topic-summary::before {
+      content: counter(care-topic, decimal-leading-zero);
+      font-family: var(--bt-font-body);
+      font-size: var(--bt-fs-body-xs);
+      font-weight: var(--bt-fw-medium);
+      letter-spacing: 0.08em;
+      color: var(--bt-color-secondary-text);
+    }
+    .bt-care-guide__inner--text-only .bt-care-guide__topic-body {
+      line-height: 1.7;
+      max-width: 56ch;
+    }
+  }
+  @media (min-width: 1400px) {
+    .bt-care-guide__inner--text-only .bt-care-guide__topics {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
   /* Mobile: compress merchant section padding (inline style) for a tighter page rhythm */
   @media (max-width: 749px) {
