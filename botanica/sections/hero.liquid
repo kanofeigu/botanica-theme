@@ -688,7 +688,18 @@
       color: var(--bt-color-text);
       text-shadow: 0 1px 24px rgba(var(--bt-color-bg-rgb), 0.55);
     }
-    .bt-hero--full-bleed .bt-hero__eyebrow { margin-bottom: var(--bt-space-2xs); }
+    /* The gold accent (--bt-color-secondary-text) sits on bright foliage
+       before the bottom scrim has deepened — ≈3:1, below WCAG. On phones
+       the eyebrow falls back to the light scrim text tone, kept a touch
+       muted so it still reads as a label next to the headline. The extra
+       .bt-hero__panel class outranks the `.bt-glass .bt-micro-label` gold
+       lift in glass.css (the panel keeps its bt-glass class on mobile even
+       though the frost styling is dissolved). */
+    .bt-hero--full-bleed .bt-hero__panel .bt-hero__eyebrow {
+      margin-bottom: var(--bt-space-2xs);
+      color: var(--bt-color-text);
+      opacity: 0.8;
+    }
     .bt-hero--full-bleed .bt-hero__heading {
       max-width: 16ch;
       text-wrap: balance;
