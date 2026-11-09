@@ -1,0 +1,321 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "layout": "image_left",
+        "eyebrow": "Nº 012 — Studio series",
+        "heading": "Objects with <em>intention</em>",
+        "text": "Hand-thrown ceramics, sculptural vessels, and quiet objects for the home — curated like a gallery, made for everyday living.",
+        "button_label": "Browse the collection",
+        "button_link": "/collections/all",
+        "enable_reveal": true,
+        "specimen_number": "Nº 012",
+        "latin_caption": "Stoneware, natural glaze"
+      }
+    },
+    "marquee": {
+      "type": "bt-marquee",
+      "blocks": {
+        "phrase_1": {
+          "type": "phrase",
+          "settings": {
+            "text": "Free shipping over $75"
+          }
+        },
+        "phrase_2": {
+          "type": "phrase",
+          "settings": {
+            "text": "Hand-thrown in <em>small batches</em>"
+          }
+        },
+        "phrase_3": {
+          "type": "phrase",
+          "settings": {
+            "text": "One-of-a-kind glaze variations"
+          }
+        },
+        "phrase_4": {
+          "type": "phrase",
+          "settings": {
+            "text": "Wrapped in recycled paper"
+          }
+        }
+      },
+      "block_order": [
+        "phrase_1",
+        "phrase_2",
+        "phrase_3",
+        "phrase_4"
+      ],
+      "settings": {
+        "style": "serif",
+        "speed": 45
+      }
+    },
+    "rich-text-intro": {
+      "type": "rich-text",
+      "blocks": {
+        "eyebrow_intro": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Our philosophy"
+          }
+        },
+        "heading_intro": {
+          "type": "heading",
+          "settings": {
+            "text": "Made to be lived with"
+          }
+        },
+        "text_intro": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We work directly with independent ceramicists and small studios to bring you objects with a point of view. Each series is curated like an exhibition — numbered, documented, and made to be kept for decades, not seasons.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_intro",
+        "heading_intro",
+        "text_intro"
+      ],
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 12
+      }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "heading": "The current exhibition",
+        "products_to_show": 8,
+        "columns_desktop": "4",
+        "enable_reveal": true
+      }
+    },
+    "collage": {
+      "type": "collage",
+      "blocks": {
+        "tile_vessels": {
+          "type": "image",
+          "settings": {
+            "aspect_ratio": "3-4",
+            "heading": "Vessels & <em>vases</em>",
+            "text": "Hand-thrown stoneware in warm, unglazed finishes.",
+            "specimen_number": "Nº 011",
+            "specimen_latin": "Stoneware, ash glaze"
+          }
+        },
+        "tile_shelf": {
+          "type": "image",
+          "settings": {
+            "aspect_ratio": "4-5",
+            "heading": "Objects for the shelf",
+            "text": "Small sculptures and bookends with a quiet presence.",
+            "specimen_number": "Nº 024",
+            "specimen_latin": "Fired clay, matte finish"
+          }
+        },
+        "tile_table": {
+          "type": "image",
+          "settings": {
+            "aspect_ratio": "1-1",
+            "heading": "The table series",
+            "text": "Bowls, plates, and serving pieces for slow dinners.",
+            "specimen_number": "Nº 032",
+            "specimen_latin": "Porcelain, speckled"
+          }
+        }
+      },
+      "block_order": [
+        "tile_vessels",
+        "tile_shelf",
+        "tile_table"
+      ],
+      "settings": {
+        "heading": "Curated for considered spaces",
+        "enable_reveal": true
+      }
+    },
+    "hotspots": {
+      "type": "bt-hotspots",
+      "blocks": {
+        "spot_vase": {
+          "type": "hotspot",
+          "settings": {
+            "x": 28,
+            "y": 52,
+            "label": "Stoneware vase"
+          }
+        },
+        "spot_table": {
+          "type": "hotspot",
+          "settings": {
+            "x": 55,
+            "y": 38,
+            "label": "Walnut side table"
+          }
+        },
+        "spot_throw": {
+          "type": "hotspot",
+          "settings": {
+            "x": 76,
+            "y": 64,
+            "label": "Linen throw"
+          }
+        }
+      },
+      "block_order": [
+        "spot_vase",
+        "spot_table",
+        "spot_throw"
+      ],
+      "settings": {
+        "heading": "Shop the room",
+        "image_aspect": "16-9"
+      }
+    },
+    "image-with-text": {
+      "type": "image-with-text",
+      "blocks": {
+        "eyebrow_iwt": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "The studio"
+          }
+        },
+        "heading_iwt": {
+          "type": "heading",
+          "settings": {
+            "text": "Made by hand, made to last"
+          }
+        },
+        "text_iwt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every piece begins on the wheel or the workbench of a maker we know by name. We visit each studio, review every glaze batch, and photograph each series in natural light — so what arrives at your door is exactly what you fell in love with.</p>"
+          }
+        },
+        "button_iwt": {
+          "type": "button-group",
+          "settings": {
+            "label": "Meet the makers",
+            "style": "outline"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_iwt",
+        "heading_iwt",
+        "text_iwt",
+        "button_iwt"
+      ],
+      "settings": {
+        "color_scheme": "scheme-4",
+        "layout": "image_right",
+        "image_aspect": "3-4",
+        "enable_reveal": true,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "multicolumn": {
+      "type": "multicolumn",
+      "blocks": {
+        "col_1": {
+          "type": "column",
+          "settings": {
+            "title": "Small-batch making",
+            "text": "Each piece is thrown, glazed, and fired by hand — no two are exactly alike."
+          }
+        },
+        "col_2": {
+          "type": "column",
+          "settings": {
+            "title": "Natural materials",
+            "text": "Stoneware, porcelain, linen, and reclaimed wood. Nothing synthetic, nothing disposable."
+          }
+        },
+        "col_3": {
+          "type": "column",
+          "settings": {
+            "title": "Gallery curation",
+            "text": "Collections are released in numbered series, curated like exhibitions — not seasons."
+          }
+        },
+        "col_4": {
+          "type": "column",
+          "settings": {
+            "title": "Free shipping",
+            "text": "Complimentary shipping on orders over $75, packed in fully recycled materials."
+          }
+        }
+      },
+      "block_order": [
+        "col_1",
+        "col_2",
+        "col_3",
+        "col_4"
+      ],
+      "settings": {
+        "heading": "Made to be kept",
+        "columns_desktop": "4",
+        "enable_reveal": true,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "rich-text-closing": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_close": {
+          "type": "heading",
+          "settings": {
+            "text": "Bring the gallery home"
+          }
+        },
+        "text_close": {
+          "type": "text",
+          "settings": {
+            "text": "<p>New pieces are added as they leave the kiln. Join the collectors who visit weekly.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_close",
+        "text_close"
+      ],
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64,
+        "color_scheme": "scheme-3"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "The Kiln Letter",
+        "description": "New studio drops, maker stories, and early access to numbered editions — once a month."
+      }
+    },
+    "apps": {
+      "type": "apps",
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "marquee",
+    "rich-text-intro",
+    "featured-collection",
+    "collage",
+    "hotspots",
+    "image-with-text",
+    "multicolumn",
+    "rich-text-closing",
+    "newsletter",
+    "apps"
+  ]
+}

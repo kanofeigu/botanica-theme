@@ -1,0 +1,286 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "layout": "image_right",
+        "eyebrow": "Vol. 01 — The slow living edit",
+        "heading": "Rituals for <em>slow</em> mornings",
+        "text": "Bath salts, aromatherapy, and washed linen — small ceremonies for the quietest hours of the day.",
+        "button_label": "Shop the rituals",
+        "button_link": "/collections/all",
+        "enable_reveal": true,
+        "specimen_number": "Nº 007",
+        "latin_caption": "Lavandula angustifolia"
+      }
+    },
+    "marquee": {
+      "type": "bt-marquee",
+      "blocks": {
+        "phrase_1": {
+          "type": "phrase",
+          "settings": {
+            "text": "Free shipping over $60"
+          }
+        },
+        "phrase_2": {
+          "type": "phrase",
+          "settings": {
+            "text": "Small-batch <em>aromatherapy</em>"
+          }
+        },
+        "phrase_3": {
+          "type": "phrase",
+          "settings": {
+            "text": "Clean, vegan formulations"
+          }
+        },
+        "phrase_4": {
+          "type": "phrase",
+          "settings": {
+            "text": "Refills, not landfill"
+          }
+        }
+      },
+      "block_order": [
+        "phrase_1",
+        "phrase_2",
+        "phrase_3",
+        "phrase_4"
+      ],
+      "settings": {
+        "style": "micro",
+        "speed": 50
+      }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "heading": "The apothecary shelf",
+        "products_to_show": 6,
+        "columns_desktop": "3",
+        "enable_reveal": true
+      }
+    },
+    "image-with-text-ritual": {
+      "type": "image-with-text",
+      "blocks": {
+        "eyebrow_ritual": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "The evening ritual"
+          }
+        },
+        "heading_ritual": {
+          "type": "heading",
+          "settings": {
+            "text": "Restore, replenish, repeat"
+          }
+        },
+        "text_ritual": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Draw a warm bath. Add a handful of mineral salts, light something that smells like lavender fields, and let the day dissolve. Twenty minutes later, emerge softer — skin, shoulders, and mind.</p>"
+          }
+        },
+        "button_ritual": {
+          "type": "button-group",
+          "settings": {
+            "label": "Explore bath & body",
+            "style": "outline"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_ritual",
+        "heading_ritual",
+        "text_ritual",
+        "button_ritual"
+      ],
+      "settings": {
+        "color_scheme": "scheme-4",
+        "layout": "image_left",
+        "image_aspect": "4-5",
+        "enable_reveal": true,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "hotspots": {
+      "type": "bt-hotspots",
+      "blocks": {
+        "spot_soak": {
+          "type": "hotspot",
+          "settings": {
+            "x": 22,
+            "y": 58,
+            "label": "Mineral bath soak"
+          }
+        },
+        "spot_candle": {
+          "type": "hotspot",
+          "settings": {
+            "x": 52,
+            "y": 34,
+            "label": "Aromatherapy candle"
+          }
+        },
+        "spot_towel": {
+          "type": "hotspot",
+          "settings": {
+            "x": 78,
+            "y": 66,
+            "label": "Washed linen towel"
+          }
+        }
+      },
+      "block_order": [
+        "spot_soak",
+        "spot_candle",
+        "spot_towel"
+      ],
+      "settings": {
+        "heading": "The treatment room, at home",
+        "image_aspect": "4-3"
+      }
+    },
+    "image-with-text-ingredients": {
+      "type": "image-with-text",
+      "blocks": {
+        "eyebrow_ingredients": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Inside the bottle"
+          }
+        },
+        "heading_ingredients": {
+          "type": "heading",
+          "settings": {
+            "text": "Botanical, honest, traceable"
+          }
+        },
+        "text_ingredients": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every formula starts with a plant we can name and a grower we can call. Steam-distilled lavender, cold-pressed jojoba, hand-harvested sea salt — listed on the label, traced to the source.</p>"
+          }
+        },
+        "button_ingredients": {
+          "type": "button-group",
+          "settings": {
+            "label": "Read our standards",
+            "style": "outline"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_ingredients",
+        "heading_ingredients",
+        "text_ingredients",
+        "button_ingredients"
+      ],
+      "settings": {
+        "layout": "text_first",
+        "image_aspect": "3-2",
+        "enable_reveal": true,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "multicolumn": {
+      "type": "multicolumn",
+      "blocks": {
+        "col_1": {
+          "type": "column",
+          "settings": {
+            "title": "Aromatherapy-grade",
+            "text": "Essential oils steam-distilled in small batches and blended by our in-house aromatherapist."
+          }
+        },
+        "col_2": {
+          "type": "column",
+          "settings": {
+            "title": "Softness, certified",
+            "text": "Our linen and cotton are washed, woven, and finished without harsh chemicals — gentle on skin from day one."
+          }
+        },
+        "col_3": {
+          "type": "column",
+          "settings": {
+            "title": "Refill & reuse",
+            "text": "Every bottle and jar is designed to be refilled. Send back empties and we'll take care of the rest."
+          }
+        }
+      },
+      "block_order": [
+        "col_1",
+        "col_2",
+        "col_3"
+      ],
+      "settings": {
+        "heading": "Wellness, considered",
+        "columns_desktop": "3",
+        "enable_reveal": true,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "rich-text-closing": {
+      "type": "rich-text",
+      "blocks": {
+        "eyebrow_close": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Lights down"
+          }
+        },
+        "heading_close": {
+          "type": "heading",
+          "settings": {
+            "text": "Unwind, nightly"
+          }
+        },
+        "text_close": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Build a ritual you'll actually keep. Start with one thing — a soak, a scent, a softer towel — and let it grow.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow_close",
+        "heading_close",
+        "text_close"
+      ],
+      "settings": {
+        "padding_top": 64,
+        "padding_bottom": 64,
+        "color_scheme": "scheme-3"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "The Slow Living Letter",
+        "description": "Rituals, rest notes, and new arrivals for quieter days — delivered once a month."
+      }
+    },
+    "apps": {
+      "type": "apps",
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "marquee",
+    "featured-collection",
+    "image-with-text-ritual",
+    "hotspots",
+    "image-with-text-ingredients",
+    "multicolumn",
+    "rich-text-closing",
+    "newsletter",
+    "apps"
+  ]
+}
